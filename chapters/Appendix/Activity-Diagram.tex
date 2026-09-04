@@ -1,0 +1,59 @@
+\section{Activity Diagrams Specification}
+\label{appendix:activity-diagrams}
+\subsection{Authentication Flow}
+
+This activity diagram details the user authentication workflow in aBridgeAI. It shows how users log in through Google SSO, how the system verifies the local account and MFA requirement, creates an authenticated session, resolves roles and permissions, and handles logout.
+
+\begin{figure}[H]
+    \centering
+    % Nhớ lưu ảnh tải về từ PlantUML thành tên act_auth.png
+    \includegraphics[width=0.85\textwidth]{graphics/act-diagrams/act_auth.png}   
+    \caption{Activity Diagram: User Login with 2FA}
+    \label{fig:act_auth}
+\end{figure}
+
+\subsection{Smart Content Ingestion Flow}
+
+This activity diagram details the material ingestion workflow in aBridgeAI. It shows how teachers upload learning materials directly to object storage, how the backend verifies the upload and queues processing, and how the ingestion worker extracts, chunks, embeds, and stores content for retrieval.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{graphics/act-diagrams/act_ingestion.png}
+    \caption{Activity Diagram: Smart Content Ingestion and AI Parsing}
+    \label{fig:act_ingestion}
+\end{figure}
+
+\subsection{Human-in-the-Loop Quiz Generation Flow}
+
+This diagram maps the assessment creation lifecycle. It demonstrates the "Human-in-the-Loop" architecture where the teacher configures parameters, the AI generates a draft assessment based on the Knowledge Graph, and the teacher performs the final review and pedagogical adjustments before publishing the quiz to the students.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{graphics/act-diagrams/act_quiz_gen.png}
+    \caption{Activity Diagram: HITL Quiz Generation and Execution}
+    \label{fig:act_quiz_gen}
+\end{figure}
+
+
+\subsection{Context-Aware Mock Interview Flow}
+
+This diagram maps the core application loop where a student undergoes an AI-driven mock interview. It details the real-time interaction cycle: the AI generating context-specific questions, the student providing text or voice answers, and the system evaluating the response to determine follow-up questions. It also includes alternative paths for handling AI latency and connection timeouts.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{graphics/act-diagrams/act_interview.png}
+    \caption{Activity Diagram: Context-Aware Mock Interview}
+    \label{fig:act_interview}
+\end{figure}
+
+% \subsection{Bulk User Import and Validation Flow}
+
+% This diagram maps the administrative workflow for bulk onboarding users via CSV files. It demonstrates the system's robust error-handling capabilities, illustrating how the validation engine processes the data, separates valid records from malformed ones, and dispatches asynchronous invitation emails.
+
+% \begin{figure}[H]
+%     \centering
+%     % Nhớ lưu ảnh tải về từ PlantUML thành tên act_admin.png
+%     \includegraphics[width=0.85\textwidth]{graphics/act_admin.png}
+%     \caption{Activity Diagram: Bulk User Import via CSV}
+%     \label{fig:act_admin}
+% \end{figure}

@@ -1,0 +1,445 @@
+\subsection{Requirements}
+\subsubsection{User Requirements}
+User Requirements articulate the functional needs of the system from the perspective of the end-users.
+
+\paragraph{Student Requirements}
+\begin{itemize}
+    \item \textbf{UR-STU-01:} As a Student, I want to consume multimedia course materials and complete spaced-repetition quiz reviews scheduled by the system so that I can build durable retention of lesson content.
+    \item \textbf{UR-STU-02:} As a Student, I want to participate in context-aware mock interviews via voice or text so that I can practise articulating my understanding under realistic conditions.
+    \item \textbf{UR-STU-03:} As a Student, I want to receive the binary pass/fail outcome of each interview session --- without per-outcome scoring or rubric exposure --- so that I am evaluated on overall demonstrated competence rather than on isolated answers.
+    \item \textbf{UR-STU-04:} As a Student, I want to track my own progress through learner-facing metrics --- per-lesson Knowledge Retention Estimate, Progression Readiness, and Review Compliance Rate --- so that I can self-regulate my study pace without depending on instructor intervention.
+\end{itemize}
+
+\paragraph{Teacher Requirements}
+\begin{itemize}
+    \item \textbf{UR-TCH-01:} As a Teacher, I want to upload and organise learning materials so that I can build a structured knowledge base for each lesson.
+    \item \textbf{UR-TCH-02:} As a Teacher, I want the system to draft quiz questions and interview prompts from my uploaded materials, and I want to review, edit, approve, or reject each draft before publication, so that AI-generated assessments retain pedagogical accuracy through Human-in-the-Loop oversight.
+    \item \textbf{UR-TCH-03:} As a Teacher, I want to confirm the expected response time $T_{\exp}$ for every published quiz card and define the outcome criteria for every published interview so that the system can compute response-time ratios and binary pass/fail verdicts against my domain judgment rather than against generic heuristics.
+    \item \textbf{UR-TCH-04:} As a Teacher, I want to configure per-lesson spaced-repetition parameters --- the minimum Easiness Factor for unlock ($EF_{\min}^{\text{unlock}}$), the coverage threshold ($\tau$), and lesson prerequisites --- so that progression stringency can be tuned to the criticality of each lesson.
+    \item \textbf{UR-TCH-05:} As a Teacher, I want a cohort monitoring dashboard exposing per-student and class-wide Knowledge Retention Estimates, Progression Readiness distributions, and Review Compliance Rates so that I can identify at-risk learners and detect systemic weak points in my source material.
+\end{itemize}
+
+\paragraph{Educational Manager Requirements}
+\begin{itemize}
+    \item \textbf{UR-MGR-01:} As an Educational Manager (e.g., Dean, Vice Dean), I want to bulk-onboard Students and Teachers via CSV import within my organisation so that I can provision a new cohort without manual per-account creation.
+    \item \textbf{UR-MGR-02:} As an Educational Manager, I want to define career pathways by grouping courses into ordered sequences and assigning Teachers to those courses so that my institution's curriculum structure is reflected in the platform's progression model.
+    \item \textbf{UR-MGR-03:} As an Educational Manager, I want to view organisation-scoped Career Readiness snapshots --- aggregated across all enrolled Students in a pathway, with drill-down to individual progress --- so that I can report on cohort outcomes without exposing per-interview rubrics.
+    \item \textbf{UR-MGR-04:} As an Educational Manager, I want all my actions to be strictly scoped to my single tenant organisation so that I cannot accidentally or intentionally access data belonging to other institutions on the platform.
+\end{itemize}
+
+\paragraph{IT Administrator Requirements}
+\begin{itemize}
+    \item \textbf{UR-ITA-01:} As an IT Administrator, I want to provision new tenant organisations and invite their initial Educational Manager so that institutions can be onboarded onto the platform without my involvement in their internal user management.
+    \item \textbf{UR-ITA-02:} As an IT Administrator, I want to configure organisation-level operational limits (storage quotas, concurrent-user caps, feature-flag toggles) so that I can enforce platform-wide capacity and licensing constraints across all tenants.
+    \item \textbf{UR-ITA-03:} As an IT Administrator, I want to monitor cross-tenant system health, infrastructure metrics, and an immutable audit log so that I can ensure platform stability and respond to security or compliance incidents.
+    \item \textbf{UR-ITA-04:} As an IT Administrator, I want my authority to exclude course content, assessment configuration, and intra-organisation user data so that pedagogical decisions remain with the Educational Manager and Teachers of each tenant.
+    \item \textbf{UR-ITA-05:} As an IT Administrator, I want the platform to enforce centralised authentication and identity controls --- including Google SSO, two-factor authentication, session management, and role-based access control --- so that user access is uniformly secured across all tenant organisations.
+
+\end{itemize}
+\subsubsection{Functional Requirements}
+
+The functional requirements of aBridgeAI specify the concrete system behaviours, processes, and user interactions that the platform must support. They are organised into six functional modules: (1)~Authentication and Access Control, (2)~Organisation and User Management, (3)~Course and Material Management, (4)~Learning Loop and Adaptive Quiz, (5)~Application Loop and Mock Interview, and (6)~Analytics, Reporting, and Notifications. Each requirement is traced to one or more User Requirements to ensure comprehensive coverage and end-to-end traceability. The complete Functional Requirements specification is provided in Appendix~\ref{appendix:fr}.
+
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.05\textwidth}|m{0.29\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Core functional requirements by module.}
+\label{tab:fr_core} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endfirsthead
+ 
+\multicolumn{7}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endhead
+ 
+\hline \multicolumn{7}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+ 
+\hline
+\endlastfoot
+ 
+\multicolumn{7}{|l|}{\textit{Module 1 --- Authentication \& Access Control}} \\ \hline
+ 
+FR-1.1 & The system shall allow users to authenticate using Google SSO and log out of the system. & All Users & UR-ITA-05 & Yes & Yes & High \\ \hline
+ 
+FR-1.3 & The system shall support two-factor authentication using authenticator-app verification codes and one-time recovery codes for additional account protection. & All Users & UR-ITA-05 & Yes & Yes & High \\ \hline
+
+ 
+\multicolumn{7}{|l|}{\textit{Module 2 --- Organisation \& User Management}} \\ \hline
+ 
+FR-2.1 & The system shall allow IT administrators to provision new tenant organisations and to assign the initial Educational Manager role to a user within each organisation. & IT Administrators & UR-ITA-01 & Yes & Yes & High \\ \hline
+ 
+FR-2.3 & The system shall allow Educational Managers to bulk-enroll students into a course via CSV import, creating new student accounts for unseen email addresses and reporting per-row validation errors without aborting the batch. & Educational Managers & UR-MGR-01 & Yes & Yes & High \\ \hline
+
+\multicolumn{7}{|l|}{\textit{Module 3 --- Course \& Material Management}} \\ \hline
+ 
+FR-3.1 & The system shall allow Teachers and Educational Managers to manage courses through draft, published, archived, and soft-deleted states, including administrative restoration of soft-deleted courses. & Teachers, Educational Managers & UR-TCH-01 & Yes & Yes & High \\ \hline
+ 
+FR-3.3 & The system shall allow Teachers to upload learning materials in supported formats using standard or resumable upload flows, manage material metadata, link materials to lessons, and re-run processing when needed. & Teachers, Educational Managers & UR-TCH-01 & Yes & Yes & High \\ \hline
+ 
+\multicolumn{7}{|l|}{\textit{Module 4 --- Learning Loop \& Adaptive Quiz}} \\ \hline
+ 
+FR-4.1 & The system shall allow Teachers to create quiz questions manually or through AI drafting from ingested course content, review them through pending, approved, edited, or rejected states, reuse approved questions, and maintain source references and revision history. & Teachers, Educational Managers & UR-TCH-02 & Yes & Yes & High \\ \hline
+ 
+ 
+FR-4.5 & The system shall gate lesson access using prerequisite completion, the lesson coverage threshold $\tau$ over cards meeting the EF unlock threshold, and optional interview-pass requirements. & Students & UR-STU-01 & Yes & Yes & High \\ \hline
+ 
+\multicolumn{7}{|l|}{\textit{Module 5 --- Application Loop \& Mock Interview}} \\ \hline
+ 
+FR-5.1 & The system shall allow Teachers to define interview sections by specifying desired outcomes that students must demonstrate to pass, without requiring any expected or model answer. & Teachers, Educational Managers & UR-TCH-03 & Yes & Yes & High \\ \hline
+ 
+FR-5.4 & The system shall allow Students to start mock interview sessions in text mode or voice mode as an adaptive turn-taking dialogue with an AI interviewer. & Students & UR-STU-02 & Yes & Yes & High \\ \hline
+ 
+\multicolumn{7}{|l|}{\textit{Module 6 --- Analytics, Reporting \& Notifications}} \\ \hline
+ 
+ 
+FR-6.7 & The system shall maintain an immutable audit log for role assignments, sensitive data changes, and HTTP request events, queryable by administrators for security and compliance review. & IT Administrators & UR-ITA-03 & Yes & Yes & High \\
+ 
+\end{longtable}
+
+
+
+% =================================================
+% ========================= NFRs ===================
+% =================================================
+\subsubsection{Non-Functional Requirements}
+
+Non-functional requirements define the quality attributes and operational constraints of aBridgeAI, specifying how the system behaves rather than what it does. They govern performance, scalability, security, and usability properties that collectively determine the reliability and institutional suitability of the platform. The complete Non-Functional Requirements specification is provided in Appendix~\ref{appendix:nfr}. Representative points are summarised below:
+
+\begin{itemize}
+    \item Performance and latency targets ensure AI interview responses and core learning workflows remain responsive for users.
+    \item Scalability and reliability requirements target modest peak concurrency while prioritising graceful degradation and uptime.
+    \item Security and compliance mandates cover encryption at rest, RBAC, audit logging, and session management.
+    \item Usability and accessibility requirements emphasise responsive UI and WCAG 2.1 AA alignment.
+\end{itemize}
+The complete Functional Requirements specification is provided in Appendix~\ref{appendix:nfr}.
+\renewcommand{\arraystretch}{1.4}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.07\textwidth}|m{0.53\textwidth}|>{\centering\arraybackslash}m{0.14\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Representative non-functional requirements by domain.}
+\label{tab:nfr_core} \\
+\hline
+	\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.53\textwidth}|}{\centering \textbf{Requirement}} & \textbf{Users} & \textbf{Pri\-or\-ity} \\ \hline
+\endfirsthead
+
+\multicolumn{4}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+	extbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.53\textwidth}|}{\centering \textbf{Requirement}} & \textbf{Users} & \textbf{Pri\-or\-ity} \\ \hline
+\endhead
+
+\hline \multicolumn{4}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+NFR-2.1 & The system shall support on average 50 concurrent active users, 10 simultaneous video streams, and 5 concurrent AI interview sessions during peak hours without performance degradation. & Admin & Medium \\ \hline
+NFR-3.1 & All sensitive data must be encrypted at rest using AES-256, including user passwords (hashed with bcrypt, cost factor $\geq$ 12), PII, session tokens, API keys, and uploaded learning materials. & All Users, Admin & High \\ \hline
+NFR-4.2 & The system must comply with WCAG 2.1 AA accessibility standards, supporting full keyboard navigation, sufficient color contrast ratios, and alt text for all visual elements. & Users with Disabilities & Low \\ \hline
+\end{longtable}
+
+
+
+
+\subsubsection{Data Requirements}
+
+This section describes the data demands of aBridgeAI across its core 
+functional domains. Rather than specifying a physical schema, it 
+identifies what information must be captured, maintained, and related 
+to support each system capability. The requirements are organised by 
+domain and reflect the full lifecycle of content creation, assessment, 
+learner modeling, and progress reporting.
+
+\paragraph{Audit and Traceability}
+
+All entities in the system are subject to audit requirements. Every 
+record — regardless of domain — must carry a creation timestamp, the 
+identity of the actor who created it, a last-modified timestamp, and 
+the identity of the actor who last modified it. Where records are 
+soft-deleted rather than physically removed, a deletion timestamp and 
+responsible actor must also be recorded. This base traceability 
+requirement applies uniformly across users, courses, assessments, 
+sessions, and configuration records, and forms the foundation for 
+compliance reporting, dispute resolution, and system monitoring.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\paragraph{Identity, Roles, and Permission Management}
+% NOTE: 2026/04/22: Add role lại
+The system must maintain a unified identity record for every 
+participant, capturing sufficient information to authenticate the 
+individual, associate them with one or more organisations, and enforce 
+access control across all system functions. Identity data includes 
+credentials, profile attributes, and organisational membership.
+
+Access control in aBridgeAI is fully dynamic: permissions are not 
+hardcoded to roles but are defined and modified at runtime by 
+authorised actors. The system must therefore maintain a permission 
+model that records which actions each role may perform, which roles 
+are assigned to which users within which organisational scope, and 
+which role assignments were granted by whom and when. Four canonical 
+roles exist — administrator, organisation manager, teacher, and 
+student — but the permission sets associated with these roles must be 
+configurable rather than fixed, and role assignments must be scoped 
+to the organisational or course context in which they apply.
+
+The system must support the case where a single user holds different 
+roles in different contexts: a user may be a teacher in one course 
+and a student in another, and their data access and action 
+eligibility must reflect the role active in each specific context 
+rather than a single global assignment.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\paragraph{Organisations, Careers, and Courses}
+
+Organisation managers are responsible for defining the structural 
+containers within which learning occurs. The system must capture the 
+definition of each organisation and its associated managers. Within 
+each organisation, managers define \textit{careers} — structured 
+learning pathways representing a target professional competency or 
+qualification. A career groups an ordered collection of courses that 
+together constitute the pathway, and the system must record this 
+membership and ordering so that career-level progress can be computed 
+from course-level outcomes.
+
+Each course must be described by its title, subject domain, and 
+associated tags that enable discovery and categorisation. The system 
+must record which teachers are assigned to deliver the course, which 
+students are enrolled, and the dates on which these assignments were 
+made. Course publication state must be tracked so that content remains 
+invisible to students until explicitly released. Courses are 
+subdivided into lessons, each of which carries an ordering index that 
+determines the sequence in which students encounter the material.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\paragraph{Learning Material and Knowledge Ingestion}
+Teachers upload source materials — documents, videos, audio recordings, 
+and presentation files — as the raw input from which the system 
+generates structured learning content. The system must record the 
+identity of each uploaded file, its type, its storage location, its 
+association with a specific lesson, and the processing status of the 
+AI ingestion pipeline acting upon it.
+
+The AI ingestion pipeline transforms raw uploads into a structured 
+knowledge representation. The system must store the resulting 
+knowledge units — summaries, concepts, examples, and their 
+relationships — in a form that preserves their origin in specific 
+source files and their association with the lesson they belong to. 
+These knowledge units serve as the retrieval corpus for all subsequent 
+AI generation tasks and must therefore be queryable by semantic 
+similarity as well as by structural membership. The system must record 
+whether each knowledge unit was generated by the AI pipeline or 
+subsequently edited by a teacher, and maintain the full edit history 
+to support content auditing.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\paragraph{Quiz Configuration and Generation}
+
+Before quiz generation, teachers configure the parameters that 
+govern both the generation process and the subsequent SM-2 scheduling 
+behaviour. The system must capture the following configuration demands 
+per lesson:
+
+\begin{itemize}
+    \item The desired number of questions.
+    \item The default difficulty distribution across easy, medium, and 
+    hard questions.
+    \item Any supplementary instructions provided to the AI generation 
+    model to constrain the topic scope or stylistic register of 
+    generated questions.
+    \item Whether teacher review is required before questions are 
+    published to students.
+    \item The SM-2 scheduling parameters: the initial Easiness Factor 
+    $EF_0$, the minimum EF required per card before a student satisfies 
+    the lesson unlock condition $EF_{\min}^{\text{unlock}}$, the 
+    coverage threshold $\tau$ defining what proportion of cards must 
+    meet this floor, and whether SR reminders are active 
+    for this lesson.
+    \item Optional prerequisite criteria: a reference to a prior lesson 
+    and the minimum EF that students must have achieved in that lesson 
+    before this quiz becomes accessible.
+\end{itemize}
+
+The system must also store, per individual quiz card, a 
+teacher-assigned \textit{expected response time} — the duration within 
+which a student demonstrating confident recall is expected to answer 
+the question. Unlike a formula-derived baseline, this value is set 
+explicitly by the teacher during the review phase, informed by the 
+teacher's domain knowledge of the question's cognitive demand. The 
+expected response time is the primary normalisation baseline for 
+computing the time ratio $\rho$ used in $Q$ derivation, and must 
+therefore be a mandatory field before any card is published. The 
+system must additionally capture a per-card \textit{expected EF 
+ceiling} — the EF value the teacher considers achievable for that 
+card given its difficulty — enabling fine-grained configuration of 
+unlock criteria at the card level rather than only at the lesson level.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\paragraph{Quiz Review and Publication}
+After generation, each quiz card enters a review workflow. The system 
+must track the review status of every card — pending, approved, edited, 
+or rejected — along with the identity of the reviewing teacher and the 
+timestamp of the review action. Where a teacher edits a generated 
+card, the system must preserve both the original AI-generated content 
+and the edited version to support quality analysis of the generation 
+pipeline over time.
+
+A card may only be published — and therefore made visible to students 
+— once it has been approved or edited by a teacher and its expected 
+response time has been explicitly confirmed. The publication state of 
+individual cards must be tracked independently from the publication 
+state of the lesson as a whole, allowing teachers to publish a subset 
+of cards while continuing to review the remainder.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\paragraph{Student Quiz Interaction and SM-2 State}
+% When a student reviews quiz cards, the system must record the complete 
+% interaction at two levels of granularity.
+
+At the \textit{session level}, the system must capture when the review 
+session began and ended, how many cards were reviewed, and summary 
+statistics including the mean $Q$ value and mean EF across cards 
+reviewed in that session.
+
+At the \textit{answer level}, the system must capture for each 
+individual card response: the answer given, whether it was correct, 
+whether a hint was used, the actual response time in milliseconds, the 
+derived $Q$ value, and the EF and interval values both before and 
+after the SM-2 update. This granular record is necessary both for 
+computing the performance metrics described in 
+Section~\ref{sec:performance_metrics} and for supporting teacher 
+review of individual student trajectories.
+
+The SM-2 state for each student-card pair — comprising the current EF, 
+the current interval, the repetition count, and the next scheduled due 
+date — must be stored as an independent record isolated from all other 
+students. No student's scheduling state may be derived from or 
+influenced by the state of any peer on the same card.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\paragraph{Interview Configuration and Question Generation}
+Teachers define interview sections by specifying a set of 
+\textit{desired outcomes} — descriptions of the competencies or 
+demonstrations the student must satisfy to pass the interview. The 
+system must record each outcome, its association with a specific 
+lesson, and its ordering within the outcome set. Outcomes are the 
+authoritative reference against which both question generation and 
+post-session assessment are performed.
+
+From these outcomes, the AI generation model produces a bank of sample 
+questions. The system must record each generated question, its 
+association with the outcome it is designed to probe, and whether it 
+has been reviewed and approved by the teacher. Critically, no expected 
+answer or model answer is stored alongside interview questions — by 
+design, the assessment is outcome-based rather than answer-keyed, and 
+exposing model answers would undermine the open-ended nature of the 
+interview.
+
+The system must capture teacher-defined interview configuration 
+parameters including the maximum number of attempts permitted per 
+student, the minimum number of outcomes that must be satisfied for a 
+pass verdict, whether EF progression in the associated quiz is locked 
+until the interview is passed, and any supplementary instructions 
+provided to the AI assessment model.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\paragraph{Student Interview Sessions}
+Each student interview session is an independent interaction between 
+the student and a dedicated model instance. The system must record the 
+session's association with a specific interview configuration, the 
+student's identity, the attempt number, the input mode used (voice, 
+text, or both), and the session's start and end timestamps.
+
+The system must store the full session transcript — either as 
+structured text or as a reference to a stored audio file in the case 
+of voice input — to support post-session AI assessment and to provide 
+an auditable record of the interaction. The transcript must be linked 
+to the specific questions drawn from the question bank during that 
+session, along with the student's response to each.
+
+At the conclusion of each session, the AI assessment model evaluates 
+the transcript against the defined outcome checklist. The system must 
+store the per-outcome verdict — met or not met — along with the 
+model's internal reasoning for each verdict. The internal reasoning 
+is retained for audit and quality assurance purposes but is never 
+exposed to the student. The student-facing result is limited to a 
+binary pass or fail at the session level, with no rubric, no 
+per-outcome breakdown, and no score.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\paragraph{Progress Tracking and Career Readiness Reporting}
+The system must aggregate assessment outcomes into progress 
+representations at multiple levels of granularity for both students 
+and teachers.
+
+At the \textit{lesson level}, progress must reflect the student's 
+current SM-2 state across quiz cards — specifically the Knowledge 
+Retention Estimate $\hat{R}_{s,\ell}$, the Progression Readiness 
+against the teacher-configured unlock threshold, and the Review 
+Compliance Rate $\rho_{s,\ell}$ — as well as the pass/fail status of 
+the associated interview section if one exists. A lesson is 
+considered complete only when both the quiz unlock condition and the 
+interview pass condition are satisfied.
+
+At the \textit{course level}, progress must be computed as the 
+proportion of lessons completed relative to the total lessons in the 
+course, weighted or unweighted according to teacher configuration. 
+This course completion percentage is surfaced to both the student and 
+the assigned teachers.
+
+At the \textit{career level}, the system must aggregate course 
+completion percentages across all courses belonging to a career to 
+produce a \textit{Career Readiness} score for each enrolled student. 
+This score represents the student's overall progression through the 
+defined competency pathway and is reported to both the student and 
+the organisation manager. The system must retain historical snapshots 
+of career readiness over time to support longitudinal reporting and 
+to allow managers to track cohort progression trends.
+
+Teacher-facing views must additionally support class-wide aggregations 
+— mean retention estimates, interview pass rates, and compliance rates 
+across all enrolled students — to enable identification of systematic 
+content gaps or cohort-level disengagement patterns that warrant 
+intervention at the course or lesson level rather than at the 
+individual student level.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\paragraph{Notifications and Review Reminders}
+The system must maintain a notification record for each scheduled or 
+triggered communication to a student or teacher. For SR 
+reminders, the system must store the scheduled delivery time — derived 
+from the next due date of the student's cards — alongside the 
+recipient, the lesson in scope, and the delivery status. Review 
+reminder notifications are only generated for lessons where the 
+teacher has enabled the repetition reminder flag in the quiz 
+configuration.
+
+Additional notification types include lesson unlock events triggered 
+when a student satisfies the progression criteria, interview result 
+notifications delivered after AI assessment completes, and course 
+announcements initiated by teachers or managers. All notifications 
+must be associated with the entity that triggered them — card, lesson, 
+session, or course — to support deep-linking from the notification 
+to the relevant system view.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\paragraph{AI Generation and Assessment Logging}
+Every interaction with an external AI model — whether for knowledge 
+ingestion, quiz generation, interview question generation, or 
+post-session outcome assessment — must be logged with sufficient 
+detail to support cost monitoring, quality auditing, and model 
+performance analysis. The log must capture the triggering actor and 
+entity, the full prompt submitted to the model, the model identifier 
+and version, token counts for both input and output, estimated cost, 
+response latency, and the success or failure status of the call. 
+Where generation fails, the error detail must be retained to support 
+retry logic and failure analysis.
+
+Deduplication lock records must be maintained for generation jobs 
+that should not be triggered concurrently — specifically quiz 
+generation and interview question generation — to prevent duplicate 
+content being produced when a teacher saves a configuration in rapid 
+succession. These lock records carry an expiry time after which a 
+new generation job may proceed.

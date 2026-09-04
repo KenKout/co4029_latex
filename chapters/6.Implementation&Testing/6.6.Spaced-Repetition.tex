@@ -1,0 +1,41 @@
+\subsection{Spaced Repetition Implementation}
+\label{sec:impl_sr}
+
+The spaced repetition subsystem translates the SM-2 algorithm and its extensions (described in Section~\ref{sec:system_sm2}) into a production-grade scheduling service. The implementation lives in \path{abridgeai/features/spaced_repetition/} and is composed of three layers: the pure SM-2 core, the review service, and the background worker.
+
+\paragraph{SM-2 core}
+The algorithmic core is implemented as a set of pure functions in \path{features/spaced_repetition/sm2/}:
+
+\begin{itemize}
+    \item \path{ef_update.update_ef(ef_old, q, n, alpha=0.6)} — computes the new Easiness Factor using the standard SM-2 delta formula with calibration dampening. During the first three repetitions ($n \leq 3$), positive EF deltas are multiplied by $\alpha = 0.6$ to slow early growth and mitigate over-confidence from limited evidence. Negative deltas are not dampened so the forgetting signal is preserved.
+    \item \path{scheduler.next_interval_days(ef, n, q, prev_interval)} — computes the next review interval in days following the SM-2 recurrence: 1 day for the first review, 6 days for the second, and $\text{round}(\text{prev\_interval} \times \text{ef})$ for subsequent reviews. A grade of $q < 3$ resets the interval to 1 day unconditionally.
+    \item \path{scheduler.apply_jitter(interval_days, fraction=0.1)} — adds $\pm 10\%$ random jitter to the computed interval to prevent review pile-up when a cohort of students all enroll on the same day. Jitter uses float arithmetic (\texttt{round(interval * (1 + epsilon))}) to avoid the dead zone that integer truncation produces for short intervals.
+    \item \texttt{q\_derivation} — derives the $Q$ value from objective response signals (correctness, hint usage, and time ratio $\rho = T_{\text{actual}} / T_{\text{exp}}$) as specified in Section~\ref{sec:q_derivation}.
+\end{itemize}
+
+All four modules are pure functions with no database or network dependencies, making them straightforwardly unit-testable. The test suite in \path{tests/unit/} covers boundary conditions including $\rho$ at 0.5, 1.0, and 2.0, $n = 0$ through $n = 4$, and $q \in \{0, 1, 2, 3, 4, 5\}$.
+
+\paragraph{Review service}
+The review service (\path{features/spaced_repetition/services/review.py}) orchestrates a card review transaction:
+
+\begin{enumerate}
+    \item Load the \texttt{SpacedRepetitionCard} row for the (student, question) pair, acquiring a row-level lock to prevent concurrent review submissions.
+    \item Derive $Q$ from the submitted response signals.
+    \item Call \texttt{update\_ef} and \texttt{next\_interval\_days} to compute the new EF and interval.
+    \item Apply jitter via \texttt{apply\_jitter} and compute the absolute \texttt{due\_at} timestamp.
+    \item Write the updated card state and append a \texttt{CardReviewEvent} row for audit and analytics.
+\end{enumerate}
+
+\paragraph{Lesson unlock}
+A lesson is unlocked for a student when their knowledge retention (KR) score across all cards in the prerequisite lesson exceeds a configurable threshold. The unlock query (\path{queries/sql/lesson_unlock.sql}) computes the KR score as the fraction of cards with $\text{ef} \geq \text{ef\_threshold}$ and $\text{interval} \geq \text{interval\_threshold}$. The \texttt{LessonUnlockService} evaluates this condition after each review and emits an unlock event if the threshold is crossed.
+
+\paragraph{Background worker}
+An \texttt{arq} cron worker (\path{features/spaced_repetition/workers/scan_due_cards.py}) runs on a configurable schedule (default: every 15 minutes) to scan for cards whose \texttt{due\_at} has passed and dispatch review-due notifications to the affected students via the notifications subsystem.
+
+\paragraph{Analytics dashboards}
+The \path{features/spaced_repetition/routers/teacher.py} router exposes instructor-facing analytics endpoints backed by SQL queries in \path{queries/sql/}:
+\begin{itemize}
+    \item \texttt{at\_risk.sql} — students whose average EF has dropped below a threshold, indicating systematic forgetting.
+    \item \texttt{compliance\_rate.sql} — fraction of due reviews completed on time per student per lesson.
+    \item \path{class_kr_distribution.sql} — histogram of KR scores across the class for a given lesson.
+\end{itemize}

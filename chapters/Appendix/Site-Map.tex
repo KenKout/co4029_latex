@@ -1,0 +1,187 @@
+\section{Site Map Specification}
+\label{appendix:sitemap}
+
+This appendix provides the complete site map of the aBridgeAI frontend application, organised by user role. Each entry specifies the URL path, page title, and primary purpose. Routes marked with parameters (e.g.\ \texttt{\$slug}) are dynamic segments resolved at runtime.
+
+% ────────────────────────────────────────────────────────────
+\subsection{Public Routes (Unauthenticated)}
+
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{longtable}{|>{\raggedright\arraybackslash}m{0.32\textwidth}|>{\raggedright\arraybackslash}m{0.20\textwidth}|>{\raggedright\arraybackslash}m{0.38\textwidth}|}
+\caption{Public (unauthenticated) routes.}
+\label{tab:sitemap_public} \\
+\hline
+\textbf{Path} & \textbf{Page} & \textbf{Purpose} \\ \hline
+\endfirsthead
+\multicolumn{3}{c}{{\bfseries Table \thetable\ -- Continued}} \\ \hline
+\textbf{Path} & \textbf{Page} & \textbf{Purpose} \\ \hline
+\endhead
+\hline
+\endfoot
+
+\path|/| & Landing Page & Marketing page with platform overview and CTA. \\ \hline
+\path|/login| & Login & Google SSO authentication entry point. \\ \hline
+\path|/login/mfa| & MFA Verification & TOTP or recovery code verification after initial login. \\ \hline
+\path|/auth/google/callback| & OAuth Callback & Handles Google OAuth redirect and token exchange. \\ \hline
+
+\end{longtable}
+\normalsize
+
+% ────────────────────────────────────────────────────────────
+\subsection{Student Routes}
+
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{longtable}{|>{\raggedright\arraybackslash}m{0.40\textwidth}|>{\raggedright\arraybackslash}m{0.18\textwidth}|>{\raggedright\arraybackslash}m{0.32\textwidth}|}
+\caption{Student-facing routes.}
+\label{tab:sitemap_student} \\
+\hline
+\textbf{Path} & \textbf{Page} & \textbf{Purpose} \\ \hline
+\endfirsthead
+\multicolumn{3}{c}{{\bfseries Table \thetable\ -- Continued}} \\ \hline
+\textbf{Path} & \textbf{Page} & \textbf{Purpose} \\ \hline
+\endhead
+\hline
+\endfoot
+
+\path|/dashboard| & Dashboard & Overview of enrolled courses, due reviews, and progress summary. \\ \hline
+\path|/dashboard/sr| & SR Dashboard & Spaced repetition metrics: due cards, retention, streaks. \\ \hline
+\path|/study/cards-due| & Study Cards & Review due flashcards from spaced repetition queue. \\ \hline
+\path|/courses| & Course Catalog & Browse and search available courses. \\ \hline
+\path|/courses/$slug| & Course Detail & View course structure, modules, and lessons. \\ \hline
+\path|/courses/$slug/learn| & Course Learn & Read lesson content, stream materials, view resources. \\ \hline
+\path|/courses/$slug/quiz/$quizId| & Quiz Session & Take a quiz attempt with timed questions. \\ \hline
+\path|/courses/$slug/quiz/$quizId/attempts/$attemptId| & Quiz Review & Review past attempt with correct answers and explanations. \\ \hline
+\path|/courses/$slug/interview/$moduleId| & Interview Session & Conduct AI mock interview for a module. \\ \hline
+\path|/progress| & Progress & Overall learning progress and completion tracking. \\ \hline
+\path|/career-paths| & Career Paths & Browse available career pathways. \\ \hline
+\path|/career-paths/$slug| & Career Path Detail & View courses in a pathway and progression status. \\ \hline
+\path|/me/career-paths| & My Career Paths & View enrolled career pathways and progress. \\ \hline
+\path|/notifications| & Notifications & In-app notification inbox. \\ \hline
+\path|/profile| & Profile & View own public profile. \\ \hline
+\path|/settings| & Settings Hub & Navigation hub for account settings. \\ \hline
+\path|/settings/profile| & Profile Settings & Edit display name, avatar, bio, and links. \\ \hline
+\path|/settings/security| & Security Settings & MFA setup, recovery codes, session management. \\ \hline
+\path|/settings/notifications| & Notification Prefs & Configure notification preferences by category. \\ \hline
+
+\end{longtable}
+\normalsize
+
+% ────────────────────────────────────────────────────────────
+\subsection{Teacher / Instructor Routes}
+
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{longtable}{|>{\raggedright\arraybackslash}m{0.46\textwidth}|>{\raggedright\arraybackslash}m{0.18\textwidth}|>{\raggedright\arraybackslash}m{0.26\textwidth}|}
+\caption{Teacher and instructor routes.}
+\label{tab:sitemap_teacher} \\
+\hline
+\textbf{Path} & \textbf{Page} & \textbf{Purpose} \\ \hline
+\endfirsthead
+\multicolumn{3}{c}{{\bfseries Table \thetable\ -- Continued}} \\ \hline
+\textbf{Path} & \textbf{Page} & \textbf{Purpose} \\ \hline
+\endhead
+\hline
+\endfoot
+
+\path|/teacher| & Overview & Teacher dashboard with course summary. \\ \hline
+\path|/teacher/courses| & My Courses & List of courses the teacher manages. \\ \hline
+\path|/teacher/courses/new| & Create Course & Form to create a new course. \\ \hline
+\path|/teacher/courses/$courseId| & Course Manage & Course authoring: modules, settings, publishing. \\ \hline
+\path|/teacher/courses/$courseId/modules/$moduleId| & Module Manage & Edit module: ordering, items, prerequisites. \\ \hline
+\path|/teacher/courses/$courseId/lessons/$lessonId| & Lesson Manage & Edit lesson content, notes, and settings. \\ \hline
+\path|/teacher/courses/$courseId/lessons/$lessonId/materials| & Lesson Materials & Upload, manage, and re-process materials. \\ \hline
+\path|/teacher/courses/$courseId/quizzes/$quizId| & Quiz Editor & Manage questions, review AI drafts, configure settings. \\ \hline
+\path|/teacher/courses/$courseId/interview-configs/new| & New Interview Config & Create interview section with desired outcomes. \\ \hline
+\path|/teacher/courses/$courseId/interview-configs/$configId| & Interview Config & Edit interview configuration and rules. \\ \hline
+\path|/teacher/interview-sessions/$sessionId/gap-report| & Gap Report & Review student interview transcript and evaluation. \\ \hline
+\path|/teacher/courses/$courseId/students| & Student Roster & View enrolled students and progress. \\ \hline
+\path|/teacher/courses/$courseId/students/$studentId| & Student Detail & Individual student progress and activity. \\ \hline
+\path|/teacher/courses/$courseId/students/$studentId/sr| & Student SR Detail & Student's spaced repetition card-level data. \\ \hline
+\path|/teacher/courses/$courseId/sr-cohort| & SR Cohort & Cohort-level retention distribution and analytics. \\ \hline
+\path|/teacher/courses/$courseId/at-risk| & At-Risk Students & Students flagged for low retention or engagement. \\ \hline
+\path|/teacher/courses/$courseId/progress| & Course Progress & Aggregate course completion analytics. \\ \hline
+\path|/dept| & Department Courses & View all courses in the department. \\ \hline
+\path|/dept/courses/$courseId| & Dept Course Detail & Read-only view of a department course. \\ \hline
+
+\end{longtable}
+\normalsize
+
+% ────────────────────────────────────────────────────────────
+\subsection{Educational Manager Routes}
+
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{longtable}{|>{\raggedright\arraybackslash}m{0.42\textwidth}|>{\raggedright\arraybackslash}m{0.18\textwidth}|>{\raggedright\arraybackslash}m{0.30\textwidth}|}
+\caption{Educational Manager routes.}
+\label{tab:sitemap_manager} \\
+\hline
+\textbf{Path} & \textbf{Page} & \textbf{Purpose} \\ \hline
+\endfirsthead
+\multicolumn{3}{c}{{\bfseries Table \thetable\ -- Continued}} \\ \hline
+\textbf{Path} & \textbf{Page} & \textbf{Purpose} \\ \hline
+\endhead
+\hline
+\endfoot
+
+\path|/management/courses/$courseId/enrollments| & Course Enrollments & Bulk enroll students via CSV, manage roster. \\ \hline
+\path|/management/career-paths| & Career Paths Mgmt & Create and manage career pathways. \\ \hline
+\path|/management/career-paths/$id| & Career Path Edit & Edit pathway details and course ordering. \\ \hline
+
+\end{longtable}
+\normalsize
+
+% ────────────────────────────────────────────────────────────
+\subsection{IT Administrator Routes}
+
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{longtable}{|>{\raggedright\arraybackslash}m{0.38\textwidth}|>{\raggedright\arraybackslash}m{0.20\textwidth}|>{\raggedright\arraybackslash}m{0.32\textwidth}|}
+\caption{IT Administrator routes.}
+\label{tab:sitemap_admin} \\
+\hline
+\textbf{Path} & \textbf{Page} & \textbf{Purpose} \\ \hline
+\endfirsthead
+\multicolumn{3}{c}{{\bfseries Table \thetable\ -- Continued}} \\ \hline
+\textbf{Path} & \textbf{Page} & \textbf{Purpose} \\ \hline
+\endhead
+\hline
+\endfoot
+
+\path|/admin/stats| & Admin Dashboard & Platform-level statistics overview. \\ \hline
+\path|/admin/stats/active| & Active Users & Real-time active user metrics. \\ \hline
+\path|/admin/stats/content| & Content Stats & Content volume and growth metrics. \\ \hline
+\path|/admin/stats/health| & System Health & Infrastructure health indicators. \\ \hline
+\path|/admin/users| & Users & Manage all user accounts across tenants. \\ \hline
+\path|/admin/users/$userId| & User Detail & View/edit individual user, disable account. \\ \hline
+\path|/admin/organizations| & Organizations & Manage tenant organisations. \\ \hline
+\path|/admin/organizations/$orgId| & Org Detail & Edit org settings, domains, lifecycle. \\ \hline
+\path|/admin/courses| & Courses & Cross-org course overview and restoration. \\ \hline
+\path|/admin/courses/$courseId| & Course Detail & Inspect course processing history and stats. \\ \hline
+\path|/admin/processing| & Processing Jobs & View ingestion and AI pipeline job queue. \\ \hline
+\path|/admin/processing/$jobId| & Job Detail & Inspect individual job logs and retry. \\ \hline
+\path|/admin/ai-costs| & AI Costs & AI usage telemetry by user and pipeline. \\ \hline
+\path|/admin/health| & Health Check & Backend service health and connectivity. \\ \hline
+
+\end{longtable}
+\normalsize
+
+% ────────────────────────────────────────────────────────────
+\subsection{Route Summary}
+
+\begin{table}[H]
+\centering
+\caption{Route count by role.}
+\label{tab:sitemap_summary}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Role / Section} & \textbf{Routes} \\ \hline
+Public (unauthenticated) & 4 \\ \hline
+Student & 19 \\ \hline
+Teacher / Instructor & 19 \\ \hline
+Educational Manager & 3 \\ \hline
+IT Administrator & 14 \\ \hline
+\textbf{Total unique routes} & \textbf{59} \\ \hline
+\end{tabular}
+\end{table}

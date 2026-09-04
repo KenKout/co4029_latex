@@ -1,0 +1,60 @@
+\section{Sequence Diagrams Specification}
+\label{appendix:sequence-diagrams}
+\subsubsection{Authentication}
+This sequence diagram maps the execution flow of the user authentication process.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{graphics/seq-diagrams/seq_auth.png}
+    \caption{Sequence Diagram: Authentication}
+    \label{fig:seq_auth}
+\end{figure}
+
+
+\subsubsection{Smart Content Ingestion}
+This sequence details the interactions when a teacher uploads course materials. It highlights the asynchronous chunking, embedding generation, and vector storage processes required to build the RAG pipeline.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{graphics/seq-diagrams/seq_ingestion.png}
+    \caption{Sequence Diagram: Smart Content Ingestion}
+    \label{fig:seq_ingestion}
+\end{figure}
+
+
+\subsubsection{Human-in-the-Loop Quiz Generation}
+
+This activity diagram maps the assessment creation lifecycle, emphasizing the "Human-in-the-Loop" architectural pattern. While the AI Engine performs the computationally heavy task of generating questions via RAG based on the Course Knowledge Graph, the Teacher retains full control. The workflow includes a review and editing phase, allowing the instructor to adjust question content, difficulty levels, and passing thresholds before publishing the final quiz to the students.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{graphics/seq-diagrams/seq_quiz_gen.png}
+    \caption{Sequence Diagram: HITL Quiz Generation and Execution}
+    \label{fig:act_quiz_gen}
+\end{figure}
+
+
+
+\subsubsection{Context-Aware Mock Interview Session}
+This sequence maps the real-time interaction during a mock interview. It demonstrates how the backend retrieves semantic context from the Vector Database (Qdrant) and communicates with the LLM to generate dynamic, curriculum-aligned questions and simultaneously evaluate student responses.
+\begin{figure}[H]
+    \centering
+    % Nhớ lưu ảnh tải về từ PlantUML thành tên seq_interview.png
+    \includegraphics[width=1\textwidth]{graphics/seq-diagrams/seq_interview_phase_1.png}
+    \caption{Sequence Diagram: Mock Interview (Phase 1)}
+    \label{fig:seq_interview}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    % Nhớ lưu ảnh tải về từ PlantUML thành tên seq_interview.png
+    \includegraphics[width=1\textwidth]{graphics/seq-diagrams/seq_interview_phase_2.png}
+    \caption{Sequence Diagram: Mock Interview (Phase 2)}
+    \label{fig:seq_interview}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    % Nhớ lưu ảnh tải về từ PlantUML thành tên seq_interview.png
+    \includegraphics[width=1\textwidth]{graphics/seq-diagrams/seq_interview_phase_3.png}
+    \caption{Sequence Diagram: Mock Interview (Phase 3)}
+    \label{fig:seq_interview}
+\end{figure}

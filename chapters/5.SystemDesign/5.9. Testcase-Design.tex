@@ -1,0 +1,81 @@
+\subsection{Test Case Design}
+
+Representative test cases are summarized below to illustrate coverage across authentication, learning-loop, and interview workflows. The complete test case specification is provided in Appendix~\ref{appendix:testcases}.
+
+\paragraph{Authentication and Access Control (Representative)}
+\renewcommand{\arraystretch}{1.4}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.10\textwidth}|>{\centering\arraybackslash}m{0.12\textwidth}|m{0.30\textwidth}|m{0.34\textwidth}|}
+\caption{Representative Test Cases: Authentication \& Access Control}
+\label{tab:tc_auth_access_rep} \\
+\hline
+\textbf{ID} & \textbf{Req} & \textbf{Level} & \textbf{Input} & \textbf{Expected Result} \\ \hline
+\endfirsthead
+
+\multicolumn{5}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} & \textbf{Req} & \textbf{Level} & \textbf{Input} & \textbf{Expected Result} \\ \hline
+\endhead
+
+\hline \multicolumn{5}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+TC-1.1.1 & FR-1.1 & System & User initiates login using Google SSO & System redirects to Google OAuth and authenticates after a successful callback \\ \hline
+TC-1.3.1 & FR-1.3 & System & User with MFA enabled enters a valid authenticator code & MFA verification succeeds and protected features are accessible \\ \hline
+TC-1.5.1 & FR-1.5 & System & User accesses a protected backend route with sufficient permission & Request is allowed and the protected resource is returned \\ \hline
+\end{longtable}
+
+\paragraph{Learning Loop and Adaptive Quiz (Representative)}
+\renewcommand{\arraystretch}{1.4}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.10\textwidth}|>{\centering\arraybackslash}m{0.12\textwidth}|m{0.30\textwidth}|m{0.34\textwidth}|}
+\caption{Representative Test Cases: Learning Loop \& Adaptive Quiz}
+\label{tab:tc_learning_loop_rep} \\
+\hline
+\textbf{ID} & \textbf{Req} & \textbf{Level} & \textbf{Input} & \textbf{Expected Result} \\ \hline
+\endfirsthead
+
+\multicolumn{5}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} & \textbf{Req} & \textbf{Level} & \textbf{Input} & \textbf{Expected Result} \\ \hline
+\endhead
+
+\hline \multicolumn{5}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+TC-4.2.1 & FR-4.2 & System & Teacher configures quiz settings and sets $T_{\text{exp}}$ for every live question & Quiz can be published and settings are applied to student attempts \\ \hline
+TC-4.3.1 & FR-4.3 & System & Student submits a quiz answer with response time and optional hint usage & System records correctness, response time, and hint usage for the answer \\ \hline
+TC-4.4.2 & FR-4.4 & Integration & Card response produces a derived $Q$ value & Student-card SM-2 state is updated with EF, interval, due date, calibration, and jitter rules \\ \hline
+\end{longtable}
+
+\paragraph{Application Loop and Mock Interview (Representative)}
+\renewcommand{\arraystretch}{1.4}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.10\textwidth}|>{\centering\arraybackslash}m{0.12\textwidth}|m{0.30\textwidth}|m{0.34\textwidth}|}
+\caption{Representative Test Cases: Application Loop \& Mock Interview}
+\label{tab:tc_interview_rep} \\
+\hline
+\textbf{ID} & \textbf{Req} & \textbf{Level} & \textbf{Input} & \textbf{Expected Result} \\ \hline
+\endfirsthead
+
+\multicolumn{5}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} & \textbf{Req} & \textbf{Level} & \textbf{Input} & \textbf{Expected Result} \\ \hline
+\endhead
+
+\hline \multicolumn{5}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+TC-5.1.1 & FR-5.1 & System & Teacher defines desired interview outcomes without model answers & Interview section is saved with outcome-based assessment criteria \\ \hline
+TC-5.4.1 & FR-5.4 & System & Eligible student starts a text-mode interview & AI interviewer begins adaptive turn-taking dialogue \\ \hline
+TC-5.6.1 & FR-5.6 & Integration & Student completes an interview session & Transcript and metadata are persisted and system produces a binary pass-or-fail verdict \\ \hline
+\end{longtable}

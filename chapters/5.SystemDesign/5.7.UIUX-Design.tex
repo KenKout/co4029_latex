@@ -1,0 +1,103 @@
+% ============================================================
+%  \subsection{UI/UX Design}
+%  aBridgeAI — main-body summary; full screen-by-screen detail
+%  is in Appendix \ref{appendix:uiux}.
+% ============================================================
+
+\subsection{UI/UX Design}
+
+% ────────────────────────────────────────────────────────────
+\subsubsection{Design Philosophy}
+% ────────────────────────────────────────────────────────────
+
+aBridgeAI adopts a \textbf{light-first, academic} design language inspired by enterprise dashboards (Metronic Demo 6) --- dense rows, crisp 1\,px borders, restrained 4--10\,px corner radii. The interface deliberately reads as a serious learning tool rather than a consumer product. Four guiding principles shape every screen:
+
+\begin{enumerate}
+  \item \textbf{Role-based clarity} --- students, instructors, and administrators see entirely distinct navigation and accent colours; the same shell component renders all three contexts driven by a per-role \path|navItems| prop.
+  \item \textbf{Progressive disclosure} --- AI features (quiz generation, processing queue, cost telemetry) are surfaced contextually inside their host screens, only when the user has the required role and prerequisites.
+  \item \textbf{Accessibility-first typography} --- body copy uses \textit{Be Vietnam Pro}, a humanist sans-serif with full Vietnamese diacritic support, paired with a 14\,px base size and 1.5 line-height for sustained reading.
+  \item \textbf{Responsive shell architecture} --- a persistent \path|AppShell| renders a left sidebar that collapses from 256\,px (\path|w-64|) to 64\,px (\path|w-16|, icons only) below the \path|md| breakpoint or by user toggle.
+\end{enumerate}
+
+The implementation uses \textbf{shadcn/ui} components on top of \textbf{Tailwind CSS v4}; the colour system is defined as CSS custom properties (\path|var(--primary)|, \path|var(--surface)|, \dots) so that the light and dark themes share a single component layer with full parity.
+
+\paragraph{Internationalisation (i18n).} Every authenticated page exposes a globe icon in the \path|ContentTopBar| that opens a language selector; the active language is shown next to the icon (\textit{e.g.}\ ``EN''). Locale strings live in \path|src/locales/<lang>.json| and load lazily, with English as the fallback. Navigation labels and form fields reference an \path|i18nKey| (such as \path|nav.dashboard|, \path|nav.career_paths|) defined in \path|src/lib/navigation.ts|, so adding a new locale requires only a JSON dictionary --- no component changes. The platform was developed with English and Vietnamese as first-class locales, matching the choice of Be Vietnam Pro as the primary typeface.
+
+% ────────────────────────────────────────────────────────────
+\subsubsection{Design Tokens}
+% ────────────────────────────────────────────────────────────
+
+Table~\ref{tab:design_tokens_main} consolidates the design tokens that govern the visual system. Full per-rule rationale and the complete spacing, layering, and interaction rules are documented in Appendix~\ref{appendix:uiux}.
+
+\begin{longtable}{|p{0.22\textwidth}|p{0.30\textwidth}|p{0.36\textwidth}|}
+  \caption{Core design tokens.} \label{tab:design_tokens_main} \\
+  \hline
+  \textbf{Token} & \textbf{Value} & \textbf{Usage} \\
+  \hline
+  \endfirsthead
+  \multicolumn{3}{c}{\small\tablename~\thetable{} \textit{(continued)}} \\
+  \hline
+  \textbf{Token} & \textbf{Value} & \textbf{Usage} \\
+  \hline
+  \endhead
+  \hline
+  \endfoot
+  Page background & \path|#f8fafc| (slate-50) & Page surface in light mode. \\
+  \hline
+  Surface / Card & \path|#ffffff| & Cards, panels, dialogs. \\
+  \hline
+  Primary accent & \path|#1e40af| (blue-800) & Primary actions, active nav, links, chart series 1. \\
+  \hline
+  Secondary accent & \path|#3b82f6| (blue-500) & Secondary buttons, focus rings, chart series 2. \\
+  \hline
+  CTA / accent & \path|#f59e0b| (amber-500) & High-attention CTAs and AI affordances. \\
+  \hline
+  Success & \path|#16a34a| (green-600) & Published / completed states. \\
+  \hline
+  Warning & \path|#ea580c| (orange-600) & Drafts, pending review. \\
+  \hline
+  Danger & \path|#dc2626| (red-600) & Failed jobs, destructive actions. \\
+  \hline
+  Border & \path|#e2e8f0| (slate-200) & 1\,px borders on cards, inputs, tables. \\
+  \hline
+  Typography & Be Vietnam Pro (system-ui fallback) & All body and UI text; full Vietnamese diacritic support. \\
+  \hline
+  Component library & shadcn/ui + Radix UI + Lucide React & Dialogs, dropdowns, sheets, tooltips, icons. \\
+  \hline
+  Charts & Recharts & Bar, line, area; reuses palette for chart series 1--5. \\
+  \hline
+  i18n keys & \path|src/lib/navigation.ts| + \path|src/locales/<lang>.json| & Translatable nav labels and copy. \\
+  \hline
+  Sidebar widths & 64\,px collapsed / 256\,px expanded & \path|w-16| / \path|w-64| with auto-collapse below \path|md|. \\
+  \hline
+  Border radius (card) & 8\,px (\path|rounded-lg|) & 10\,px hard cap project-wide. \\
+  \hline
+  Base spacing unit & 4\,px & All spacing is a multiple of 4\,px. \\
+  \hline
+  Max modal depth & 1 stacked modal & Prevents nested-modal anti-patterns. \\
+  \hline
+\end{longtable}
+
+% ────────────────────────────────────────────────────────────
+\subsubsection{Key Screens}
+% ────────────────────────────────────────────────────────────
+
+This subsection sketches the principal screens by role. Per-screen layouts and interaction details are illustrated in Appendix~\ref{appendix:uiux}.
+
+\paragraph{Public surfaces.} The \textbf{Landing Page} (\path|/|) is the marketing entry point; it carries a hero, stats strip, category grid, and featured-courses carousel under a dedicated \path|TopNavBar| that is unique to this route. The \textbf{Login} screen (\path|/login|) offers Google SSO as the single sign-in path; on success, accounts with MFA enabled are routed to \path|/login/mfa| for a TOTP or recovery-code challenge before a session is issued. A \path|next| query parameter preserves deep links across the auth round-trip.
+
+\paragraph{Student.} The \textbf{Student Dashboard} (\path|/dashboard|) keeps the layout calm: stat cards summarise enrolled courses, in-progress lessons, and recently earned milestones; a recommendations strip suggests the next course in the active career path. The \textbf{Course Catalog} (\path|/courses|) opens with a sticky search and filter bar (query, category, difficulty); enrolled courses display an inline progress ring so students can pick up where they left off. The \textbf{Course View} (\path|/courses/$slug/learn|) splits into a sticky curriculum accordion on the left and the active lesson's content on the right (video, reading, attached resources, embedded quiz launcher). The \textbf{Quiz Session} (\path|/courses/$slug/quiz/$quizId|) is a focused, distraction-free interface with a countdown timer and a question-navigation grid; on submission students land on the attempt-review screen with correct answers and per-question explanations.
+
+\paragraph{Instructor.} The \textbf{Teacher Dashboard} (\path|/teacher|) summarises authoring activity (total / published / draft / AI-enabled) and surfaces the most recently edited course with a one-click jump into management. The \textbf{Course Manage} screen (\path|/teacher/courses/$courseId|) is the authoring core: modules render as drag-handle cards, expanding to reveal ordered lesson and quiz items, each with a publish-state badge and inline \textbf{+ Video / + Reading / + Quiz} quick-add buttons. The \textbf{Lesson Editor} (\path|/teacher/courses/$courseId/lessons/$lessonId|) splits into a Markdown content area with attached resources on the left and a settings sidebar (Visibility, Lesson Type, Duration, Difficulty, Prerequisites, AI Material Hub) on the right.
+
+The \textbf{Quiz Editor} (\path|/teacher/courses/$courseId/quizzes/$quizId|) is structured around three sub-tabs --- \textit{Questions}, \textit{Settings}, and \textit{Preview}. The Questions tab lists every item with its type badge, per-question time limit, and approval status; bulk-action controls let the instructor apply uniform timing or bulk-approve. A persistent banner reports how many questions are pending review, enforcing a deliberate approval gate between AI generation and student exposure. An \textbf{Open generator} button launches a modal that drives the AI quiz pipeline: source-lesson selection, question count, difficulty band, question types (multiple choice, true/false, short answer, fill in the blank), generation mode (\textit{Topic} balanced spread vs.\ \textit{Coverage} guaranteeing per-section coverage), and an \textit{Append} or \textit{Replace} policy for existing questions. Generated items land in \textit{Pending Review} state and are visible to students only after explicit instructor approval.
+
+\paragraph{Administrator.} The \textbf{Processing Queue} (\path|/admin/processing|) gives platform operators direct visibility into the AI background-job pipeline (material ingestion, embedding, quiz generation, validation): stat cards report the current backlog, status-pill filters narrow the table, and failed jobs expose a per-row \textbf{Retry} action. The \textbf{AI Costs} page (\path|/admin/ai-costs|) tracks spend on language-model and embedding APIs across a selectable time range (24\,h / 7\,d / 30\,d); two bar charts break the spend down by \textit{role} (embedding, ideation, chunking enrichment, generation, validation) and by \textit{pipeline stage}, reusing the platform palette so administrators can correlate cost with backlog health on the Processing page without a context switch.
+
+% ────────────────────────────────────────────────────────────
+\subsubsection{Navigation Architecture}
+% ────────────────────────────────────────────────────────────
+
+The authenticated experience is built around a single role-agnostic \path|AppShell| component that orchestrates a fixed-position \path|SideNavBar| and a sticky \path|ContentTopBar| around the main content. The shell receives a \path|navItems| array as a prop (defined in \path|src/lib/navigation.ts|), so the same layout code serves the student, teacher, and admin route groups; role differentiation is communicated entirely through the \path|navItems| configuration and the active accent colour. Below the \path|md| breakpoint the sidebar collapses to icons-only and overlays the page content via a backdrop on toggle, keeping the main column readable on narrow screens.
+
+The \path|TopNavBar| and \path|Footer| components are reserved exclusively for the landing page, ensuring a clean visual handoff between the marketing surface and the authenticated product.

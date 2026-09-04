@@ -1,0 +1,21 @@
+\subsection{Scope}
+\noindent To ensure the feasibility of the aBridgeAI, the scope is constrained across five dimensions:
+
+\begin{itemize}
+    \item \textbf{Technological Scope:} The system is developed as a responsive web application to ensure cross-platform compatibility. Based on the evaluation of real-time AI requirements, the technology stack encompasses React.js for the frontend, FastAPI (Python) for backend and AI orchestration, a hybrid database topology utilizing PostgreSQL (with pgvector) and MongoDB, LiveKit for WebRTC-based ultra-low latency audio streaming, and Google OAuth 2.0 / OpenID Connect for delegated authentication with in-platform second-factor (TOTP) enrolment and session management.
+    
+    \item \textbf{Temporal Scope:} The development, testing, and deployment lifecycle of this Minimum Viable Product (MVP) is strictly bounded within Semester 252, commencing in early February and concluding in June.
+    
+    \item \textbf{Spatial and Contextual Scope:} The system's operational context is designed specifically for academic and structured learning environments. It targets higher education institutions, university departments, and coding bootcamps, focusing exclusively on bridging the gap between theoretical academic curricula and practical industry interview requirements.
+    
+    \item \textbf{Functional Scope:} The system's core functionalities are limited to four main interactive pillars: 
+    \begin{enumerate}
+        \item \textit{Smart Content Ingestion:} Parsing uploaded documents (PDF, DOCX) and media (MP4) to construct a localized Course Knowledge Graph.
+        \item \textit{The Learning Loop:} Providing automated, adaptive quizzes based on the ingested content.
+        \item \textit{The Application Loop:} Executing context-aware mock interviews supporting text-based and asynchronous/WebRTC voice-based interactions.
+        \item \textit{Assessment Analytics:} Generating automated Gap Reports and tracking student performance matrices.
+    \end{enumerate}
+    The following capabilities are explicit non-goals of the MVP and are excluded from this phase: synchronous human-to-human tutoring and live video conferencing; in-platform email/password registration, password reset, ``remember me'' device-trust, and per-device session pinning. Authentication is delegated exclusively to Google OAuth, and self-service password recovery is therefore handled by Google's identity infrastructure rather than in-platform.
+    
+    \item \textbf{Data Scope:} The system is scoped to process, store, and manage standard educational materials, user profiles, and assessment logs. For AI operations, the system limits data processing to generating and storing vector embeddings (via pgvector) strictly derived from the institution's uploaded materials to prevent LLM hallucinations. Live audio streams during voice interviews are processed transiently for Speech-to-Text (STT) and Text-to-Speech (TTS) purposes and are not persistently archived as raw audio files, thereby optimizing cloud storage overhead.
+\end{itemize}

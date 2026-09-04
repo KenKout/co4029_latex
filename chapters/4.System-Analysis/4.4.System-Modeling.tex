@@ -1,0 +1,298 @@
+\subsection{System Modeling}
+This section provides a visual and structured representation of the functional behavior of the aBridgeAI system. The system is modeled using Unified Modeling Language (UML) artifacts, primarily Use Case Diagrams, to describe how each actor interacts with the major functional modules of the platform.
+
+The system is decomposed into six functional modules: Authentication and Access Control, Organization and User Management, Course and Material Management, Learning Loop and Adaptive Quiz, Application Loop and Mock Interview, and Analytics, Reporting and Notifications.
+
+% ==========================================
+\subsubsection{Overall Use Case Diagram}
+
+The Overall Use Case Diagram provides a macroscopic view of the aBridgeAI system boundary and the major interactions between the system and its authorised actors. The primary actors include Students, Teachers, Educational Managers, and IT Administrators.
+
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{graphics/usecase-diagrams/overall_usecase.png}
+    \caption{Overall Use Case Diagram of the aBridgeAI System}
+    \label{fig:overall_usecase}
+\end{figure}
+
+\noindent\textit{Note.} In this diagram, authentication is treated as a prerequisite for all protected use cases rather than as a repeated \textit{<<include>>} relationship.
+
+% ==========================================
+\subsubsection{Detailed Use Case Diagrams and Use Case Specifications}
+
+The detailed use case diagrams decompose the overall system into module-level views. Each module-level diagram is followed by use case specifications that illustrate the most important workflows of that module. To keep the main report concise, only the most critical use cases are described in this section. The complete set of use case specifications is provided in Appendix~\ref{appendix:usecase-specifications}.
+
+
+% ================1 Authentication and Access Control Module==========================
+\paragraph{Authentication and Access Control Module}
+
+This module covers Google SSO authentication, logout, authenticated session management, multi-factor authentication, role-based and permission-based access control, and security-related audit events.
+
+The diagram highlights that all users must authenticate before accessing protected features. It also shows that sensitive account-security operations require recent second-factor verification, while access to backend routes and frontend UI actions is controlled by the authenticated user's active roles and effective permissions.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{graphics/usecase-diagrams/auth_access_usecase.png}
+    \caption{Detailed Use Case Diagram: Authentication and Access Control Module}
+    \label{fig:auth_access_usecase}
+\end{figure}
+
+The full set of use case specifications for this module is provided in Appendix~\ref{appendix:usecase-specifications}.
+
+
+
+% 
+% ===============2 Organization and User Management Module===========================
+\paragraph{Organization and User Management Module}
+
+This module supports multi-tenant organisation management, user onboarding, organisation memberships, user profiles, domain-based auto-provisioning, and tenant-scoped access control.
+
+IT Administrators are responsible for provisioning and managing tenant organisations, organisation domains, and account status. Educational Managers manage organisation-level learning operations such as bulk student enrollment, teacher-course assignment, and career pathway definition. The module also ensures that Educational Manager actions and queries remain scoped to their own tenant organisation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{graphics/usecase-diagrams/org_user_usecase.png}
+    \caption{Detailed Use Case Diagram: Organization and User Management Module}
+    \label{fig:org_user_usecase}
+\end{figure}
+
+\noindent\textit{Representative use case.} The following use case specification illustrates tenant organisation management. The full set of use case specifications for this module is provided in Appendix~\ref{appendix:usecase-specifications}.
+
+% =========================================================
+% Representative UC-ORG-01: Manage Tenant Organisations
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Representative Use Case Specification: Manage Tenant Organisations}
+\label{tab:rep_uc_org_manage_tenants} \\
+\hline
+\endfirsthead
+
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-ORG-01} \\ \hline
+\textbf{Use Case Name} & \textbf{Manage Tenant Organisations} \\ \hline
+\textbf{Actors} & IT Administrator \\ \hline
+\textbf{Related Requirements} & FR-2.1, FR-2.2, FR-2.7, FR-2.9 \\ \hline
+\textbf{Description} & Allows IT Administrators to provision tenant organisations, manage organisation lifecycle states, configure organisation domains, and enable domain-based account auto-provisioning. \\ \hline
+\textbf{Pre-conditions} & The user is authenticated as an IT Administrator. \\ \hline
+\textbf{Post-conditions} & A tenant organisation is created or updated, and its domain and lifecycle configuration are saved. \\ \hline
+\textbf{Main Flow} &
+1. The IT Administrator opens the Organisation Management dashboard. \newline
+2. The administrator creates a new tenant organisation or selects an existing one. \newline
+3. The administrator enters or updates the organisation's basic information. \newline
+4. For a new organisation, the administrator assigns the initial Educational Manager. \newline
+5. The administrator configures the organisation lifecycle status. \newline
+6. The administrator attaches one or more email domains to the organisation. \newline
+7. The administrator enables or disables auto-provisioning for each domain. \newline
+8. The system saves the organisation configuration. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{3a. Invalid organisation information:} \newline
+\hspace*{1em} 1. The system highlights invalid or missing fields. \newline
+\hspace*{1em} 2. The organisation is not saved until the fields are corrected. \newline
+\textbf{6a. Domain already attached elsewhere:} \newline
+\hspace*{1em} 1. The system rejects the domain assignment. \newline
+\hspace*{1em} 2. The administrator is informed that the domain is already registered. \\
+\end{longtable}
+
+% ==========================================
+% ==========================================
+\paragraph{Course and Material Management Module}
+
+This module allows Teachers and Educational Managers to manage course lifecycles, organise modules and learning items, configure prerequisites and unlock rules, upload materials, manage material versions, and monitor ingestion progress.
+
+The diagram also shows the student-facing side of the module, where enrolled Students can browse published courses, view course details, and access approved materials. Material visibility is controlled separately from course publication status, ensuring that students only access content that is both published and explicitly marked visible.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{graphics/usecase-diagrams/course_material_usecase.png}
+    \caption{Detailed Use Case Diagram: Course and Material Management Module}
+    \label{fig:course_material_usecase}
+\end{figure}
+
+\noindent\textit{Representative use case.} The following use case specification illustrates the upload and ingestion workflow for learning materials. The full set of use case specifications for this module is provided in Appendix~\ref{appendix:usecase-specifications}.
+
+% =========================================================
+% Representative UC-COURSE-02: Upload and Process Learning Materials
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Representative Use Case Specification: Upload and Process Learning Materials}
+\label{tab:rep_uc_course_material_upload} \\
+\hline
+\endfirsthead
+
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-COURSE-02} \\ \hline
+\textbf{Use Case Name} & \textbf{Upload and Process Learning Materials} \\ \hline
+\textbf{Actors} & Teacher, Educational Manager \\ \hline
+\textbf{Related Requirements} & FR-3.3, FR-3.4, FR-3.5 \\ \hline
+\textbf{Description} & Allows Teachers to upload supported learning materials, manage metadata, link materials to lessons, monitor ingestion progress, and maintain material version history. \\ \hline
+\textbf{Pre-conditions} & The actor has course-authoring permission and has selected a target lesson. \\ \hline
+\textbf{Post-conditions} & The material is stored, linked to the lesson, processed by the ingestion pipeline, and versioned when updated. \\ \hline
+\textbf{Main Flow} &
+1. The Teacher opens a lesson in authoring mode. \newline
+2. The Teacher selects ``Upload Material''. \newline
+3. The Teacher uploads a supported file using a standard or resumable upload flow. \newline
+4. The system stores the material and records upload metadata. \newline
+5. The Teacher links the material to one or more lessons. \newline
+6. The system queues the material for ingestion and processing. \newline
+7. The system displays processing status, percent completion, and any failure reason. \newline
+8. If a replacement file is uploaded, the system creates a new material version and retains prior versions for rollback or re-processing. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{3a. Unsupported format or failed upload:} \newline
+\hspace*{1em} 1. The system rejects the upload. \newline
+\hspace*{1em} 2. The Teacher is shown an error message. \newline
+\textbf{7a. Processing fails:} \newline
+\hspace*{1em} 1. The system marks the material version as failed. \newline
+\hspace*{1em} 2. The failure reason is displayed to the Teacher. \\
+\end{longtable}
+
+% =====================4 Learning Loop and Adaptive Quiz Module =====================
+\paragraph{Learning Loop and Adaptive Quiz Module}
+
+This module represents the core learning mechanism of aBridgeAI, combining AI-assisted quiz question authoring, teacher review, adaptive quiz attempts, quality-score derivation, and hybrid SM-2 spaced-repetition scheduling.
+
+Teachers create or review quiz questions, configure expected response time $T_{\text{exp}}$, spaced-repetition parameters, unlock thresholds, and prerequisites. Students take quiz sessions, during which correctness, hint usage, and response time are recorded. These values are used to derive the per-card quality score $Q$ and update each student's spaced-repetition state. The module also supports lesson access gating, due-card reminders, remediation links, and learning-loop dashboards.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.70\textwidth]{graphics/usecase-diagrams/learning_loop_usecase.png}
+    \caption{Detailed Use Case Diagram: Learning Loop and Adaptive Quiz Module}
+    \label{fig:learning_loop_usecase}
+\end{figure}
+
+\noindent\textit{Representative use case.} The following use case specification illustrates the adaptive quiz workflow, including $Q$ derivation and hybrid SM-2 scheduling. The full set of use case specifications for this module is provided in Appendix~\ref{appendix:usecase-specifications}.
+
+% =========================================================
+% Representative UC-LEARN-02: Configure and Take Adaptive Quiz
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Representative Use Case Specification: Configure and Take Adaptive Quiz}
+\label{tab:rep_uc_learn_take_adaptive_quiz} \\
+\hline
+\endfirsthead
+
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-LEARN-02} \\ \hline
+\textbf{Use Case Name} & \textbf{Configure and Take Adaptive Quiz} \\ \hline
+\textbf{Actors} & Teacher, Student \\ \hline
+\textbf{Related Requirements} & FR-4.2, FR-4.3, FR-4.4, FR-4.5 \\ \hline
+\textbf{Description} & Covers quiz configuration, student quiz attempts, quality-score derivation, hybrid SM-2 spaced-repetition updates, and lesson access gating. \\ \hline
+\textbf{Pre-conditions} & The quiz contains approved questions, and the Student is enrolled in the course. \\ \hline
+\textbf{Post-conditions} & The Student's answers are recorded, quality score $Q$ is derived, spaced-repetition state is updated, and lesson access is recalculated. \\ \hline
+\textbf{Main Flow} &
+1. The Teacher configures quiz and spaced-repetition settings, including $T_{\text{exp}}$, initial EF, EF unlock threshold, coverage threshold $\tau$, prerequisites, and optional interview-pass requirements. \newline
+2. The system blocks publication until $T_{\text{exp}}$ is set for every live question. \newline
+3. The Student opens an available quiz session. \newline
+4. The Student answers quiz cards, optionally using hints. \newline
+5. The system records correctness, response time, and hint usage for each answer. \newline
+6. The system derives a quality score $Q$ from correctness, hint usage, and $\rho = T_{\text{actual}} / T_{\text{exp}}$. \newline
+7. The system updates the Student's per-card spaced-repetition state using the hybrid SM-2 scheduling model. \newline
+8. The system recalculates whether the Student satisfies prerequisite completion and lesson coverage threshold $\tau$. \newline
+9. If all unlock conditions are satisfied, the next lesson becomes accessible. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{2a. Missing expected response time:} \newline
+\hspace*{1em} 1. The system blocks quiz publication. \newline
+\hspace*{1em} 2. The Teacher is prompted to set $T_{\text{exp}}$. \newline
+\textbf{3a. Retake policy or cooldown prevents attempt:} \newline
+\hspace*{1em} 1. The system blocks the quiz attempt. \newline
+\hspace*{1em} 2. The Student is shown the remaining cooldown or retake limitation. \\
+\end{longtable}
+
+
+% ===================5 Application Loop and Mock Interview Module=======================
+\paragraph{Application Loop and Mock Interview Module}
+
+This module focuses on transforming learned knowledge into applied interview performance. Teachers define desired outcomes that students must demonstrate, while the system drafts interview questions from ingested course content and associates them with those outcomes.
+
+Students participate in mock interviews through text mode or voice mode. The system persists the interview transcript and session metadata, evaluates the student's responses against teacher-defined desired outcomes, and produces a binary pass-or-fail verdict. Students only see the final verdict, while Teachers can review the transcript and outcome-level assessment for remediation purposes. The module also records interview session activity signals to support post-session integrity review.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.70\textwidth]{graphics/usecase-diagrams/mock_interview_usecase.png}
+    \caption{Detailed Use Case Diagram: Application Loop and Mock Interview Module}
+    \label{fig:mock_interview_usecase}
+\end{figure}
+
+The full set of use case specifications for this module is provided in Appendix~\ref{appendix:usecase-specifications}.
+
+
+
+
+
+% ====================6 Analytics, Reporting and Notifications Module======================
+\paragraph{Analytics, Reporting and Notifications Module}
+This module consolidates progress tracking, notification delivery, administrative analytics, audit-log querying, AI cost telemetry, processing-job inspection, and Career Readiness reporting.
+
+Students can view completion progress and receive notifications, while Teachers can monitor roster progress and identify at-risk learners. Educational Managers can view organisation-scoped Career Readiness snapshots and drill down into individual learner progress. IT Administrators can inspect platform statistics, AI usage, processing jobs, and immutable audit logs for security and compliance review.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.70\textwidth]{graphics/usecase-diagrams/analytics_reporting_usecase.png}
+    \caption{Detailed Use Case Diagram: Analytics, Reporting and Notifications Module}
+    \label{fig:analytics_reporting_usecase}
+\end{figure}
+The full set of use case specifications for this module is provided in Appendix~\ref{appendix:usecase-specifications}.
+
+
+
+
+
+
+% ======================Activity Diagrams===========================
+\subsubsection{Activity Diagrams}
+
+Activity diagrams model the dynamic behavior of the system by illustrating the flow of activities, decision points, and asynchronous AI-driven processes.
+The system activity diagrams focus on four major workflows: Authentication, Smart Content Ingestion, Human-in-the-Loop Quiz Generation, and Context-Aware Mock Interviews.
+
+The following activity diagram illustrates the Human-in-the-Loop quiz generation workflow. The full set of activity diagrams is provided in Appendix~\ref{appendix:activity-diagrams}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{graphics/act-diagrams/act_quiz_gen.png}
+    \caption{Activity Diagram: HITL Quiz Generation and Execution}
+    \label{fig:act_quiz_gen_rep}
+\end{figure}
+
+The following activity diagram details the material ingestion workflow in aBridgeAI. It shows how teachers upload learning materials directly to object storage, how the backend verifies the upload and queues processing, and how the ingestion worker extracts, chunks, embeds, and stores content for retrieval.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{graphics/act-diagrams/act_ingestion.png}
+    \caption{Activity Diagram: Smart Content Ingestion and AI Parsing}
+    \label{fig:act_ingestion_rep}
+\end{figure}
+Detailed activity diagrams are provided in Appendix~\ref{appendix:activity-diagrams}.

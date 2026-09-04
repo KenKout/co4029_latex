@@ -1,0 +1,13 @@
+\section{Implementation}
+\label{sec:implementation}
+
+This chapter describes the concrete implementation of the aBridgeAI backend, covering the development environment, project structure, and the realisation of each major subsystem. The implementation follows a feature-first architecture in which each domain (identity, courses, materials, quizzes, interviews, spaced repetition) is a self-contained package exposing its own models, queries, services, and API routers. Cross-cutting concerns — caching, audit logging, observability, and access control — are isolated in a shared \texttt{core} layer consumed by all features.
+
+\input{chapters/6.Implementation/6.1.Environment}
+\input{chapters/6.Implementation/6.2.Project-Structure}
+\input{chapters/6.Implementation/6.3.Authentication}
+\input{chapters/6.Implementation/6.4.Material-Ingestion}
+\input{chapters/6.Implementation/6.5.AI-Pipelines}
+\input{chapters/6.Implementation/6.6.Spaced-Repetition}
+\input{chapters/6.Implementation/6.7.Access-Control}
+\input{chapters/6.Implementation/6.8.Testing}

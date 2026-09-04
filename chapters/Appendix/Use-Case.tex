@@ -1,0 +1,879 @@
+\section{Use Case Specification}
+\label{appendix:usecase-specifications}
+
+% =========================================================
+% Module 1: Authentication and Access Control
+% =========================================================
+\subsection{Authentication and Access Control Module}
+
+% =========================================================
+% UC-AUTH-01: Authenticate and Log Out
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Authenticate and Log Out}
+\label{tab:uc_auth_login_logout} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-AUTH-01} \\ \hline
+\textbf{Use Case Name} & \textbf{Authenticate and Log Out} \\ \hline
+\textbf{Actors} & Anonymous Visitor for login; Authenticated User for logout \\ \hline
+\textbf{Related Requirements} & FR-1.1, FR-1.2, FR-1.3 \\ \hline
+\textbf{Description} & Allows a pre-registered user to authenticate using Google SSO, complete multi-factor authentication when required, establish an authenticated session, and securely log out of the system. \\ \hline
+\textbf{Pre-conditions} &
+$\bullet$ The user has been provisioned in the system and the account is active. \newline
+$\bullet$ The user owns a Google account associated with the provisioned system account. \newline
+$\bullet$ For logout, the user is currently authenticated with an active session. \\ \hline
+\textbf{Post-conditions} &
+$\bullet$ If authentication succeeds and MFA is not required, the user receives an authenticated session and is redirected to the appropriate dashboard. \newline
+$\bullet$ If MFA is required, the user must complete the second-factor challenge before accessing protected system features. \newline
+$\bullet$ If the user logs out, the active session is revoked and can no longer be used to access protected resources. \\ \hline
+\textbf{Main Flow} &
+1. The user navigates to the Login page. \newline
+2. The user selects ``Continue with Google''. \newline
+3. The system redirects the user to the Google SSO authentication flow. \newline
+4. Google authenticates the user and redirects back to the aBridgeAI system. \newline
+5. The system validates the authentication response and resolves the corresponding local user account. \newline
+6. The system verifies that the account is active and allowed to access the platform. \newline
+7. The system creates an authenticated session and issues the required access credentials. \newline
+8. If MFA is required, the system redirects the user to the MFA verification screen. \newline
+9. If MFA is not required or has been completed, the system redirects the user to the dashboard according to their role and permissions. \newline
+10. When the user selects ``Log out'', the system revokes the active session and redirects the user to the Login page. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{4a. Google SSO authentication fails:} \newline
+\hspace*{1em}1. The system rejects the authentication attempt. \newline
+\hspace*{1em}2. The user is returned to the Login page with an authentication error. \newline
+\textbf{5a. User account is not provisioned:} \newline
+\hspace*{1em}1. The system cannot match the Google identity to a provisioned local account. \newline
+\hspace*{1em}2. The system denies access and instructs the user to contact an administrator. \newline
+\textbf{6a. User account is inactive or disabled:} \newline
+\hspace*{1em}1. The system refuses to create an authenticated session. \newline
+\hspace*{1em}2. The user is informed that the account is not allowed to access the system. \newline
+\textbf{8a. MFA verification is required:} \newline
+\hspace*{1em}1. The system prompts the user to enter an authenticator-app code or a one-time recovery code. \newline
+\hspace*{1em}2. If the code is valid, the system marks the session as MFA-verified and redirects the user to the dashboard. \newline
+\hspace*{1em}3. If the code is invalid or expired, the system rejects the verification attempt and remains on the MFA screen. \newline
+\textbf{10a. Session has already expired before logout:} \newline
+\hspace*{1em}1. The system treats the logout request as completed. \newline
+\hspace*{1em}2. The user is redirected to the Login page. \\
+\end{longtable}
+
+% =========================================================
+% UC-AUTH-02: Manage MFA
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Manage Multi-Factor Authentication}
+\label{tab:uc_auth_mfa} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-AUTH-02} \\ \hline
+\textbf{Use Case Name} & \textbf{Manage Multi-Factor Authentication} \\ \hline
+\textbf{Actors} & All Users \\ \hline
+\textbf{Related Requirements} & FR-1.3, FR-1.4 \\ \hline
+\textbf{Description} & Allows users to verify their identity using an authenticator-app code or a one-time recovery code, and requires recent second-factor verification before sensitive account-security operations. \\ \hline
+\textbf{Pre-conditions} & The user is authenticated through Google SSO and either has MFA enabled or is performing an MFA-sensitive account-security operation. \\ \hline
+\textbf{Post-conditions} & The user completes MFA verification, or the requested sensitive operation is blocked until verification is refreshed. \\ \hline
+\textbf{Main Flow} &
+1. The user completes Google SSO. \newline
+2. The system detects that MFA is enabled for the account. \newline
+3. The system prompts the user to enter a verification code from an authenticator application. \newline
+4. The user enters the verification code. \newline
+5. The system validates the code and marks the session as MFA-verified. \newline
+6. The user accesses protected features normally. \newline
+7. If the user attempts a sensitive operation, such as regenerating recovery codes or disabling MFA, the system checks whether the second-factor verification is still fresh. \newline
+8. If verification is fresh, the operation is allowed. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{4a. Invalid verification code:} \newline
+\hspace*{1em}1. The system rejects the code. \newline
+\hspace*{1em}2. The user remains on the MFA challenge screen. \newline
+\textbf{4b. User chooses recovery code:} \newline
+\hspace*{1em}1. The user enters a one-time recovery code. \newline
+\hspace*{1em}2. The system validates the code and marks it as used. \newline
+\textbf{7a. Verification is no longer fresh:} \newline
+\hspace*{1em}1. The system blocks the sensitive operation. \newline
+\hspace*{1em}2. The user is required to complete second-factor verification again. \\
+\end{longtable}
+
+% =========================================================
+% UC-AUTH-03: Access Protected Features
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Access Protected Features}
+\label{tab:uc_auth_access_control} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-AUTH-03} \\ \hline
+\textbf{Use Case Name} & \textbf{Access Protected Features} \\ \hline
+\textbf{Actors} & All Users, IT Administrators \\ \hline
+\textbf{Related Requirements} & FR-1.5, FR-1.6, FR-1.8 \\ \hline
+\textbf{Description} & Ensures that access to protected backend routes and frontend UI actions is controlled according to the authenticated user's active roles and effective permissions. \\ \hline
+\textbf{Pre-conditions} & The user is authenticated and has an active session. \\ \hline
+\textbf{Post-conditions} & The requested action is either allowed or denied based on the user's effective permissions, and relevant auditable events are recorded. \\ \hline
+\textbf{Main Flow} &
+1. The user attempts to access a protected page or perform a protected action. \newline
+2. The frontend retrieves the user's active roles and effective permissions. \newline
+3. The frontend renders only the UI actions permitted for that user. \newline
+4. The user submits a protected backend request. \newline
+5. The backend validates the session and checks the required permission. \newline
+6. If the permission is present, the system completes the requested operation. \newline
+7. For authentication, MFA, account-security, or access-control actions, the system records an auditable event. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{5a. Permission missing:} \newline
+\hspace*{1em}1. The system denies the request. \newline
+\hspace*{1em}2. No protected data is returned. \newline
+\textbf{5b. Session invalid or revoked:} \newline
+\hspace*{1em}1. The system rejects the request. \newline
+\hspace*{1em}2. The user is redirected to authenticate again. \\
+\end{longtable}
+
+
+% =========================================================
+% UC-AUTH-04: Manage User Account Access
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Manage User Account Access}
+\label{tab:uc_auth_account_access} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-AUTH-04} \\ \hline
+\textbf{Use Case Name} & \textbf{Manage User Account Access} \\ \hline
+\textbf{Actors} & IT Administrator \\ \hline
+\textbf{Related Requirements} & FR-1.7, FR-1.8 \\ \hline
+\textbf{Description} & Allows IT Administrators to search users, view user details, enable or disable user accounts, and ensure that sensitive account-access changes are recorded as auditable events. \\ \hline
+\textbf{Pre-conditions} & The actor is authenticated as an IT Administrator and has account-management permission. \\ \hline
+\textbf{Post-conditions} & The selected user's account status is updated, active sessions are revoked when required, and the account-access change is recorded for audit review. \\ \hline
+\textbf{Main Flow} &
+1. The IT Administrator opens the account management page. \newline
+2. The administrator searches for a user by name, email, organisation, or status. \newline
+3. The system displays matching users within the administrator's permitted scope. \newline
+4. The administrator opens a user's detail page. \newline
+5. The administrator reviews account status, assigned roles, organisation membership, and recent security-related information. \newline
+6. The administrator enables or disables the selected account. \newline
+7. If the account is disabled, the system revokes all active sessions for that account. \newline
+8. The system records the account-access change as an auditable event. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{2a. No matching user found:} \newline
+\hspace*{1em}1. The system displays an empty search result. \newline
+\hspace*{1em}2. No account state is changed. \newline
+\textbf{3a. User is outside administrator scope:} \newline
+\hspace*{1em}1. The system hides the user record or denies access to the detail page. \newline
+\textbf{6a. Administrator attempts an invalid status transition:} \newline
+\hspace*{1em}1. The system rejects the update and displays a validation message. \newline
+\textbf{8a. Audit logging fails:} \newline
+\hspace*{1em}1. The system prevents the sensitive change from being completed or flags the operation for administrative review according to the audit policy. \\
+\end{longtable}
+
+% =========================================================
+% Module 2: Organization and User Management
+% =========================================================
+\subsection{Organization and User Management Module}
+
+% =========================================================
+% UC-ORG-01: Manage Tenant Organisations
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Manage Tenant Organisations}
+\label{tab:uc_org_manage_tenants} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-ORG-01} \\ \hline
+\textbf{Use Case Name} & \textbf{Manage Tenant Organisations} \\ \hline
+\textbf{Actors} & IT Administrator \\ \hline
+\textbf{Related Requirements} & FR-2.1, FR-2.2, FR-2.7, FR-2.9 \\ \hline
+\textbf{Description} & Allows IT Administrators to provision tenant organisations, manage organisation lifecycle states, configure organisation domains, and enable domain-based account auto-provisioning. \\ \hline
+\textbf{Pre-conditions} & The user is authenticated as an IT Administrator. \\ \hline
+\textbf{Post-conditions} & A tenant organisation is created or updated, and its domain and lifecycle configuration are saved. \\ \hline
+\textbf{Main Flow} &
+1. The IT Administrator opens the Organisation Management dashboard. \newline
+2. The administrator creates a new tenant organisation or selects an existing one. \newline
+3. The administrator enters or updates the organisation's basic information. \newline
+4. For a new organisation, the administrator assigns the initial Educational Manager. \newline
+5. The administrator configures the organisation lifecycle status. \newline
+6. The administrator attaches one or more email domains to the organisation. \newline
+7. The administrator enables or disables auto-provisioning for each domain. \newline
+8. The system saves the organisation configuration. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{3a. Invalid organisation information:} \newline
+\hspace*{1em}1. The system highlights invalid or missing fields. \newline
+\hspace*{1em}2. The organisation is not saved until the fields are corrected. \newline
+\textbf{6a. Domain already attached elsewhere:} \newline
+\hspace*{1em}1. The system rejects the domain assignment. \newline
+\hspace*{1em}2. The administrator is informed that the domain is already registered. \\
+\end{longtable}
+
+% =========================================================
+% UC-ORG-02: Manage Users and Memberships
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Manage Users and Memberships}
+\label{tab:uc_org_manage_users} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-ORG-02} \\ \hline
+\textbf{Use Case Name} & \textbf{Manage Users and Memberships} \\ \hline
+\textbf{Actors} & Educational Manager, IT Administrator, All Users \\ \hline
+\textbf{Related Requirements} & FR-2.3, FR-2.6, FR-2.8, FR-2.10 \\ \hline
+\textbf{Description} & Supports user onboarding, organisation membership management, tenant-scoped manager actions, and authenticated user profile updates. \\ \hline
+\textbf{Pre-conditions} & The actor is authenticated and has the required organisation-management or profile-management permission. \\ \hline
+\textbf{Post-conditions} & User membership records, profile data, or account status are updated according to the actor's permission scope. \\ \hline
+\textbf{Main Flow} &
+1. The Educational Manager opens the User Management area for their organisation. \newline
+2. The manager uploads a CSV file to bulk-enroll students into a course. \newline
+3. The system validates each row and creates accounts for unseen email addresses. \newline
+4. The system reports per-row validation errors without aborting the whole batch. \newline
+5. The manager views or updates organisation membership records, including student or employee identifier codes. \newline
+6. The system ensures that every manager query and action is scoped to the manager's tenant organisation. \newline
+7. Separately, an authenticated user may view and update their own profile information. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{3a. CSV contains invalid rows:} \newline
+\hspace*{1em}1. The system imports valid rows. \newline
+\hspace*{1em}2. The system reports invalid rows with validation errors. \newline
+\textbf{6a. Manager attempts cross-tenant access:} \newline
+\hspace*{1em}1. The system denies the request. \newline
+\hspace*{1em}2. No cross-tenant data is returned. \newline
+\textbf{7a. Profile data is invalid:} \newline
+\hspace*{1em}1. The system rejects invalid profile fields or external links. \newline
+\hspace*{1em}2. The user is prompted to correct the profile information. \\
+\end{longtable}
+
+% =========================================================
+% UC-ORG-03: Manage Career Pathways and Teacher Assignments
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Manage Career Pathways and Teacher Assignments}
+\label{tab:uc_org_career_pathway} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-ORG-03} \\ \hline
+\textbf{Use Case Name} & \textbf{Manage Career Pathways and Teacher Assignments} \\ \hline
+\textbf{Actors} & Educational Manager \\ \hline
+\textbf{Related Requirements} & FR-2.4, FR-2.5, FR-2.6 \\ \hline
+\textbf{Description} & Allows Educational Managers to define career pathways as ordered course sequences and assign teachers to courses within their organisation. \\ \hline
+\textbf{Pre-conditions} & The Educational Manager is authenticated and belongs to the tenant organisation being managed. \\ \hline
+\textbf{Post-conditions} & Career pathways and teacher-course assignments are saved within the organisation scope. \\ \hline
+\textbf{Main Flow} &
+1. The Educational Manager opens the Career Pathway Management page. \newline
+2. The manager creates a new pathway or edits an existing pathway. \newline
+3. The manager selects courses and arranges them into the intended order. \newline
+4. The manager saves the pathway. \newline
+5. The manager opens the course assignment page. \newline
+6. The manager selects a teacher within the organisation. \newline
+7. The manager assigns the teacher to a course. \newline
+8. The system saves the assignment and grants the teacher course-authoring access. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{3a. Invalid course reference:} \newline
+\hspace*{1em}1. The system rejects the pathway update. \newline
+\hspace*{1em}2. The manager is prompted to choose valid courses. \newline
+\textbf{6a. Teacher outside organisation:} \newline
+\hspace*{1em}1. The system blocks the assignment. \newline
+\hspace*{1em}2. The manager is informed that the teacher is outside their organisation scope. \\
+\end{longtable}
+
+
+% =========================================================
+% Module 3: Course and Material Management
+% =========================================================
+\subsection{Course and Material Management Module}
+
+% =========================================================
+% UC-COURSE-01: Manage Course Structure and Lifecycle
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Manage Course Structure and Lifecycle}
+\label{tab:uc_course_structure_lifecycle} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-COURSE-01} \\ \hline
+\textbf{Use Case Name} & \textbf{Manage Course Structure and Lifecycle} \\ \hline
+\textbf{Actors} & Teacher, Educational Manager, IT Administrator \\ \hline
+\textbf{Related Requirements} & FR-3.1, FR-3.2, FR-3.6, FR-3.8 \\ \hline
+\textbf{Description} & Allows authorised users to manage course lifecycle states, organise course content into ordered modules and learning items, configure prerequisites and unlock rules, and control material visibility. \\ \hline
+\textbf{Pre-conditions} & The actor is authenticated and has course-authoring or administrative permission. \\ \hline
+\textbf{Post-conditions} & The course structure, lifecycle state, visibility settings, and unlock rules are saved. \\ \hline
+\textbf{Main Flow} &
+1. The Teacher or Educational Manager opens the Course Management dashboard. \newline
+2. The actor creates or selects a course. \newline
+3. The actor manages the course lifecycle state, such as draft, published, archived, or soft-deleted. \newline
+4. The actor organises modules and learning items, including lessons, quizzes, and interviews. \newline
+5. The actor configures prerequisites and unlock rules. \newline
+6. The actor configures material and resource visibility for students. \newline
+7. The system saves the course configuration. \newline
+8. If the actor is an IT Administrator, the actor may inspect course processing-job history or restore soft-deleted courses. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{5a. Invalid prerequisite configuration:} \newline
+\hspace*{1em}1. The system rejects the configuration. \newline
+\hspace*{1em}2. The actor is prompted to correct the prerequisite rule. \newline
+\textbf{8a. Restore permission missing:} \newline
+\hspace*{1em}1. The system blocks course restoration. \newline
+\hspace*{1em}2. The actor is shown an unauthorised message. \\
+\end{longtable}
+
+% =========================================================
+% UC-COURSE-02: Upload and Process Learning Materials
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Upload and Process Learning Materials}
+\label{tab:uc_course_material_upload} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-COURSE-02} \\ \hline
+\textbf{Use Case Name} & \textbf{Upload and Process Learning Materials} \\ \hline
+\textbf{Actors} & Teacher, Educational Manager \\ \hline
+\textbf{Related Requirements} & FR-3.3, FR-3.4, FR-3.5 \\ \hline
+\textbf{Description} & Allows Teachers to upload supported learning materials, manage metadata, link materials to lessons, monitor ingestion progress, and maintain material version history. \\ \hline
+\textbf{Pre-conditions} & The actor has course-authoring permission and has selected a target lesson. \\ \hline
+\textbf{Post-conditions} & The material is stored, linked to the lesson, processed by the ingestion pipeline, and versioned when updated. \\ \hline
+\textbf{Main Flow} &
+1. The Teacher opens a lesson in authoring mode. \newline
+2. The Teacher selects ``Upload Material''. \newline
+3. The Teacher uploads a supported file using a standard or resumable upload flow. \newline
+4. The system stores the material and records upload metadata. \newline
+5. The Teacher links the material to one or more lessons. \newline
+6. The system queues the material for ingestion and processing. \newline
+7. The system displays processing status, percent completion, and any failure reason. \newline
+8. If a replacement file is uploaded, the system creates a new material version and retains prior versions for rollback or re-processing. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{3a. Unsupported format or failed upload:} \newline
+\hspace*{1em}1. The system rejects the upload. \newline
+\hspace*{1em}2. The Teacher is shown an error message. \newline
+\textbf{7a. Processing fails:} \newline
+\hspace*{1em}1. The system marks the material version as failed. \newline
+\hspace*{1em}2. The failure reason is displayed to the Teacher. \newline
+\textbf{8a. Teacher re-runs processing:} \newline
+\hspace*{1em}1. The Teacher selects ``Re-run processing''. \newline
+\hspace*{1em}2. The system queues a new processing job for the material version. \\
+\end{longtable}
+
+% =========================================================
+% UC-COURSE-03: Browse Courses and Access Materials
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Browse Courses and Access Materials}
+\label{tab:uc_course_browse_materials} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-COURSE-03} \\ \hline
+\textbf{Use Case Name} & \textbf{Browse Courses and Access Materials} \\ \hline
+\textbf{Actors} & Student \\ \hline
+\textbf{Related Requirements} & FR-3.7 \\ \hline
+\textbf{Description} & Allows enrolled Students to browse published courses in their organisation, view course details, and stream or download approved materials. \\ \hline
+\textbf{Pre-conditions} & The Student is authenticated, enrolled in the course, and the course is published. \\ \hline
+\textbf{Post-conditions} & The Student accesses only approved and visible learning materials. \\ \hline
+\textbf{Main Flow} &
+1. The Student opens the course catalogue. \newline
+2. The system displays published courses available to the Student's organisation and enrollment status. \newline
+3. The Student opens a course detail page. \newline
+4. The system displays modules, lessons, learning outcomes, tags, and visible lesson resources. \newline
+5. The Student selects an approved material. \newline
+6. The system generates a short-lived presigned URL. \newline
+7. The Student streams or downloads the material. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{2a. Course unpublished or unavailable:} \newline
+\hspace*{1em}1. The course is not displayed to the Student. \newline
+\textbf{5a. Material hidden or not approved:} \newline
+\hspace*{1em}1. The material is not accessible to the Student. \newline
+\textbf{6a. Presigned URL expires:} \newline
+\hspace*{1em}1. The system issues a new URL if the Student remains authorised. \\
+\end{longtable}
+
+
+% =========================================================
+% Module 4: Learning Loop and Adaptive Quiz
+% =========================================================
+\subsection{Learning Loop and Adaptive Quiz Module}
+
+% =========================================================
+% UC-LEARN-01: Author and Review Quiz Questions
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Author and Review Quiz Questions}
+\label{tab:uc_learn_quiz_authoring} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-LEARN-01} \\ \hline
+\textbf{Use Case Name} & \textbf{Author and Review Quiz Questions} \\ \hline
+\textbf{Actors} & Teacher, Educational Manager \\ \hline
+\textbf{Related Requirements} & FR-4.1 \\ \hline
+\textbf{Description} & Allows Teachers to create quiz questions manually or through AI drafting from ingested course content, review drafted questions, reuse approved questions, and maintain source references and revision history. \\ \hline
+\textbf{Pre-conditions} & The relevant course materials have been ingested, and the actor has quiz-authoring permission. \\ \hline
+\textbf{Post-conditions} & Quiz questions are created, reviewed, and stored with source references and revision history. \\ \hline
+\textbf{Main Flow} &
+1. The Teacher opens the Quiz Authoring page for a lesson or module. \newline
+2. The Teacher chooses to create questions manually or generate them from ingested content. \newline
+3. If AI drafting is selected, the system drafts questions from source materials and attaches source references. \newline
+4. The Teacher reviews each question. \newline
+5. The Teacher edits, approves, rejects, or reuses approved questions from the question bank. \newline
+6. The system stores the final question state and revision history. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{3a. Source content unavailable:} \newline
+\hspace*{1em}1. The system blocks AI drafting. \newline
+\hspace*{1em}2. The Teacher is informed that the source material is not ready. \newline
+\textbf{5a. Question rejected:} \newline
+\hspace*{1em}1. The question is excluded from student-facing quiz publication. \\
+\end{longtable}
+
+% =========================================================
+% UC-LEARN-02: Configure and Take Adaptive Quiz
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Configure and Take Adaptive Quiz}
+\label{tab:uc_learn_take_adaptive_quiz} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-LEARN-02} \\ \hline
+\textbf{Use Case Name} & \textbf{Configure and Take Adaptive Quiz} \\ \hline
+\textbf{Actors} & Teacher, Student \\ \hline
+\textbf{Related Requirements} & FR-4.2, FR-4.3, FR-4.4, FR-4.5 \\ \hline
+\textbf{Description} & Covers quiz configuration, student quiz attempts, quality-score derivation, hybrid SM-2 spaced-repetition updates, and lesson access gating. \\ \hline
+\textbf{Pre-conditions} & The quiz contains approved questions, and the Student is enrolled in the course. \\ \hline
+\textbf{Post-conditions} & The Student's answers are recorded, quality score $Q$ is derived, spaced-repetition state is updated, and lesson access is recalculated. \\ \hline
+\textbf{Main Flow} &
+1. The Teacher configures quiz and spaced-repetition settings, including $T_{\text{exp}}$, initial EF, EF unlock threshold, coverage threshold $\tau$, prerequisites, and optional interview-pass requirements. \newline
+2. The system blocks publication until $T_{\text{exp}}$ is set for every live question. \newline
+3. The Student opens an available quiz session. \newline
+4. The Student answers quiz cards, optionally using hints. \newline
+5. The system records correctness, response time, and hint usage for each answer. \newline
+6. The system derives a quality score $Q$ from correctness, hint usage, and $\rho = T_{\text{actual}} / T_{\text{exp}}$. \newline
+7. The system updates the Student's per-card spaced-repetition state using the hybrid SM-2 scheduling model. \newline
+8. The system recalculates whether the Student satisfies prerequisite completion and lesson coverage threshold $\tau$. \newline
+9. If all unlock conditions are satisfied, the next lesson becomes accessible. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{2a. Missing expected response time:} \newline
+\hspace*{1em}1. The system blocks quiz publication. \newline
+\hspace*{1em}2. The Teacher is prompted to set $T_{\text{exp}}$. \newline
+\textbf{3a. Retake policy or cooldown prevents attempt:} \newline
+\hspace*{1em}1. The system blocks the quiz attempt. \newline
+\hspace*{1em}2. The Student is shown the remaining cooldown or retake limitation. \newline
+\textbf{8a. Unlock conditions not satisfied:} \newline
+\hspace*{1em}1. The next lesson remains locked. \newline
+\hspace*{1em}2. The system shows the remaining requirements. \\
+\end{longtable}
+
+% =========================================================
+% UC-LEARN-03: View Learning Loop Dashboards and Notifications
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: View Learning Loop Dashboards and Notifications}
+\label{tab:uc_learn_dashboard_notifications} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-LEARN-03} \\ \hline
+\textbf{Use Case Name} & \textbf{View Learning Loop Dashboards and Notifications} \\ \hline
+\textbf{Actors} & Student, Teacher \\ \hline
+\textbf{Related Requirements} & FR-4.6, FR-4.7, FR-4.8 \\ \hline
+\textbf{Description} & Provides spaced-repetition reminders, remediation notifications, Teacher learning-loop analytics, and Student learning dashboards. \\ \hline
+\textbf{Pre-conditions} & Quiz activity and spaced-repetition data exist for the course or student. \\ \hline
+\textbf{Post-conditions} & The actor receives relevant learning-loop insights, reminders, or remediation links. \\ \hline
+\textbf{Main Flow} &
+1. A Student has due cards or recently failed a card. \newline
+2. The system sends an in-app spaced-repetition reminder or remediation notification. \newline
+3. The Student opens the personal learning dashboard. \newline
+4. The system displays due-card lists, retention estimates, progression readiness, and course-level progress. \newline
+5. The Teacher opens course learning-loop analytics. \newline
+6. The system displays cohort retention distribution, difficult-card lists, at-risk students, and per-student spaced-repetition details. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{1a. No due cards exist:} \newline
+\hspace*{1em}1. The system displays an empty due-card state. \newline
+\textbf{2a. No reliable source reference exists:} \newline
+\hspace*{1em}1. The remediation notification is sent without a direct source-material link. \newline
+\textbf{6a. No quiz activity exists:} \newline
+\hspace*{1em}1. The Teacher dashboard displays an empty state. \\
+\end{longtable}
+
+
+% =========================================================
+% Module 5: Application Loop and Mock Interview
+% =========================================================
+\subsection{Application Loop and Mock Interview Module}
+
+% =========================================================
+% UC-INTERVIEW-01: Configure Mock Interview
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Configure Mock Interview}
+\label{tab:uc_interview_configure} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-INTERVIEW-01} \\ \hline
+\textbf{Use Case Name} & \textbf{Configure Mock Interview} \\ \hline
+\textbf{Actors} & Teacher, Educational Manager \\ \hline
+\textbf{Related Requirements} & FR-5.1, FR-5.2, FR-5.3 \\ \hline
+\textbf{Description} & Allows Teachers to define desired interview outcomes, generate and review interview questions, and configure interview session rules. \\ \hline
+\textbf{Pre-conditions} & The actor has authoring permission for the course or module. \\ \hline
+\textbf{Post-conditions} & The interview configuration, desired outcomes, reviewed questions, and session rules are saved. \\ \hline
+\textbf{Main Flow} &
+1. The Teacher opens the Mock Interview configuration page. \newline
+2. The Teacher defines interview sections and desired outcomes that students must demonstrate to pass. \newline
+3. The system does not require the Teacher to provide expected or model answers. \newline
+4. The Teacher drafts interview questions from ingested course content. \newline
+5. The system associates each question with one or more desired outcomes. \newline
+6. The Teacher reviews, edits, approves, or rejects drafted questions. \newline
+7. The Teacher configures session rules, including maximum attempts, cooldown periods, and whether related quiz progression remains locked until the interview is passed. \newline
+8. The system saves the interview configuration for publication. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{2a. No desired outcomes defined:} \newline
+\hspace*{1em}1. The system blocks interview publication. \newline
+\hspace*{1em}2. The Teacher is prompted to define at least one desired outcome. \newline
+\textbf{5a. Question cannot be mapped to an outcome:} \newline
+\hspace*{1em}1. The system flags the question for review. \newline
+\textbf{7a. Invalid session rule:} \newline
+\hspace*{1em}1. The system rejects the rule and displays validation feedback. \\
+\end{longtable}
+
+% =========================================================
+% UC-INTERVIEW-02: Take Mock Interview
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Take Mock Interview}
+\label{tab:uc_interview_take} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-INTERVIEW-02} \\ \hline
+\textbf{Use Case Name} & \textbf{Take Mock Interview} \\ \hline
+\textbf{Actors} & Student \\ \hline
+\textbf{Related Requirements} & FR-5.4, FR-5.5, FR-5.6, FR-5.8 \\ \hline
+\textbf{Description} & Allows Students to participate in text-mode or voice-mode mock interview sessions with an adaptive AI interviewer, while the system records transcript, metadata, and session activity signals. \\ \hline
+\textbf{Pre-conditions} & The Student is authenticated, enrolled, and eligible to access the interview. \\ \hline
+\textbf{Post-conditions} & The interview transcript, session metadata, and activity signals are persisted for evaluation and review. \\ \hline
+\textbf{Main Flow} &
+1. The Student selects an available mock interview. \newline
+2. The Student chooses text mode or voice mode. \newline
+3. The system starts an adaptive turn-taking dialogue with the AI interviewer. \newline
+4. The AI interviewer presents a question. \newline
+5. The Student responds by typing or speaking. \newline
+6. In voice mode, the system streams audio, transcribes speech, and generates text-to-speech responses. \newline
+7. The system processes raw audio transiently without persistent archival. \newline
+8. The interview continues until the session is completed. \newline
+9. The system persists the interview transcript and session metadata. \newline
+10. The system records session activity signals such as browser focus changes, tab switching, full-screen status, and session events. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{1a. Student is not eligible:} \newline
+\hspace*{1em}1. The system denies access to the interview. \newline
+\hspace*{1em}2. The Student is shown the unmet requirement. \newline
+\textbf{2a. Microphone permission denied:} \newline
+\hspace*{1em}1. The system shows guidance or allows fallback to text mode. \newline
+\textbf{10a. Integrity signal detected:} \newline
+\hspace*{1em}1. The system records the event for post-session review. \\
+\end{longtable}
+
+% =========================================================
+% UC-INTERVIEW-03: Review Interview Result
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Review Interview Result}
+\label{tab:uc_interview_review_result} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-INTERVIEW-03} \\ \hline
+\textbf{Use Case Name} & \textbf{Review Interview Result} \\ \hline
+\textbf{Actors} & Student, Teacher \\ \hline
+\textbf{Related Requirements} & FR-5.6, FR-5.7 \\ \hline
+\textbf{Description} & Evaluates the Student's interview responses against teacher-defined desired outcomes and controls result visibility for Students and Teachers. \\ \hline
+\textbf{Pre-conditions} & The interview session has been completed and the transcript has been persisted. \\ \hline
+\textbf{Post-conditions} & A binary pass-or-fail verdict is produced, shown to the Student, and the transcript with outcome-level assessment is available to Teachers for remediation review. \\ \hline
+\textbf{Main Flow} &
+1. The Student completes the interview session. \newline
+2. The system evaluates the transcript against teacher-defined desired outcomes. \newline
+3. The system produces a single binary pass-or-fail verdict. \newline
+4. The Student opens the interview result page. \newline
+5. The system displays only the binary verdict to the Student. \newline
+6. The Teacher opens the completed interview session. \newline
+7. The system displays the transcript and outcome-level assessment to the Teacher for remediation purposes. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{1a. Interview incomplete:} \newline
+\hspace*{1em}1. The system does not produce a final verdict. \newline
+\textbf{5a. Student attempts to access outcome-level details:} \newline
+\hspace*{1em}1. The system hides per-outcome rubric details. \newline
+\textbf{6a. Teacher does not manage the course:} \newline
+\hspace*{1em}1. The system denies access to the transcript and assessment. \\
+\end{longtable}
+
+
+% =========================================================
+% Module 6: Analytics, Reporting and Notifications
+% =========================================================
+\subsection{Analytics, Reporting and Notifications Module}
+
+% =========================================================
+% UC-ANALYTICS-01: Manage Notifications
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Manage Notifications}
+\label{tab:uc_analytics_notifications} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-ANALYTICS-01} \\ \hline
+\textbf{Use Case Name} & \textbf{Manage Notifications} \\ \hline
+\textbf{Actors} & All Users \\ \hline
+\textbf{Related Requirements} & FR-6.3 \\ \hline
+\textbf{Description} & Allows users to view in-app notifications, manage unread state, dismiss notifications, and configure notification preferences by category and channel. \\ \hline
+\textbf{Pre-conditions} & The user is authenticated. \\ \hline
+\textbf{Post-conditions} & Notification state or preferences are updated. \\ \hline
+\textbf{Main Flow} &
+1. The user opens the notification inbox. \newline
+2. The system displays notifications and unread count. \newline
+3. The user marks notifications as read or dismisses them. \newline
+4. The user opens notification preferences. \newline
+5. The user configures notification preferences by category and channel. \newline
+6. The system saves the preferences and applies them to future notifications. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{5a. Invalid preference combination:} \newline
+\hspace*{1em}1. The system rejects the configuration. \newline
+\hspace*{1em}2. The user is prompted to correct the preference. \\
+\end{longtable}
+
+% =========================================================
+% UC-ANALYTICS-02: View Progress and Career Readiness Reports
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: View Progress and Career Readiness Reports}
+\label{tab:uc_analytics_reports} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-ANALYTICS-02} \\ \hline
+\textbf{Use Case Name} & \textbf{View Progress and Career Readiness Reports} \\ \hline
+\textbf{Actors} & Student, Teacher, Educational Manager \\ \hline
+\textbf{Related Requirements} & FR-6.1, FR-6.2, FR-6.8 \\ \hline
+\textbf{Description} & Provides student completion progress, teacher roster progress, at-risk learner identification, and organisation-scoped Career Readiness snapshots. \\ \hline
+\textbf{Pre-conditions} & The actor is authenticated and has permission to view the selected report scope. \\ \hline
+\textbf{Post-conditions} & The actor views progress, risk, or Career Readiness information according to their role and organisation scope. \\ \hline
+\textbf{Main Flow} &
+1. A Student opens the progress page. \newline
+2. The system displays per-lesson and per-course completion progress separately from spaced-repetition metrics. \newline
+3. A Teacher opens the roster progress view for a course. \newline
+4. The system displays course-level roster progress and at-risk learners. \newline
+5. An Educational Manager opens the Career Readiness report for an organisation pathway. \newline
+6. The system displays aggregated pathway-level learner outcomes. \newline
+7. The manager drills down into individual progress where permitted. \newline
+8. The report excludes per-interview rubric details. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{2a. Student has no activity:} \newline
+\hspace*{1em}1. The system displays zero progress instead of an error. \newline
+\textbf{4a. No roster activity exists:} \newline
+\hspace*{1em}1. The system displays an empty state. \newline
+\textbf{7a. Manager attempts to access another organisation:} \newline
+\hspace*{1em}1. The system denies access. \\
+\end{longtable}
+
+% =========================================================
+% UC-ANALYTICS-03: Monitor Platform Operations
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Monitor Platform Operations}
+\label{tab:uc_analytics_operations} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-ANALYTICS-03} \\ \hline
+\textbf{Use Case Name} & \textbf{Monitor Platform Operations} \\ \hline
+\textbf{Actors} & IT Administrator, Educational Manager \\ \hline
+\textbf{Related Requirements} & FR-6.4, FR-6.5, FR-6.6, FR-6.7 \\ \hline
+\textbf{Description} & Allows authorised administrators to view platform and organisation-level statistics, inspect AI cost telemetry, inspect processing jobs, retry failed jobs, and query immutable audit logs. \\ \hline
+\textbf{Pre-conditions} & The actor is authenticated and has administrative reporting or audit permissions. \\ \hline
+\textbf{Post-conditions} & The actor obtains operational visibility into platform health, AI usage, processing jobs, or audit records. \\ \hline
+\textbf{Main Flow} &
+1. The administrator opens the Operations dashboard. \newline
+2. The system displays platform or organisation-level statistics according to the actor's scope. \newline
+3. The administrator opens AI cost telemetry. \newline
+4. The system displays usage summaries by user, pipeline, and recent model calls. \newline
+5. The administrator opens ingestion or AI processing jobs. \newline
+6. The system displays job status and failed job details. \newline
+7. The administrator retries a failed processing job when appropriate. \newline
+8. The administrator opens the audit log. \newline
+9. The system displays immutable audit records for role assignments, sensitive data changes, and HTTP request events. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{2a. Actor has organisation-only scope:} \newline
+\hspace*{1em}1. The system filters statistics to the actor's organisation. \newline
+\textbf{7a. Failed job cannot be retried:} \newline
+\hspace*{1em}1. The system blocks retry and explains the missing material or configuration. \newline
+\textbf{8a. Actor lacks audit permission:} \newline
+\hspace*{1em}1. The system denies access to audit logs. \\
+\end{longtable}

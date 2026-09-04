@@ -1,0 +1,28 @@
+\subsection{Access Control}
+\label{sec:impl_access_control}
+
+The access control subsystem implements a hierarchical Role-Based Access Control (RBAC) model that supports multi-tenant organisations with nested organisational units. It is implemented in \path{abridgeai/features/access_control/} and \path{abridgeai/access_control/}.
+
+\paragraph{Permission catalog}
+All permissions are declared in a YAML catalog (\path{access_control/permissions/catalog.yaml}) that is validated at startup against a Pydantic schema. Each permission entry specifies a \texttt{resource}, an \texttt{action}, and an optional \texttt{scope} (e.g., \texttt{course:read}, \texttt{quiz:generate}, \texttt{admin:users:write}). The catalog is the single source of truth for the permission namespace; adding a new permission requires only a catalog entry and a migration to seed it into the \texttt{permissions} table.
+
+\paragraph{Role seeds}
+Default roles (\texttt{student}, \texttt{instructor}, \texttt{admin}) and their permission assignments are declared in \texttt{role\_seeds.yaml} and applied by migration \path{0004_seed_permission_catalog.py}. Custom roles can be created at the organisation level and assigned any subset of catalog permissions.
+
+\paragraph{Organisation hierarchy}
+Organisations are structured as trees of \texttt{OrgUnit} nodes. Membership in a parent unit implicitly grants membership in all descendant units. The recursive membership resolution query (\path{queries/sql/org_unit_tree.sql}) uses a PostgreSQL recursive CTE to traverse the tree in a single query, returning the full set of unit IDs a user belongs to.
+
+\paragraph{Permission resolution}
+At request time, the \texttt{PermissionsLookupService} (\path{services/permissions_lookup.py}) resolves the caller's effective permission set by:
+\begin{enumerate}
+    \item Loading all role assignments for the user across all their organisation memberships.
+    \item Expanding each role to its permission set via the catalog.
+    \item Merging direct permission grants (\texttt{user\_permission\_grants}) with role-derived permissions.
+    \item Caching the resolved set in Redis with a short TTL to avoid repeated database queries on every request.
+\end{enumerate}
+
+\paragraph{Policy enforcement}
+Route handlers declare their required permissions via FastAPI dependencies. The \texttt{policies.py} module in each feature defines the permission checks for that feature's endpoints. A failed permission check raises \texttt{ForbiddenError} (HTTP 403), which the global exception handler converts to a structured JSON error response.
+
+\paragraph{Audit logging}
+Every write operation that modifies a soft-deletable entity is recorded in the \texttt{http\_audit\_log} table by a SQLAlchemy event listener (\path{core/audit/listener.py}). The listener captures the actor's user ID, the HTTP method and path, the affected table and row ID, and a JSON diff of the changed columns. Audit writes are dispatched asynchronously via an actor pool (\path{core/audit/_worker_actor.py}) to avoid adding latency to the request path.

@@ -1,0 +1,253 @@
+\section{Functional Requirements Specification}
+\label{appendix:fr}
+
+% ============================ Module 1: Authentication & Access Control ====================
+\paragraph{Authentication and Access Control}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.05\textwidth}|m{0.29\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Functional Requirements for Authentication \& Access Control}
+\label{tab:fr_auth_access} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endfirsthead
+
+\multicolumn{7}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endhead
+% Ngân check mess :v
+\hline \multicolumn{7}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+FR-1.1 & The system shall allow users to authenticate using Google SSO and log out of the system. & All Users & UR-ITA-05 & Yes & Yes & High \\ \hline
+
+FR-1.2 & The system shall manage authenticated user sessions, including session creation, validation, refresh, expiration, and revocation. & All Users & UR-ITA-05 & Yes & Yes & High \\ \hline
+
+FR-1.3 & The system shall support two-factor authentication using authenticator-app verification codes and one-time recovery codes for additional account protection. & All Users & UR-ITA-05 & Yes & Yes & High \\ \hline
+
+FR-1.4 & The system shall require recent second-factor verification before allowing sensitive account-security operations, such as regenerating recovery codes or disabling MFA. & All Users & UR-ITA-05 & Yes & Yes & High \\ \hline
+
+FR-1.5 & The system shall enforce role-based and permission-based access control for protected backend routes and frontend UI actions based on the authenticated user’s active roles and effective permissions. & All Users & UR-ITA-05 & Yes & Yes & High \\ \hline
+
+
+FR-1.6 & The system shall record auditable events for authentication actions, including login, logout, MFA verification, account-security changes, and access-control changes. & IT Administrators & UR-ITA-03 & Yes & Yes & Medium \\
+
+\end{longtable}
+
+
+% ============================ Module 2: Organization & User Management ====================
+\paragraph{Organization and User Management}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.05\textwidth}|m{0.29\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Functional Requirements for Organization \& User Management}
+\label{tab:fr_org} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endfirsthead
+
+\multicolumn{7}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endhead
+
+\hline \multicolumn{7}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+FR-2.1 & The system shall allow IT administrators to provision new tenant organisations and to assign the initial Educational Manager role to a user within each organisation. & IT Administrators & UR-ITA-01 & Yes & Yes & High \\ \hline
+
+FR-2.2 & The system shall allow IT administrators to manage existing tenant organisations by updating their basic information and controlling their lifecycle status, including active, inactive, archived, and soft-deleted states. & IT Administrators & UR-ITA-01, UR-ITA-02 & Yes & Yes & High \\ \hline
+
+FR-2.3 & The system shall allow Educational Managers to bulk-enroll students into a course via CSV import, creating new student accounts for unseen email addresses and reporting per-row validation errors without aborting the batch. & Educational Managers & UR-MGR-01 & Yes & Yes & High \\ \hline
+
+FR-2.4 & The system shall allow Educational Managers to define career pathways as ordered sequences of courses, with support for re-ordering courses within a pathway. & Educational Managers & UR-MGR-02 & Yes & Yes & High \\ \hline
+
+FR-2.5 & The system shall allow Educational Managers to assign Teachers to courses within their organisation. & Educational Managers & UR-MGR-02 & Yes & Yes & High \\ \hline
+
+FR-2.6 & The system shall strictly scope every Educational Manager action and query to that manager's own tenant organisation, preventing any cross-tenant data access. & Educational Managers & UR-MGR-04 & Yes & Yes & High \\ \hline
+
+FR-2.7 & The system shall associate users with organisations and org units, and shall automatically place newly provisioned accounts into the matching organisation when their email domain is registered. & IT Administrators, Educational Managers & UR-MGR-04, UR-ITA-01 & Yes & Yes & High \\ \hline
+
+FR-2.8 & The system shall allow authenticated users to view and update their own profile, including display name, avatar, bio, and external links (website, GitHub, LinkedIn, portfolio). & All Users & UR-ITA-05 & Yes & Yes & Medium \\ \hline
+
+FR-2.9 & The system shall allow IT administrators to manage the list of email domains attached to each organisation, including toggling auto-provisioning per domain. & IT Administrators & UR-ITA-01, UR-ITA-05 & Yes & Yes & Medium \\ \hline
+
+FR-2.10 & The system shall maintain organisation membership records for each user, including student or employee identifier codes, and allow authorised managers to view and update those records. & IT Administrators, Educational Managers & UR-MGR-01, UR-ITA-01 & Yes & Yes & High \\ \hline
+FR-2.11 & The system shall allow IT administrators to enable or disable user accounts across tenant organisations, and disabled accounts shall be prevented from accessing protected system resources. & IT Administrators & UR-ITA-03 & Yes & Yes & High \\ \hline
+\end{longtable}
+% ============================ Module 3: Course & Material Management ====================
+
+
+
+\paragraph{Course and Material Management}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.05\textwidth}|m{0.29\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Functional Requirements for Course \& Material Management}
+\label{tab:fr_course} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endfirsthead
+
+\multicolumn{7}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endhead
+
+\hline \multicolumn{7}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+FR-3.1 & The system shall allow Teachers and Educational Managers to manage courses through draft, published, archived, and soft-deleted states, including administrative restoration of soft-deleted courses. & Teachers, Educational Managers & UR-TCH-01 & Yes & Yes & High \\ \hline
+
+FR-3.2 & The system shall allow authoring roles to organise course content into ordered modules and learning items, including lessons, quizzes, and interviews, with configurable prerequisites and unlock rules. & Teachers, Educational Managers & UR-TCH-01 & Yes & Yes & High \\ \hline
+
+FR-3.3 & The system shall allow Teachers to upload learning materials in supported formats using standard or resumable upload flows, manage material metadata, link materials to lessons, and re-run processing when needed. & Teachers, Educational Managers & UR-TCH-01 & Yes & Yes & High \\ \hline
+
+FR-3.4 & The system shall maintain version histories for updated materials, expose the current approved version to learners, and retain prior versions for re-processing or rollback. & Teachers, Educational Managers & UR-TCH-01 & Yes & Yes & Medium \\ \hline
+
+FR-3.5 & The system shall expose ingestion progress for each material version, including processing status, percent completion, and failure reasons, both per material and aggregated per lesson. & Teachers, Educational Managers & UR-TCH-01 & Yes & Yes & Medium \\ \hline
+
+FR-3.6 & The system shall allow Teachers to control material and resource visibility independently from course publication status, ensuring that students can access only materials that are both course-published and marked visible to students. & Teachers, Educational Managers & UR-TCH-01 & Yes & Yes & Medium \\ \hline
+
+FR-3.7 & The system shall allow enrolled Students to browse the published catalogue of courses in their organisation, view course detail, and stream or download approved materials via short-lived presigned URLs. & Students & UR-STU-01 & Yes & Yes & High \\ \hline
+
+FR-3.8 & The system shall allow IT administrators to view courses across organisations, restore soft-deleted courses, inspect processing-job history, and view aggregate course statistics. & IT Administrators & UR-ITA-03 & Yes & Yes & Medium \\
+
+\end{longtable}
+
+% ============================ Module 4: Learning Loop & Adaptive Quiz ====================
+\paragraph{Learning Loop and Adaptive Quiz}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.05\textwidth}|m{0.29\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Functional Requirements for Learning Loop \& Adaptive Quiz}
+\label{tab:fr_learning_loop} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endfirsthead
+
+\multicolumn{7}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endhead
+
+\hline \multicolumn{7}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+FR-4.1 & The system shall allow Teachers to create quiz questions manually or through AI drafting from ingested course content, review them through pending, approved, edited, or rejected states, reuse approved questions, and maintain source references and revision history. & Teachers, Educational Managers & UR-TCH-02 & Yes & Yes & High \\ \hline
+
+FR-4.2 & The system shall require Teachers to configure quiz and spaced-repetition settings --- including expected response time $T_{\text{exp}}$, question metadata, initial EF, EF unlock threshold, coverage threshold $\tau$, prerequisites, and optional interview-pass requirements --- and shall block quiz publication until $T_{\text{exp}}$ is set on every live question. & Teachers, Educational Managers & UR-TCH-03, UR-TCH-04 & Yes & Yes & High \\ \hline
+
+FR-4.3 & The system shall allow Students to take quiz sessions subject to teacher-configured retake policies and per-card cooldown rules, while recording correctness, response time, and hint usage for each answer. & Students & UR-STU-01 & Yes & Yes & High \\ \hline
+
+FR-4.4 & The system shall derive a per-card quality score $Q$ from correctness, hint usage, and the time ratio $\rho = T_{\text{actual}} / T_{\text{exp}}$, then update each student's per-card spaced-repetition state using the hybrid SM-2 scheduling model, which applies a calibration weight $\alpha$ on early-rep positive EF deltas, enforces an EF floor of $1.3$, and adds per-card interval jitter. & Students & UR-STU-01 & Yes & Yes & High \\ \hline
+
+FR-4.5 & The system shall gate lesson access using prerequisite completion, the lesson coverage threshold $\tau$ over cards meeting the EF unlock threshold, and optional interview-pass requirements. & Students & UR-STU-01 & Yes & Yes & High \\ \hline
+
+FR-4.6 & The system shall deliver in-app spaced-repetition reminders for due cards and remediation notifications after failed answers, linking students back to relevant source materials when available. & Students & UR-STU-01 & Yes & Yes & Medium \\ \hline
+
+
+FR-4.7 & The system shall provide Teachers with learning-loop analytics, including cohort retention distribution, difficult-card lists, at-risk-student lists, and per-student spaced-repetition details. & Teachers & UR-TCH-05 & Yes & Yes & Medium \\ \hline
+
+FR-4.8 & The system shall provide Students with personal learning-loop dashboards, including due-card lists, per-lesson knowledge-retention estimates, progression readiness, and course-level progress overview. & Students & UR-STU-04 & Yes & Yes & Medium \\
+
+\end{longtable}
+
+% ============================ Module 5: Application Loop & Mock Interview ====================
+\paragraph{Application Loop and Mock Interview}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.05\textwidth}|m{0.29\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Functional Requirements for the Application Loop \& Mock Interview}
+\label{tab:fr_interview} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endfirsthead
+
+\multicolumn{7}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endhead
+
+\hline \multicolumn{7}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+FR-5.1 & The system shall allow Teachers to define interview sections by specifying desired outcomes that students must demonstrate to pass, without requiring any expected or model answer. & Teachers, Educational Managers & UR-TCH-03 & Yes & Yes & High \\ \hline
+
+FR-5.2 & The system shall draft interview questions from ingested course content, associate each question with one or more desired outcomes, and allow Teachers to review, edit, approve, or reject them before publication. & Teachers, Educational Managers & UR-TCH-02 & Yes & Yes & High \\ \hline
+
+FR-5.3 & The system shall allow Teachers to configure interview session rules, including maximum attempts, cooldown periods, and whether related quiz progression remains locked until the interview is passed. & Teachers, Educational Managers & UR-TCH-03 & Yes & Yes & High \\ \hline
+
+FR-5.4 & The system shall allow Students to start mock interview sessions in text mode or voice mode as an adaptive turn-taking dialogue with an AI interviewer. & Students & UR-STU-02 & Yes & Yes & High \\ \hline
+
+FR-5.5 & The system shall support voice-mode interview sessions through real-time audio streaming, speech-to-text transcription, and text-to-speech responses, while processing raw audio transiently without persistent archival. & Students & UR-STU-02 & Yes & Yes & High \\ \hline
+
+FR-5.6 & The system shall persist the interview transcript and session metadata, and evaluate the student's responses against teacher-defined desired outcomes to produce a binary pass-or-fail verdict. & Students, Teachers & UR-STU-03, UR-TCH-03 & Yes & Yes & High \\ \hline
+
+FR-5.7 & The system shall expose only the binary pass-or-fail verdict to Students --- without per-outcome rubric scores --- while allowing Teachers to review the transcript and outcome-level assessment for remediation purposes. & Students, Teachers & UR-STU-03, UR-TCH-03 & Yes & Yes & High \\ \hline
+
+FR-5.8 & The system shall record interview session activity signals, such as browser focus changes, tab switching, full-screen status, and session events, to support post-session integrity review. & Students, Teachers & UR-STU-02, UR-TCH-03 & Yes & Yes & Medium \\
+
+\end{longtable}
+
+% ============================ Module 6: Analytics, Reporting & Notifications ====================
+\paragraph{Analytics, Reporting and Notifications}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.05\textwidth}|m{0.29\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Functional Requirements for Analytics, Reporting \& Notifications}
+\label{tab:fr_analytics} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endfirsthead
+
+\multicolumn{7}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endhead
+
+\hline \multicolumn{7}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+FR-6.1 & The system shall allow Students to view their per-lesson and per-course completion progress and record material engagement separately from spaced-repetition metrics. & Students & UR-STU-04 & Yes & Yes & Medium \\ \hline
+
+FR-6.2 & The system shall allow Teachers to view course-level roster progress and identify at-risk learners based on course-progress signals. & Teachers, Educational Managers & UR-TCH-05 & Yes & Yes & Medium \\ \hline
+
+FR-6.3 & The system shall provide an in-app notification inbox with unread-count, mark-read, dismiss actions, and configurable notification preferences by category and channel. & All Users & UR-STU-04, UR-ITA-05 & Yes & Yes & Medium \\ \hline
+
+FR-6.4 & The system shall provide authorised administrators with platform and organisation-level statistics, including active users, content volume, and system-health indicators. & IT Administrators, Educational Managers & UR-ITA-03 & Yes & Yes & Medium \\ \hline
+
+FR-6.5 & The system shall track AI-related operational cost telemetry, including usage summaries by user, pipeline, and recent model calls. & IT Administrators & UR-ITA-03 & Yes & Yes & Medium \\ \hline
+
+FR-6.6 & The system shall allow administrators to inspect ingestion and AI processing jobs, view failed jobs, and manually retry failed processing tasks. & IT Administrators & UR-ITA-03 & Yes & Yes & Medium \\ \hline
+
+FR-6.7 & The system shall maintain an immutable audit log for role assignments, sensitive data changes, and HTTP request events, queryable by administrators for security and compliance review. & IT Administrators & UR-ITA-03 & Yes & Yes & High \\ \hline
+
+FR-6.8 & The system shall produce organisation-scoped Career Readiness snapshots that aggregate pathway-level learner outcomes with drill-down to individual progress while excluding per-interview rubric details. & Educational Managers & UR-MGR-03 & Yes & Yes & Low \\
+
+\end{longtable}

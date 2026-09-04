@@ -1,0 +1,226 @@
+\subsection{Algorithm Design}
+\label{sec:system_sm2}
+\subsubsection{Hybrid SM-2 and Q Derivation}
+\label{sec:q_derivation}
+aBridgeAI adopts SM-2 as the scheduling foundation for quiz-based SR, extending it with two modifications: replacement of self-reported $Q$ with an algorithmically derived value grounded in objective response signals, and introduction of a calibration weight that dampens early EF growth until sufficient retrieval evidence has accumulated. The theoretical motivation for these departures is established in Section~\ref{sec:sm2_limitation}; this section specifies their formal implementation.
+
+\paragraph{Teacher-Defined Expected Response Time}
+Each quiz card carries a teacher-assigned expected response time $T_{\text{exp}}$, set explicitly during the card review phase before publication. This value reflects the teacher's domain judgment of the duration within which a student demonstrating confident, independent recall should be able to answer the question. $T_{\text{exp}}$ is a mandatory field — no card may be published without it — and may be revised by the teacher at any point prior to or during deployment. Because $T_{\text{exp}}$ is teacher-defined rather than formula-derived, it incorporates contextual knowledge of the question's cognitive demand that no surface-feature heuristic could reliably approximate: a teacher setting $T_{\text{exp}}$ for a TCP troubleshooting question draws on their understanding of how long a competent student requires to reason through the problem, not merely how long the question takes to read.
+
+\paragraph{Time Ratio}
+Each student response is normalised against the card's expected response time via a dimensionless time ratio $\rho$:
+
+\begin{equation}
+    \rho = \frac{T_{\text{actual}}}{T_{\text{exp}}},
+\end{equation}
+
+
+
+where $T_{\text{actual}}$ is the elapsed time in milliseconds between question presentation and answer submission. A value of $\rho < 1$ indicates the student responded faster than expected; $\rho = 1$ indicates exact correspondence with the teacher's expectation; and $\rho > 1$ indicates the response exceeded the expected window. Because $\rho$ is dimensionless and normalised against a card-specific baseline, it is comparable across questions of differing complexity — a student answering a hard question in exactly the expected time produces the same $\rho$ as a student answering an easy question in its expected time.
+
+\paragraph{Q Value Assignment}
+The quality response value $Q \in \{0, 1, 2, 3, 4, 5\}$ is determined by two signals in sequence: first, whether the answer was correct; second, for correct answers, whether a hint was used. Within each branch, $Q$ is resolved as a continuous function of $\rho$ rather than through fixed threshold boundaries, ensuring that the mapping from response latency to recall quality varies smoothly with the ratio rather than producing discontinuous jumps at arbitrary cutoff values.
+
+An incorrect answer yields $Q = 0$ unconditionally, reflecting the position established in Section~\ref{sec:sm2_limitation} that partial credit for failed recall creates an advancement pathway inconsistent with competency-based progression.
+
+For correct answers where a hint was used, the student has demonstrated assisted rather than independent recall. The ceiling is therefore $Q = 2$, with the value resolved by:
+
+\begin{equation}
+Q = \max\!\left(1,\ 
+    2 - \left\lfloor \rho \right\rfloor
+\right), \quad Q \in \{1, 2\}.
+\end{equation}
+
+This maps $\rho < 1$ and $\rho \in [1, 2)$ to $Q = 2$, and $\rho \geq 2$ — indicating the student took more than twice the expected time even with a hint — to $Q = 1$. No hint usage can produce $Q \geq 3$, preserving the SM-2 convention that scores of 3 and above require independent retrieval \cite{wozniak1998sm2}.
+
+For correct answers where no hint was used, $Q$ is mapped from $\rho$ over the range $\{3, 4, 5\}$ as:
+
+\begin{equation}
+Q = \max\!\left(3,\ 
+    5 - \left\lfloor 2\rho \right\rfloor
+\right), \quad Q \in \{3, 4, 5\}.
+\end{equation}
+
+This assigns $Q = 5$ when $\rho < 0.5$ — the student answered in less than half the teacher's expected time, consistent with effortless retrieval; $Q = 4$ when $0.5 \leq \rho < 1$ — the student answered within the expected window, consistent with controlled but fluent recall; and $Q = 3$ when $\rho \geq 1$ — the student exceeded the expected time, consistent with laboured reconstruction despite eventual correctness \cite{benjamin1996}. The floor of 3 ensures that any independent correct response, regardless of latency, is treated as a passing recall event and does not trigger an interval reset. The complete assignment rule is summarised in Table~\ref{tab:q_assignment}.
+
+\begin{table}[H]
+\centering
+\small
+\renewcommand{\arraystretch}{1.3}
+\caption{Q value assignment rules based on correctness, hint usage, and time ratio $\rho$. Boundaries at $\rho = 1$ and $\rho = 2$ correspond to the teacher-defined expected response time and twice that value respectively; the boundary at $\rho = 0.5$ corresponds to half the expected time.}
+\begin{tabular}{|l|l|c|l|}
+\hline
+\textbf{Correctness} & \textbf{Hint Used} & 
+\textbf{Time Ratio $\rho$} & \textbf{$Q$} \\
+\hline
+Incorrect & — & any & 0 \\
+\hline
+Correct & Yes & $\rho \geq 2$ & 1 \\
+Correct & Yes & $\rho < 2$    & 2 \\
+\hline
+Correct & No  & $\rho \geq 1$ & 3 \\
+Correct & No  & $0.5 \leq \rho < 1$ & 4 \\
+Correct & No  & $\rho < 0.5$  & 5 \\
+\hline
+\end{tabular}
+\label{tab:q_assignment}
+\end{table}
+
+The boundaries in the no-hint branch — $\rho = 1$ and $\rho = 0.5$ — require no external calibration because they derive directly from the teacher-defined $T_{\text{exp}}$: $\rho = 1$ is exactly the teacher's competency expectation, and $\rho = 0.5$ is half of it. Similarly, the hint branch boundary at $\rho = 2$ represents twice the expected time, a duration at which continued difficulty despite hint exposure reasonably indicates weak encoding rather than momentary hesitation. All boundaries are therefore interpretable as multiples of $T_{\text{exp}}$ rather than as independently chosen constants, and their justification is grounded in the semantics of the teacher-defined baseline rather than in arbitrary numerical choices.
+
+\paragraph{EF Update and Interval Scheduling}
+The derived $Q$ value is passed into the standard SM-2 EF 
+update rule:
+
+\begin{equation}
+EF_{\text{new}} = EF_{\text{old}} + 
+\left(0.1 - (5 - Q)\left(0.08 + (5 - Q) \cdot 
+0.02\right)\right),
+\end{equation}
+
+with $EF$ bounded below by $EF_{\min} = 1.3$. The review 
+interval follows the standard SM-2 recurrence:
+
+\begin{equation}
+I(n) =
+\begin{cases}
+1               & \text{if } n = 1 \\
+6               & \text{if } n = 2 \\
+I(n-1) \cdot EF & \text{if } n > 2,
+\end{cases}
+\end{equation}
+
+where $n$ denotes the repetition count. If $Q < 3$, the item is considered failed: $I$ resets to 1 day and $n$ returns to zero regardless of prior history. The EF penalty is applied before the reset, ensuring that repeated failures progressively reduce the interval growth rate even as the absolute interval restarts.
+
+\paragraph{Interval Jitter}
+To prevent review storms caused by the simultaneous scheduling of multiple cards to the same date, a jitter factor $\varepsilon \sim \mathcal{U}(-0.1,\ 0.1)$ is applied multiplicatively to each computed interval:
+
+\begin{equation}
+I_{\text{final}} = I(n) \cdot (1 + \varepsilon).
+\end{equation}
+
+The magnitude of $\varepsilon$ is small enough to have negligible effect on retention outcomes while distributing scheduled reviews across a window of approximately $\pm 10\%$ of the nominal interval, preventing the concentration of review obligations on single calendar dates.
+
+\paragraph{Calibration Weight}
+SM-2 initialises $EF$ at $2.5$ for all items, implicitly assuming average retention ability from the first review. In an institutional context where EF influences lesson unlock eligibility, an overestimated early EF produces intervals that grow too quickly before the algorithm has accumulated sufficient evidence of the student's retention capacity for that item. To address this, aBridgeAI applies a calibration weight $\alpha$ to positive EF increments during the first three repetitions of any card:
+
+\begin{equation}
+EF_{\text{new}} = 
+\begin{cases}
+EF_{\text{old}} + \alpha \cdot \Delta EF 
+  & \text{if } n \leq 3 \text{ and } \Delta EF > 0 \\
+EF_{\text{old}} + \Delta EF 
+  & \text{otherwise},
+\end{cases}
+\end{equation}
+
+where $\Delta EF$ denotes the increment produced by the standard update rule and $\alpha = 0.6$. Negative increments — produced when $Q < 4$ — are applied at full magnitude regardless of $n$, ensuring that evidence of forgetting is incorporated immediately while evidence of retention accumulates more conservatively. Once $n > 3$, $\alpha = 1$ and the standard update rule applies without modification. This asymmetric initialisation ensures faster convergence onto the student's true retention profile than an optimistic starting assumption would permit, consistent with the principle that conservative initial models require fewer corrective cycles than overconfident ones \cite{wozniak1998sm2}.
+
+\subsubsection{Individualised Learner Modeling}
+\label{sec:individualised_modeling}
+A foundational design decision in aBridgeAI is the isolation of all SM-2 state variables at the level of the student-card pair rather than the card itself. The Easiness Factor $EF$, review interval $I$, repetition counter $n$, and next scheduled due date are maintained as independent records for each unique combination of student and knowledge item. Two students reviewing the same card therefore accumulate entirely separate $EF$ trajectories reflecting their individual retrieval histories, and no student's scheduling is influenced by the aggregate performance of peers on shared material. This isolation is a theoretical necessity as much as an implementation choice: the same observable response pattern may reflect different underlying knowledge states in different learners depending on prior experience, domain familiarity, and cognitive strategy \cite{corbett1994, vanlehn2006}. Aggregating state across learners would systematically misrepresent individual knowledge trajectories and undermine the validity of any progression gate derived from the model.
+
+\paragraph{Per-Student EF Trajectory}
+Because $EF$ evolves independently for every student-card pair, each student accumulates a distinct $EF$ trajectory for every card they review. A student who consistently answers a card correctly and quickly — producing high $Q$ values and therefore upward $EF$ drift — will be scheduled to review that card at progressively longer intervals, reflecting growing memory stability. A student who repeatedly fails the same card will see its $EF$ driven toward the floor of $1.3$, producing frequent short-interval reviews until stable retention is demonstrated. These trajectories are entirely independent: the high-performing student's $EF$ on a card has no influence on the struggling student's schedule for the same card, and vice versa.
+
+The calibration weight $\alpha = 0.6$ applied during the first three repetitions, specified in Section~\ref{sec:q_derivation}, further ensures that early $EF$ growth is conservative across all student-card pairs. Since $EF$ is initialised at $2.5$ for every new card encounter regardless of the student's general performance profile, the calibration phase provides a card-level adjustment that complements the per-student isolation: each student begins each new card at the same conservative starting point and diverges from there according to their own retrieval evidence.
+
+\paragraph{Lesson-Level EF Distribution}
+Because $EF$ is tracked at the card level, each student possesses a distribution of $EF$ values across all active cards within a lesson. Let $\mathcal{C}_{\ell}$ denote the set of active cards in lesson $\ell$, and let $EF_{s,c}$ denote the current Easiness Factor of student $s$ on card $c$. The set of $EF$ values $\{EF_{s,c} \mid c \in \mathcal{C}_{\ell}\}$ constitutes the student's memory stability profile for that lesson — a card-granular representation of which knowledge components are well-consolidated and which remain fragile. This profile is the basis from which both the lesson unlock condition and the Knowledge Retention Estimate are derived.
+
+\paragraph{Lesson Unlock Eligibility}
+A student satisfies the unlock condition for lesson $\ell$ — becoming eligible to progress to the subsequent lesson — when the proportion of their cards whose $EF$ meets or exceeds a teacher-configured minimum threshold $EF_{\min}^{\text{unlock}}$ reaches a teacher-configured coverage threshold $\tau$:
+
+\begin{equation}
+\frac{
+    \left|\left\{
+        c \in \mathcal{C}_{\ell} \mid 
+        EF_{s,c} \geq EF_{\min}^{\text{unlock}}
+    \right\}\right|
+}{
+    \left|\mathcal{C}_{\ell}\right|
+} \geq \tau.
+\end{equation}
+
+The numerator counts the cards in the lesson for which the student's $EF$ has reached the required floor; the denominator is the total number of active cards in the lesson; and $\tau \in (0, 1]$ is the minimum proportion required before the unlock condition is satisfied. Setting $\tau = 1.0$ requires every card to meet the $EF$ floor before progression, enforcing zero tolerance for weak knowledge components. Lower values of $\tau$ permit advancement when a large majority of cards are consolidated, accommodating instructors who wish to allow progression despite isolated difficult items. Both $EF_{\min}^{\text{unlock}}$ and $\tau$ are configured per lesson by the teacher, allowing unlock stringency to vary across lessons according to the criticality of the material.
+
+Where a teacher additionally configures an interview section for the lesson, the unlock condition above is necessary but not sufficient: the student must also satisfy the interview pass condition before progression is granted. The combined gate ensures that both retention of factual knowledge — measured by the quiz EF distribution — and demonstrated application of that knowledge — measured by the interview outcome assessment — are required for lesson completion.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsubsection{Student Performance Metrics}
+\label{sec:performance_metrics}
+
+aBridgeAI aggregates per-card SM-2 state into three learner-facing metrics that together characterise a student's cognitive standing within a lesson. All three are derived exclusively from the student's own retrieval history, with no dependence on peer performance or instructor-assigned grades. They are surfaced in both per-student and class-wide views: per-student views allow instructors to identify individuals requiring targeted intervention, while class-wide aggregations expose systematic knowledge gaps shared across the cohort that may warrant revision of the source material or quiz configuration rather than individual remediation.
+
+\paragraph{Knowledge Retention Estimate}
+The \textit{Knowledge Retention Estimate} $\hat{R}_{s,\ell}$ summarises the student's memory stability profile for lesson $\ell$ as a single normalised score in $[0, 1]$. Each card's $EF$ is first normalised against the operational range of the Easiness Factor, then averaged across all active cards in the lesson:
+
+\begin{equation}
+\hat{R}_{s,\ell} = \frac{1}{|\mathcal{C}_{\ell}|} 
+\sum_{c \in \mathcal{C}_{\ell}} 
+\frac{EF_{s,c} - EF_{\min}}{EF_{\max} - EF_{\min}},
+\end{equation}
+
+where $EF_{\min} = 1.3$ is the SM-2 floor and $EF_{\max} = 2.5$ is the initialisation value, defining the full operational range. A card at the floor contributes 0 to the sum; a card at the ceiling contributes 1. The resulting $\hat{R}_{s,\ell}$ therefore reflects the average proportion of the possible $EF$ range that has been achieved across the lesson's cards, with values approaching 1 indicating widespread stable retention and values approaching 0 indicating widespread difficulty or recent failure resets.
+
+Cards with repeated $Q = 0$ outcomes are driven toward $EF_{\min}$, pulling $\hat{R}_{s,\ell}$ downward and surfacing persistent knowledge gaps without requiring explicit gap detection logic. This metric is presented to both students and teachers as a continuous progress indicator without exposing the underlying per-card $EF$ values directly, preserving a clean separation between the diagnostic signal and its raw parameters.
+
+\paragraph{Progression Readiness}
+\textit{Progression Readiness} is a binary eligibility signal derived directly from the unlock condition specified in Section~\ref{sec:individualised_modeling}. It evaluates whether the proportion of the student's cards meeting $EF_{\min}^{\text{unlock}}$ satisfies the coverage threshold $\tau$, returning either eligible or ineligible. Unlike $\hat{R}_{s,\ell}$, which reflects average stability across all cards, Progression Readiness is sensitive specifically to the distribution of cards relative to the unlock floor: a student with high average $\hat{R}_{s,\ell}$ may nonetheless be ineligible if $\tau = 1.0$ and one card remains below $EF_{\min}^{\text{unlock}}$, while a student with moderate $\hat{R}_{s,\ell}$ may be eligible if the majority of their cards are above the floor and $\tau < 1.0$. The two metrics are therefore complementary: $\hat{R}_{s,\ell}$ describes the overall health of the lesson's knowledge profile, while Progression Readiness answers the specific question of whether the unlock condition has been met.
+
+\paragraph{Review Compliance Rate}
+The \textit{Review Compliance Rate} $\rho_{s,\ell}$ measures the proportion of due cards that the student reviewed within a configurable grace window $\Delta t_{\text{grace}}$ following their scheduled date:
+
+\begin{equation}
+\rho_{s,\ell} = \frac{
+    \left|\left\{
+        c \in \mathcal{C}_{\ell} \mid 
+        t_{\text{reviewed}} \leq 
+        t_{\text{due}} + \Delta t_{\text{grace}}
+    \right\}\right|
+}{
+    \left|\left\{
+        c \in \mathcal{C}_{\ell} \mid 
+        t_{\text{due}} \leq t_{\text{now}}
+    \right\}\right|
+},
+\end{equation}
+
+where the numerator counts cards reviewed on time and the denominator counts all cards whose due date has passed as of the current moment $t_{\text{now}}$. The grace window $\Delta t_{\text{grace}}$ acknowledges that students cannot review at the exact moment a card becomes due, and is configured at the system level.
+
+This metric exists specifically to address a structural consequence of the no-decay design: as established in Section~\ref{sec:sm2_limitation}, aBridgeAI does not apply automatic $EF$ penalties to overdue cards. A student who stops reviewing therefore retains their last recorded $EF$ values indefinitely, and $\hat{R}_{s,\ell}$ remains frozen at its last state — presenting an artificially healthy retention picture to both student and teacher. $\rho_{s,\ell}$ fills this gap: a student whose compliance rate is falling while $\hat{R}_{s,\ell}$ remains stable is exhibiting engagement drift on unreviewed material, a condition the teacher dashboard flags as a warning signal. The integrity of $EF$ as a measure of demonstrated retrieval performance is preserved — only reviews that actually occurred contribute to $EF$ — while disengagement remains visible through a dedicated metric rather than being silently absorbed into a decaying parameter.
+
+\medskip
+\noindent
+The relationship between the three metrics is summarised in Table~\ref{tab:metrics_summary}.
+
+\begin{table}[H]
+\centering
+\small
+\renewcommand{\arraystretch}{1.4}
+\caption{Summary of student performance metrics and their roles within the aBridgeAI learner modeling layer.}
+\begin{tabular}{|p{3.2cm}|p{2.2cm}|p{4cm}|p{4cm}|}
+\hline
+\textbf{Metric} & \textbf{Type} & 
+\textbf{What It Measures} & 
+\textbf{Primary Purpose} \\
+\hline
+Knowledge Retention Estimate $\hat{R}_{s,\ell}$ & 
+Continuous $[0,1]$ & 
+Average normalised EF across all cards in the lesson & 
+Diagnostic — overall memory stability health \\
+\hline
+Progression Readiness & 
+Binary & 
+Proportion of cards meeting $EF_{\min}^{\text{unlock}}$ 
+relative to $\tau$ & 
+Gate — lesson unlock eligibility \\
+\hline
+Review Compliance Rate $\rho_{s,\ell}$ & 
+Continuous $[0,1]$ & 
+Proportion of due cards reviewed within grace window & 
+Signal — engagement drift detection \\
+\hline
+\end{tabular}
+\label{tab:metrics_summary}
+\end{table}

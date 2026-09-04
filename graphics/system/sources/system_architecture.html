@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>aBridgeAI System Architecture</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #fff; padding: 1rem; }
+    .wrap { max-width: 2100px; margin: 0 auto; }
+    h1 { font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-bottom: 0.25rem; }
+    .sub { font-size: 0.85rem; color: #64748b; margin-bottom: 1rem; }
+    svg { width: 100%; height: auto; display: block; background: #fff; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>aBridgeAI — System Architecture</h1>
+  <p class="sub">AI-Powered Career Readiness LMS · End-to-End Component &amp; Data Flow</p>
+
+<svg viewBox="0 0 2100 1120" xmlns="http://www.w3.org/2000/svg" font-family="Inter, sans-serif">
+<defs>
+  <marker id="b-end" markerWidth="7" markerHeight="5" refX="6.5" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" fill="#3b82f6"/></marker>
+  <marker id="b-start" markerWidth="7" markerHeight="5" refX="0.5" refY="2.5" orient="auto"><polygon points="7 0, 0 2.5, 7 5" fill="#3b82f6"/></marker>
+  <marker id="g-end" markerWidth="7" markerHeight="5" refX="6.5" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" fill="#10b981"/></marker>
+  <marker id="g-start" markerWidth="7" markerHeight="5" refX="0.5" refY="2.5" orient="auto"><polygon points="7 0, 0 2.5, 7 5" fill="#10b981"/></marker>
+  <marker id="p-end" markerWidth="7" markerHeight="5" refX="6.5" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" fill="#8b5cf6"/></marker>
+  <marker id="p-start" markerWidth="7" markerHeight="5" refX="0.5" refY="2.5" orient="auto"><polygon points="7 0, 0 2.5, 7 5" fill="#8b5cf6"/></marker>
+  <marker id="o-end" markerWidth="7" markerHeight="5" refX="6.5" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" fill="#f59e0b"/></marker>
+  <marker id="o-start" markerWidth="7" markerHeight="5" refX="0.5" refY="2.5" orient="auto"><polygon points="7 0, 0 2.5, 7 5" fill="#f59e0b"/></marker>
+  <marker id="r-end" markerWidth="7" markerHeight="5" refX="6.5" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" fill="#dc2626"/></marker>
+  <marker id="r-start" markerWidth="7" markerHeight="5" refX="0.5" refY="2.5" orient="auto"><polygon points="7 0, 0 2.5, 7 5" fill="#dc2626"/></marker>
+  <marker id="gray-end" markerWidth="7" markerHeight="5" refX="6.5" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" fill="#94a3b8"/></marker>
+  <marker id="gray-start" markerWidth="7" markerHeight="5" refX="0.5" refY="2.5" orient="auto"><polygon points="7 0, 0 2.5, 7 5" fill="#94a3b8"/></marker>
+  <marker id="orange-end" markerWidth="7" markerHeight="5" refX="6.5" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" fill="#ea580c"/></marker>
+  <marker id="orange-start" markerWidth="7" markerHeight="5" refX="0.5" refY="2.5" orient="auto"><polygon points="7 0, 0 2.5, 7 5" fill="#ea580c"/></marker>
+  <marker id="teal-end" markerWidth="7" markerHeight="5" refX="6.5" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" fill="#0891b2"/></marker>
+  <marker id="teal-start" markerWidth="7" markerHeight="5" refX="0.5" refY="2.5" orient="auto"><polygon points="7 0, 0 2.5, 7 5" fill="#0891b2"/></marker>
+  <marker id="violet-end" markerWidth="7" markerHeight="5" refX="6.5" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" fill="#7c3aed"/></marker>
+  <marker id="violet-start" markerWidth="7" markerHeight="5" refX="0.5" refY="2.5" orient="auto"><polygon points="7 0, 0 2.5, 7 5" fill="#7c3aed"/></marker>
+
+  <filter id="sh" x="-5%" y="-5%" width="110%" height="115%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#00000018"/></filter>
+
+  <style>
+    .comp-box { fill: #fff; stroke-width: 1.5; }
+    .comp-name { font-size: 13px; font-weight: 700; fill: #0f172a; text-anchor: middle; }
+    .comp-sub { font-size: 10px; fill: #64748b; text-anchor: middle; }
+    .zone-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; }
+    .arrow-label { font-size: 10px; font-weight: 600; fill: #475569; }
+    .arrow-bg { fill: #fff; }
+  </style>
+</defs>
+
+
+<!-- ZONES -->
+<rect x="460" y="50" width="1240" height="895" rx="12" fill="#f8fafc" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="8,5"/>
+<text x="475" y="75" class="zone-label" fill="#3b82f6">⬡ aBridgeAI System Boundary</text>
+
+<rect x="480" y="100" width="280" height="270" rx="10" fill="#f0f9ff" stroke="#38bdf8" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+<text x="495" y="120" class="zone-label" fill="#0284c7">⬢ FRONTEND</text>
+
+<rect x="810" y="100" width="280" height="500" rx="10" fill="#f0fdf4" stroke="#10b981" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+<text x="825" y="120" class="zone-label" fill="#059669">⬢ BACKEND</text>
+
+<rect x="1140" y="100" width="280" height="500" rx="10" fill="#fef3c7" stroke="#eab308" stroke-width="1" stroke-dasharray="4,3" opacity="0.4"/>
+<text x="1155" y="120" class="zone-label" fill="#a16207">⬢ AI / REAL-TIME</text>
+
+<rect x="1470" y="100" width="210" height="800" rx="10" fill="#faf5ff" stroke="#8b5cf6" stroke-width="1" stroke-dasharray="4,3" opacity="0.4"/>
+<text x="1485" y="120" class="zone-label" fill="#7c3aed">⬢ DATA LAYER</text>
+
+<rect x="480" y="700" width="590" height="200" rx="10" fill="#fffbeb" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,3" opacity="0.4"/>
+<text x="495" y="720" class="zone-label" fill="#d97706">⬢ INFRASTRUCTURE</text>
+
+
+<!-- ACTORS -->
+<text x="40" y="75" class="zone-label" fill="#6366f1">⬢ ACTORS</text>
+
+<g filter="url(#sh)">
+  <rect x="40" y="100" width="240" height="100" rx="10" class="comp-box" stroke="#818cf8"/>
+  <text x="95" y="162" font-size="40" text-anchor="middle">🎓</text>
+  <text x="195" y="143" class="comp-name">Student</text>
+  <text x="195" y="162" class="comp-sub">Primary learner</text>
+  <text x="195" y="177" class="comp-sub">Courses · Quizzes · SR</text>
+</g>
+<g filter="url(#sh)">
+  <rect x="40" y="215" width="240" height="100" rx="10" class="comp-box" stroke="#818cf8"/>
+  <text x="95" y="277" font-size="40" text-anchor="middle">👩‍🏫</text>
+  <text x="195" y="258" class="comp-name">Instructor</text>
+  <text x="195" y="277" class="comp-sub">Content creator</text>
+  <text x="195" y="292" class="comp-sub">Course authoring</text>
+</g>
+<g filter="url(#sh)">
+  <rect x="40" y="330" width="240" height="100" rx="10" class="comp-box" stroke="#818cf8"/>
+  <text x="95" y="392" font-size="40" text-anchor="middle">🏢</text>
+  <text x="195" y="373" class="comp-name">Edu Manager</text>
+  <text x="195" y="392" class="comp-sub">Organization admin</text>
+  <text x="195" y="407" class="comp-sub">User provisioning</text>
+</g>
+<g filter="url(#sh)">
+  <rect x="40" y="445" width="240" height="100" rx="10" class="comp-box" stroke="#818cf8"/>
+  <text x="95" y="507" font-size="40" text-anchor="middle">🔧</text>
+  <text x="195" y="488" class="comp-name">IT Admin</text>
+  <text x="195" y="507" class="comp-sub">Operations</text>
+  <text x="195" y="522" class="comp-sub">Health monitoring</text>
+</g>
+
+
+<!-- BROWSER — proper-sized box between actors and system boundary -->
+<g filter="url(#sh)">
+  <rect x="315" y="195" width="120" height="250" rx="10" class="comp-box" stroke="#6366f1" stroke-width="2"/>
+  <image href="https://api.iconify.design/mdi:web.svg?color=%236366f1" x="350" y="220" width="50" height="50"/>
+  <text x="375" y="295" class="comp-name">Web</text>
+  <text x="375" y="312" class="comp-name">Browser</text>
+  <text x="375" y="335" class="comp-sub">Chrome / Firefox</text>
+  <text x="375" y="350" class="comp-sub">SPA Runtime</text>
+  <text x="375" y="370" class="comp-sub">JS · CSS · HTML</text>
+  <text x="375" y="390" class="comp-sub" font-weight="600" fill="#6366f1">Client Device</text>
+</g>
+
+
+<!-- FRONTEND: Vite + React + TS -->
+<g filter="url(#sh)">
+  <rect x="500" y="140" width="240" height="110" rx="10" class="comp-box" stroke="#38bdf8" stroke-width="2"/>
+  <image href="https://api.iconify.design/logos:vitejs.svg" x="540" y="155" width="34" height="34"/>
+  <image href="https://api.iconify.design/logos:react.svg" x="583" y="155" width="34" height="34"/>
+  <image href="https://api.iconify.design/logos:typescript-icon.svg" x="626" y="155" width="34" height="34"/>
+  <text x="620" y="215" class="comp-name">Vite + React + TS</text>
+  <text x="620" y="232" class="comp-sub">Single-Page App · TanStack Query</text>
+  <text x="620" y="246" class="comp-sub" font-weight="600">~42KB · HMR &lt;50ms</text>
+</g>
+
+<!-- Nginx -->
+<g filter="url(#sh)">
+  <rect x="500" y="270" width="240" height="90" rx="10" class="comp-box" stroke="#f59e0b" stroke-width="2"/>
+  <image href="https://api.iconify.design/logos:nginx.svg" x="596" y="283" width="48" height="32"/>
+  <text x="620" y="333" class="comp-name">Nginx Gateway</text>
+  <text x="620" y="350" class="comp-sub">Reverse Proxy · TLS · LB · :443</text>
+</g>
+
+
+<!-- BACKEND: FastAPI -->
+<g filter="url(#sh)">
+  <rect x="830" y="140" width="240" height="180" rx="10" class="comp-box" stroke="#10b981" stroke-width="2.5"/>
+  <image href="https://api.iconify.design/logos:fastapi-icon.svg" x="926" y="160" width="48" height="48"/>
+  <text x="950" y="240" class="comp-name" font-size="16">FastAPI</text>
+  <text x="950" y="260" class="comp-sub">Backend Core · Python 3.12</text>
+  <text x="950" y="276" class="comp-sub">asyncio · REST · WebSocket</text>
+  <text x="950" y="292" class="comp-sub">SM-2 · IRT · Sessions · Auth</text>
+  <text x="950" y="310" class="comp-sub" fill="#059669" font-weight="700">Routers · Services · Repos</text>
+</g>
+
+<!-- arq Workers -->
+<g filter="url(#sh)">
+  <rect x="830" y="475" width="240" height="100" rx="10" class="comp-box" stroke="#10b981" stroke-width="2"/>
+  <image href="https://api.iconify.design/logos:python.svg" x="926" y="490" width="48" height="48"/>
+  <text x="950" y="555" class="comp-name">arq Workers</text>
+  <text x="950" y="570" class="comp-sub">Background Jobs · SR Scans · Quiz Gen</text>
+</g>
+
+
+<!-- AI / REAL-TIME: LangChain -->
+<g filter="url(#sh)">
+  <rect x="1160" y="140" width="240" height="120" rx="10" class="comp-box" stroke="#a855f7" stroke-width="2"/>
+  <image href="https://api.iconify.design/simple-icons:langchain.svg?color=%231C3C3C" x="1256" y="148" width="56" height="56"/>
+  <text x="1280" y="225" class="comp-name">LangChain</text>
+  <text x="1280" y="242" class="comp-sub">RAG Pipelines · LLM Chains</text>
+  <text x="1280" y="256" class="comp-sub">Multi-turn evaluation</text>
+</g>
+
+<!-- LiveKit -->
+<g filter="url(#sh)">
+  <rect x="1160" y="290" width="240" height="120" rx="10" class="comp-box" stroke="#ea580c" stroke-width="2"/>
+  <image href="https://api.iconify.design/simple-icons:livekit.svg?color=%2306A66E" x="1256" y="305" width="48" height="48"/>
+  <text x="1280" y="375" class="comp-name">LiveKit</text>
+  <text x="1280" y="392" class="comp-sub">WebRTC · Agents SDK · VAD</text>
+  <text x="1280" y="406" class="comp-sub" font-weight="700" fill="#ea580c">Voice latency &lt;200ms</text>
+</g>
+
+
+<!-- DATA LAYER: PostgreSQL -->
+<g filter="url(#sh)">
+  <rect x="1490" y="145" width="170" height="130" rx="10" class="comp-box" stroke="#8b5cf6" stroke-width="2"/>
+  <image href="https://api.iconify.design/logos:postgresql.svg" x="1551" y="160" width="48" height="48"/>
+  <text x="1575" y="235" class="comp-name">PostgreSQL</text>
+  <text x="1575" y="250" class="comp-sub">+ pgvector</text>
+  <text x="1575" y="264" class="comp-sub" font-weight="700" fill="#7c3aed">ACID · 471 QPS</text>
+</g>
+
+<!-- Neo4j -->
+<g filter="url(#sh)">
+  <rect x="1490" y="295" width="170" height="130" rx="10" class="comp-box" stroke="#8b5cf6" stroke-width="2"/>
+  <image href="https://api.iconify.design/logos:neo4j.svg" x="1551" y="315" width="48" height="40" preserveAspectRatio="xMidYMid meet"/>
+  <text x="1575" y="385" class="comp-name">Neo4j</text>
+  <text x="1575" y="400" class="comp-sub">Knowledge Graph</text>
+  <text x="1575" y="414" class="comp-sub">Cypher · APOC</text>
+</g>
+
+<!-- Redis -->
+<g filter="url(#sh)">
+  <rect x="1490" y="445" width="170" height="130" rx="10" class="comp-box" stroke="#8b5cf6" stroke-width="2"/>
+  <image href="https://api.iconify.design/logos:redis.svg" x="1551" y="460" width="48" height="48"/>
+  <text x="1575" y="535" class="comp-name">Redis</text>
+  <text x="1575" y="550" class="comp-sub">Cache · Queue</text>
+  <text x="1575" y="564" class="comp-sub" font-weight="700" fill="#7c3aed">&gt;100K ops/sec</text>
+</g>
+
+<!-- Garage S3 -->
+<g filter="url(#sh)">
+  <rect x="1490" y="595" width="170" height="130" rx="10" class="comp-box" stroke="#8b5cf6" stroke-width="2"/>
+  <image href="https://garagehq.deuxfleurs.fr/images/garage-logo.svg" x="1546" y="610" width="58" height="48"/>
+  <text x="1575" y="685" class="comp-name">Garage S3</text>
+  <text x="1575" y="700" class="comp-sub">Object Storage</text>
+  <text x="1575" y="714" class="comp-sub">S3-compatible</text>
+</g>
+
+
+<!-- INFRASTRUCTURE -->
+<g filter="url(#sh)">
+  <rect x="500" y="740" width="260" height="130" rx="10" class="comp-box" stroke="#f59e0b" stroke-width="2"/>
+  <image href="https://api.iconify.design/logos:docker-icon.svg" x="606" y="760" width="48" height="48"/>
+  <text x="630" y="830" class="comp-name">Docker Compose</text>
+  <text x="630" y="848" class="comp-sub">Containerized · On-prem / Cloud</text>
+</g>
+<g filter="url(#sh)">
+  <rect x="790" y="740" width="260" height="130" rx="10" class="comp-box" stroke="#f59e0b" stroke-width="2"/>
+  <image href="https://api.iconify.design/logos:tux.svg" x="896" y="760" width="48" height="48"/>
+  <text x="920" y="830" class="comp-name">Linux Host</text>
+  <text x="920" y="848" class="comp-sub">Ubuntu · systemd services</text>
+</g>
+
+
+<!-- EXTERNAL SERVICES -->
+<text x="1730" y="75" class="zone-label" fill="#64748b">⬢ EXTERNAL SERVICES</text>
+
+<g filter="url(#sh)">
+  <rect x="1730" y="100" width="350" height="140" rx="10" class="comp-box" stroke="#94a3b8" stroke-width="2"/>
+  <image href="https://api.iconify.design/logos:openai-icon.svg" x="1850" y="125" width="50" height="50"/>
+  <image href="https://api.iconify.design/simple-icons:anthropic.svg?color=%23D97757" x="1910" y="125" width="50" height="50"/>
+  <text x="1905" y="200" class="comp-name">LLM Providers</text>
+  <text x="1905" y="218" class="comp-sub">OpenAI GPT · Anthropic Claude</text>
+  <text x="1905" y="232" class="comp-sub">Inference API</text>
+</g>
+
+<g filter="url(#sh)">
+  <rect x="1730" y="280" width="350" height="140" rx="10" class="comp-box" stroke="#94a3b8" stroke-width="2"/>
+  <image href="https://api.iconify.design/simple-icons:deepgram.svg?color=%2313EF93" x="1850" y="305" width="50" height="50"/>
+  <image href="https://api.iconify.design/simple-icons:elevenlabs.svg?color=%23000000" x="1910" y="305" width="50" height="50"/>
+  <text x="1905" y="380" class="comp-name">Speech Services</text>
+  <text x="1905" y="398" class="comp-sub">Deepgram (STT)</text>
+  <text x="1905" y="412" class="comp-sub">ElevenLabs (TTS)</text>
+</g>
+
+<g filter="url(#sh)">
+  <rect x="1730" y="460" width="350" height="140" rx="10" class="comp-box" stroke="#94a3b8" stroke-width="2"/>
+  <image href="https://api.iconify.design/logos:google-icon.svg" x="1880" y="485" width="50" height="50"/>
+  <text x="1905" y="560" class="comp-name">Google OAuth 2.0</text>
+  <text x="1905" y="578" class="comp-sub">Identity Provider</text>
+  <text x="1905" y="592" class="comp-sub">OIDC · JWT issuance</text>
+</g>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     ARROWS
+═══════════════════════════════════════════════════════════ -->
+
+<!-- Actors → Browser (converging trunk) -->
+<line x1="280" y1="150" x2="295" y2="150" stroke="#3b82f6" stroke-width="2"/>
+<line x1="280" y1="265" x2="295" y2="265" stroke="#3b82f6" stroke-width="2"/>
+<line x1="280" y1="380" x2="295" y2="380" stroke="#3b82f6" stroke-width="2"/>
+<line x1="280" y1="495" x2="295" y2="495" stroke="#3b82f6" stroke-width="2"/>
+<line x1="295" y1="150" x2="295" y2="495" stroke="#3b82f6" stroke-width="2"/>
+<!-- Trunk to browser -->
+<path d="M 295 320 L 313 320" fill="none" stroke="#3b82f6" stroke-width="2" marker-end="url(#b-end)" marker-start="url(#b-start)"/>
+
+<!-- Browser → Nginx (HTTPS) -->
+<path d="M 435 320 L 498 320" fill="none" stroke="#3b82f6" stroke-width="2" marker-end="url(#b-end)" marker-start="url(#b-start)"/>
+<rect x="440" y="300" width="58" height="16" class="arrow-bg" rx="3"/>
+<text x="469" y="312" class="arrow-label" text-anchor="middle" fill="#3b82f6">HTTPS</text>
+
+<!-- Nginx ↔ Frontend (vertical short) -->
+<path d="M 620 268 L 620 252" fill="none" stroke="#38bdf8" stroke-width="2" marker-end="url(#b-end)" marker-start="url(#b-start)"/>
+<rect x="635" y="252" width="55" height="14" class="arrow-bg" rx="3"/>
+<text x="662" y="263" class="arrow-label" text-anchor="middle" fill="#0284c7">Static</text>
+
+<!-- Nginx ↔ FastAPI -->
+<path d="M 742 305 L 790 305 L 790 235 L 828 235" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#o-end)" marker-start="url(#o-start)"/>
+<rect x="753" y="244" width="68" height="14" class="arrow-bg" rx="3"/>
+<text x="787" y="255" class="arrow-label" text-anchor="middle" fill="#d97706">REST · WS</text>
+
+<!-- FastAPI ↔ LangChain (horizontal) -->
+<path d="M 1072 195 L 1158 195" fill="none" stroke="#a855f7" stroke-width="2" marker-end="url(#p-end)" marker-start="url(#p-start)"/>
+<rect x="1090" y="178" width="55" height="14" class="arrow-bg" rx="3"/>
+<text x="1117" y="189" class="arrow-label" text-anchor="middle" fill="#7c3aed">Invoke</text>
+
+<!-- FastAPI ↔ LiveKit -->
+<path d="M 1072 280 L 1120 280 L 1120 350 L 1158 350" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#orange-end)" marker-start="url(#orange-start)"/>
+<rect x="1080" y="312" width="78" height="14" class="arrow-bg" rx="3"/>
+<text x="1119" y="323" class="arrow-label" text-anchor="middle" fill="#ea580c">Audio · WS</text>
+
+<!-- FastAPI ↔ arq Workers (vertical) -->
+<path d="M 950 322 L 950 472" fill="none" stroke="#10b981" stroke-width="2" marker-end="url(#g-end)" marker-start="url(#g-start)"/>
+<rect x="955" y="390" width="100" height="14" class="arrow-bg" rx="3"/>
+<text x="1005" y="401" class="arrow-label" text-anchor="middle" fill="#059669">Enqueue · Result</text>
+
+<!-- arq Workers ↔ Redis (horizontal direct) -->
+<path d="M 1072 525 L 1488 525" fill="none" stroke="#dc2626" stroke-width="2" marker-end="url(#r-end)" marker-start="url(#r-start)" stroke-dasharray="6,3"/>
+<rect x="1210" y="510" width="100" height="14" class="arrow-bg" rx="3"/>
+<text x="1260" y="521" class="arrow-label" text-anchor="middle" fill="#dc2626">Job queue · streams</text>
+
+<!-- ═════════ DB BUS PATTERN ═════════ -->
+<!-- FastAPI → Data Layer: route between LangChain and LiveKit (y=265) then down -->
+<path d="M 1072 310 L 1095 310 L 1095 440 L 1450 440" fill="none" stroke="#8b5cf6" stroke-width="2" marker-end="url(#p-end)" marker-start="url(#p-start)"/>
+<rect x="1210" y="425" width="80" height="14" class="arrow-bg" rx="3"/>
+<text x="1250" y="436" class="arrow-label" text-anchor="middle" fill="#7c3aed">Data I/O</text>
+
+<!-- Vertical trunk from y=200 to y=660 at x=1450 -->
+<line x1="1450" y1="200" x2="1450" y2="660" stroke="#8b5cf6" stroke-width="2"/>
+
+<!-- T-junctions to each DB (one-directional into DB) -->
+<path d="M 1450 200 L 1488 200" fill="none" stroke="#8b5cf6" stroke-width="2" marker-end="url(#p-end)"/>
+<path d="M 1450 360 L 1488 360" fill="none" stroke="#8b5cf6" stroke-width="2" marker-end="url(#p-end)"/>
+<path d="M 1450 510 L 1488 510" fill="none" stroke="#8b5cf6" stroke-width="2" marker-end="url(#p-end)"/>
+<path d="M 1450 660 L 1488 660" fill="none" stroke="#8b5cf6" stroke-width="2" marker-end="url(#p-end)"/>
+
+<!-- Junction dots -->
+<circle cx="1450" cy="200" r="3" fill="#8b5cf6"/>
+<circle cx="1450" cy="360" r="3" fill="#8b5cf6"/>
+<circle cx="1450" cy="510" r="3" fill="#8b5cf6"/>
+<circle cx="1450" cy="660" r="3" fill="#8b5cf6"/>
+
+<!-- DB labels -->
+<rect x="1456" y="183" width="60" height="14" class="arrow-bg" rx="2"/>
+<text x="1486" y="194" class="arrow-label" font-size="9" text-anchor="middle" fill="#7c3aed">SQL+Vec</text>
+<rect x="1456" y="343" width="50" height="14" class="arrow-bg" rx="2"/>
+<text x="1481" y="354" class="arrow-label" font-size="9" text-anchor="middle" fill="#7c3aed">Cypher</text>
+<rect x="1456" y="493" width="46" height="14" class="arrow-bg" rx="2"/>
+<text x="1479" y="504" class="arrow-label" font-size="9" text-anchor="middle" fill="#7c3aed">Cache</text>
+<rect x="1456" y="643" width="36" height="14" class="arrow-bg" rx="2"/>
+<text x="1474" y="654" class="arrow-label" font-size="9" text-anchor="middle" fill="#7c3aed">Files</text>
+
+<!-- LangChain ↔ LLM Providers — violet dashed, route via top -->
+<path d="M 1400 165 L 1440 165 L 1440 90 L 1720 90 L 1720 170 L 1728 170" fill="none" stroke="#7c3aed" stroke-width="2" marker-end="url(#violet-end)" marker-start="url(#violet-start)" stroke-dasharray="6,4"/>
+<rect x="1540" y="78" width="80" height="14" class="arrow-bg" rx="3"/>
+<text x="1580" y="89" class="arrow-label" text-anchor="middle" fill="#7c3aed">LLM API</text>
+
+<!-- LiveKit ↔ LLM Providers — orange dashed, route via upper corridor -->
+<path d="M 1400 310 L 1425 310 L 1425 72 L 1710 72 L 1710 145 L 1728 145" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#orange-end)" marker-start="url(#orange-start)" stroke-dasharray="6,4"/>
+<rect x="1530" y="58" width="90" height="14" class="arrow-bg" rx="3"/>
+<text x="1575" y="69" class="arrow-label" text-anchor="middle" fill="#ea580c">Agent LLM</text>
+
+<!-- LiveKit ↔ Speech Services — teal dashed -->
+<path d="M 1400 370 L 1430 370 L 1430 55 L 1703 55 L 1703 350 L 1728 350" fill="none" stroke="#0891b2" stroke-width="2" marker-end="url(#teal-end)" marker-start="url(#teal-start)" stroke-dasharray="6,4"/>
+<rect x="1665" y="252" width="78" height="14" class="arrow-bg" rx="3"/>
+<text x="1704" y="263" class="arrow-label" text-anchor="middle" fill="#0891b2">STT · TTS</text>
+
+<!-- FastAPI ↔ Google OAuth — route via bottom corridor -->
+<path d="M 830 250 L 800 250 L 800 920 L 1715 920 L 1715 530 L 1728 530" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#gray-end)" marker-start="url(#gray-start)" stroke-dasharray="6,4"/>
+<rect x="1200" y="908" width="100" height="14" class="arrow-bg" rx="3"/>
+<text x="1250" y="919" class="arrow-label" text-anchor="middle" fill="#64748b">OAuth · JWT</text>
+
+
+<!-- LEGEND -->
+<rect x="40" y="970" width="2030" height="130" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<text x="60" y="1000" class="zone-label" fill="#475569">LEGEND</text>
+
+<rect x="60" y="1018" width="14" height="10" rx="2" fill="#fff" stroke="#818cf8" stroke-width="1.5"/>
+<text x="80" y="1027" font-size="11" fill="#475569">Actors / Users</text>
+
+<rect x="200" y="1018" width="14" height="10" rx="2" fill="#fff" stroke="#6366f1" stroke-width="1.5"/>
+<text x="220" y="1027" font-size="11" fill="#475569">Client (Browser)</text>
+
+<rect x="360" y="1018" width="14" height="10" rx="2" fill="#fff" stroke="#38bdf8" stroke-width="1.5"/>
+<text x="380" y="1027" font-size="11" fill="#475569">Frontend</text>
+
+<rect x="470" y="1018" width="14" height="10" rx="2" fill="#fff" stroke="#10b981" stroke-width="1.5"/>
+<text x="490" y="1027" font-size="11" fill="#475569">Backend / Workers</text>
+
+<rect x="640" y="1018" width="14" height="10" rx="2" fill="#fff" stroke="#a855f7" stroke-width="1.5"/>
+<text x="660" y="1027" font-size="11" fill="#475569">AI Orchestration</text>
+
+<rect x="800" y="1018" width="14" height="10" rx="2" fill="#fff" stroke="#ea580c" stroke-width="1.5"/>
+<text x="820" y="1027" font-size="11" fill="#475569">Real-time Voice</text>
+
+<rect x="960" y="1018" width="14" height="10" rx="2" fill="#fff" stroke="#8b5cf6" stroke-width="1.5"/>
+<text x="980" y="1027" font-size="11" fill="#475569">Data Layer</text>
+
+<rect x="1090" y="1018" width="14" height="10" rx="2" fill="#fff" stroke="#f59e0b" stroke-width="1.5"/>
+<text x="1110" y="1027" font-size="11" fill="#475569">Infrastructure</text>
+
+<rect x="1230" y="1018" width="14" height="10" rx="2" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
+<text x="1250" y="1027" font-size="11" fill="#475569">External Services</text>
+
+<!-- Arrow legends -->
+<line x1="60" y1="1055" x2="105" y2="1055" stroke="#3b82f6" stroke-width="2" marker-end="url(#b-end)" marker-start="url(#b-start)"/>
+<text x="115" y="1059" font-size="11" fill="#475569">Bidirectional (request ↔ response)</text>
+
+<line x1="370" y1="1055" x2="415" y2="1055" stroke="#dc2626" stroke-width="2" marker-end="url(#r-end)" marker-start="url(#r-start)" stroke-dasharray="6,3"/>
+<text x="425" y="1059" font-size="11" fill="#475569">Async job queue</text>
+
+<line x1="570" y1="1055" x2="615" y2="1055" stroke="#7c3aed" stroke-width="2" marker-end="url(#violet-end)" marker-start="url(#violet-start)" stroke-dasharray="6,4"/>
+<text x="625" y="1059" font-size="11" fill="#475569">LangChain → LLM</text>
+
+<line x1="770" y1="1055" x2="815" y2="1055" stroke="#ea580c" stroke-width="2" marker-end="url(#orange-end)" marker-start="url(#orange-start)" stroke-dasharray="6,4"/>
+<text x="825" y="1059" font-size="11" fill="#475569">LiveKit → LLM (Agent)</text>
+
+<line x1="1000" y1="1055" x2="1045" y2="1055" stroke="#0891b2" stroke-width="2" marker-end="url(#teal-end)" marker-start="url(#teal-start)" stroke-dasharray="6,4"/>
+<text x="1055" y="1059" font-size="11" fill="#475569">LiveKit → Speech (STT/TTS)</text>
+
+<line x1="1260" y1="1055" x2="1305" y2="1055" stroke="#94a3b8" stroke-width="2" marker-end="url(#gray-end)" marker-start="url(#gray-start)" stroke-dasharray="6,4"/>
+<text x="1315" y="1059" font-size="11" fill="#475569">OAuth (External)</text>
+
+<line x1="1460" y1="1055" x2="1505" y2="1055" stroke="#8b5cf6" stroke-width="2" marker-end="url(#p-end)" marker-start="url(#p-start)"/>
+<text x="1515" y="1059" font-size="11" fill="#475569">Database I/O (bus)</text>
+
+<text x="60" y="1090" font-size="10" fill="#94a3b8">aBridgeAI · AI-Powered Career Readiness LMS · HCMUT 2026</text>
+
+</svg>
+
+</div>
+</body>
+</html>

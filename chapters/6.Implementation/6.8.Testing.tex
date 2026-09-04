@@ -1,0 +1,134 @@
+\subsection{Testing}
+\label{sec:impl_testing}
+
+This section presents the test execution results for the implemented modules of the first iteration. The backend test suite uses \path{pytest} with \texttt{asyncio\_mode = "auto"} for native async test support, running against a real PostgreSQL database in integration mode. Tests are organised into unit tests (pure function isolation) and integration tests (full request--response cycles).
+
+Table~\ref{tab:test_result_summary} summarises the test execution results for the modules delivered in this iteration.
+
+\begin{table}[htbp]
+\centering
+\caption{Test Execution Summary by Module (Iteration 1)}
+\label{tab:test_result_summary}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Module} & \textbf{Test Cases} & \textbf{Passed} & \textbf{Result} \\
+\hline
+Authentication \& Access Control & 8 & 8 & \textbf{Pass} \\
+Course \& Material Management    & 5 & 5 & \textbf{Pass} \\
+Quiz Generation \& Taking        & 4 & 4 & \textbf{Pass} \\
+\hline
+\textbf{Total}                   & \textbf{17} & \textbf{17} & \textbf{100\%} \\
+\hline
+\end{tabular}
+\end{table}
+
+% ------------------------------------------------------------------
+\subsubsection{Authentication and Access Control}
+\label{sec:impl_test_auth}
+
+Table~\ref{tab:tc_detail_auth} details the test cases covering the authentication and access control module.
+
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{longtable}{|>{\centering\arraybackslash}m{0.10\textwidth}|>{\raggedright\arraybackslash}m{0.30\textwidth}|>{\raggedright\arraybackslash}m{0.35\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Test Results: Authentication and Access Control}
+\label{tab:tc_detail_auth} \\
+\hline
+\textbf{TC-ID} & \textbf{Description} & \textbf{Test File} & \textbf{Result} \\ \hline
+\endfirsthead
+\multicolumn{4}{c}{{\bfseries Table \thetable\ -- Continued}} \\ \hline
+\textbf{TC-ID} & \textbf{Description} & \textbf{Test File} & \textbf{Result} \\ \hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+
+TC-1.1.1 & Google SSO login callback & \path{test_oauth_flow.py} & Pass \\ \hline
+TC-1.1.2 & Idempotent logout & \path{test_oauth_flow.py} & Pass \\ \hline
+TC-1.2.1 & Session creation and refresh-token rotation & \path{test_identity_full.py} & Pass \\ \hline
+TC-1.2.2 & Session revocation on account disable & \path{test_identity_queries.py} & Pass \\ \hline
+TC-1.3.1 & TOTP verification and recovery-code consumption & \path{test_mfa_router.py} & Pass \\ \hline
+TC-1.3.2 & Recovery-code reuse prevention & \path{test_mfa_gate.py} & Pass \\ \hline
+TC-1.5.1 & Recursive permission resolution & \path{test_access_control_full.py} & Pass \\ \hline
+TC-1.5.2 & Endpoint enforcement by role & \path{test_access_control_membership_resolution.py} & Pass \\ \hline
+
+\end{longtable}
+\normalsize
+
+% ------------------------------------------------------------------
+\subsubsection{Course and Material Management}
+\label{sec:impl_test_course}
+
+Table~\ref{tab:tc_detail_course} details the test cases for course and material management features implemented in this iteration.
+
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{longtable}{|>{\centering\arraybackslash}m{0.10\textwidth}|>{\raggedright\arraybackslash}m{0.30\textwidth}|>{\raggedright\arraybackslash}m{0.35\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Test Results: Course and Material Management}
+\label{tab:tc_detail_course} \\
+\hline
+\textbf{TC-ID} & \textbf{Description} & \textbf{Test File} & \textbf{Result} \\ \hline
+\endfirsthead
+\multicolumn{4}{c}{{\bfseries Table \thetable\ -- Continued}} \\ \hline
+\textbf{TC-ID} & \textbf{Description} & \textbf{Test File} & \textbf{Result} \\ \hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+
+TC-3.1.1 & Course lifecycle (draft $\to$ publish) & \path{test_courses_e2e.py} & Pass \\ \hline
+TC-3.1.2 & Course archive and restore & \path{test_courses_e2e.py} & Pass \\ \hline
+TC-3.3.1 & PDF material upload and ingestion trigger & \path{test_materials_e2e.py} & Pass \\ \hline
+TC-3.3.2 & Ingestion pipeline processing & \path{test_materials_worker.py} & Pass \\ \hline
+TC-3.7.1 & Student material access (presigned URL) & \path{test_materials_learner_router.py} & Pass \\ \hline
+
+\end{longtable}
+\normalsize
+
+% ------------------------------------------------------------------
+\subsubsection{Quiz Generation and Taking}
+\label{sec:impl_test_quiz}
+
+Table~\ref{tab:tc_detail_quiz} details the test cases for the AI quiz generation and student quiz-taking features.
+
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{longtable}{|>{\centering\arraybackslash}m{0.10\textwidth}|>{\raggedright\arraybackslash}m{0.30\textwidth}|>{\raggedright\arraybackslash}m{0.35\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Test Results: Quiz Generation and Taking}
+\label{tab:tc_detail_quiz} \\
+\hline
+\textbf{TC-ID} & \textbf{Description} & \textbf{Test File} & \textbf{Result} \\ \hline
+\endfirsthead
+\multicolumn{4}{c}{{\bfseries Table \thetable\ -- Continued}} \\ \hline
+\textbf{TC-ID} & \textbf{Description} & \textbf{Test File} & \textbf{Result} \\ \hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+
+TC-4.1.1 & AI quiz generation from PDF content & \path{test_quiz_full_pipeline.py} & Pass \\ \hline
+TC-4.1.2 & Teacher review (approve/reject/edit) & \path{test_quiz_authoring_service.py} & Pass \\ \hline
+TC-4.3.1 & Student quiz session submission & \path{test_quiz_taking_service.py} & Pass \\ \hline
+TC-4.3.2 & Per-question response and feedback & \path{test_quizzes_e2e.py} & Pass \\ \hline
+
+\end{longtable}
+\normalsize
+
+% ------------------------------------------------------------------
+\subsubsection{CI Pipeline}
+\label{sec:impl_ci}
+
+The GitHub Actions workflow (\texttt{.github/workflows/backend-new-ci.yml}) runs the following jobs on every pull request:
+
+\begin{enumerate}
+    \item \textbf{Lint} — \texttt{ruff check}, \texttt{ruff format --check}, \texttt{mypy abridgeai}, \texttt{bandit -r abridgeai/}.
+    \item \textbf{Secret scan} — \texttt{gitleaks detect} with the project's custom ruleset covering OpenAI, Anthropic, and Garage S3 key patterns.
+    \item \textbf{Unit tests} — \path{pytest tests/unit/} with coverage reporting.
+    \item \textbf{Integration tests} — \path{pytest tests/integration/} against a PostgreSQL service container spun up by the workflow.
+\end{enumerate}
+
+All pull requests must pass all four stages before merge is permitted. Live infrastructure tests (S3, Neo4j, audio, video) are gated behind pytest markers and excluded from the default CI run to keep pipeline duration manageable.

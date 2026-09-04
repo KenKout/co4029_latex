@@ -1,0 +1,115 @@
+\section{{Non-Functional Requirements Specification}}
+\label{appendix:nfr}
+% ---------------------------------------------------------
+\paragraph{Performance and Latency}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.06\textwidth}|m{0.40\textwidth}|>{\centering\arraybackslash}m{0.14\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Non-Functional Requirements for Performance \& Latency}
+\label{tab:nfr_performance} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.40\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endfirsthead
+
+\multicolumn{6}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.40\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endhead
+
+\hline \multicolumn{6}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+NFR-1.1 & The system shall transcribe and index uploaded video lectures at an average processing speed of no more than 40 seconds per minute of video content (e.g., a 15-minute lecture completes within approximately 10 minutes on average). & Teachers & Yes & Yes & High \\ \hline
+NFR-1.2 & The system shall complete quiz generation within 5 minutes on average per lesson. & Teachers & Yes & Yes & High \\ \hline
+NFR-1.3 & The system shall complete interview question bank generation within 15 minutes on average per lesson, producing a minimum of 20 candidate questions covering all teacher-defined target outcomes. & Teachers & Yes & Yes & High \\ \hline
+NFR-1.4 & Dashboard pages must load within 2 seconds on average on a standard connection. & All Users & Yes & Yes & Medium \\ \hline
+NFR-1.5 & Video streaming must start within 3 seconds on average after the user initiates playback. & All Users & Yes & Yes & Medium \\ \hline
+NFR-1.6 & Search results must return within 0.5 seconds on average. & All Users & Yes & Yes & Medium \\
+\end{longtable}
+
+% ---------------------------------------------------------
+\paragraph{Scalability and Reliability}
+
+\begin{longtable}{|>{\centering\arraybackslash}m{0.06\textwidth}|m{0.40\textwidth}|>{\centering\arraybackslash}m{0.14\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Non-Functional Requirements for Scalability \& Reliability}
+\label{tab:nfr_scalability} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.40\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endfirsthead
+
+\multicolumn{6}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.40\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endhead
+
+\hline \multicolumn{6}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+NFR-2.1 & The system shall support on average 50 concurrent active users, 10 simultaneous video streams, and 5 concurrent AI interview sessions during peak hours without performance degradation. & Admin & Yes & Yes & Medium \\ \hline
+NFR-2.2 & The system shall efficiently store on average 10GB of course content using standard MP4 compression and optimize database queries for an average response time under 0.5 seconds with 10,000 student records. & Admin & Yes & Yes & Low \\ \hline
+NFR-2.3 & The system shall maintain a 95\% uptime target on average and feature graceful degradation (e.g., video streaming continues even if the AI interview module temporarily fails). & All Users, Admin & Partial & Yes & Medium \\ \hline
+NFR-2.4 & The system shall provide fault tolerance through redundant AI servers, database replication across availability zones, and automatic retry logic for transient network issues. & Admin & Partial & Yes & Low \\
+\end{longtable}
+
+% ---------------------------------------------------------
+\paragraph{Security and Compliance}
+
+\begin{longtable}{|>{\centering\arraybackslash}m{0.06\textwidth}|m{0.40\textwidth}|>{\centering\arraybackslash}m{0.14\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Non-Functional Requirements for Security \& Compliance}
+\label{tab:nfr_security} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.40\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endfirsthead
+
+\multicolumn{6}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.40\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endhead
+
+\hline \multicolumn{6}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+NFR-3.1 & All sensitive data must be encrypted at rest using AES-256, including user passwords (hashed with bcrypt, cost factor $\geq$ 12), personally identifiable information (PII), session tokens, API keys, and uploaded learning materials. & All Users, Admin & Yes & Yes & High \\ \hline
+NFR-3.2 & The system must enforce Role-Based Access Control (RBAC) following the principle of least privilege, ensuring users can only access resources and perform actions authorized for their assigned role. & Managers, Admin & Yes & Yes & High \\ \hline
+NFR-3.3 & The system must maintain immutable audit logs for all sensitive operations, including authentication events, permission changes, data modifications, and administrative actions, with each log entry capturing the actor, timestamp, action type, and affected resource. & Managers, Admin & Yes & Yes & High \\ \hline
+NFR-3.4 & The system must enforce a 30-minute idle session timeout, automatically logging out users after the period of inactivity and requiring re-authentication. & All Users & Yes & Yes & High \\
+\end{longtable}
+
+% ---------------------------------------------------------
+\paragraph{Usability and Accessibility}
+
+\begin{longtable}{|>{\centering\arraybackslash}m{0.06\textwidth}|m{0.40\textwidth}|>{\centering\arraybackslash}m{0.14\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Non-Functional Requirements for Usability \& Accessibility}
+\label{tab:nfr_usability} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.40\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endfirsthead
+
+\multicolumn{6}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.40\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endhead
+
+\hline \multicolumn{6}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+NFR-4.1 & The User Interface must be mobile-responsive and maintain a consistent design system. & Students, Teachers & Yes & Yes & High \\ \hline
+NFR-4.2 & The system must comply with WCAG 2.1 AA accessibility standards, supporting full keyboard navigation (no mouse required), sufficient color contrast ratios, and alt text for all visual elements. & Users with Disabilities & Partial & Yes & Low \\ \hline
+NFR-4.3 & The system shall only support Chromium-based browsers (e.g., Google Chrome, Microsoft Edge, Brave, Opera). & All Users & Yes & Yes & Medium \\
+\end{longtable}

@@ -1,0 +1,79 @@
+\subsection{System Overview}
+This section establishes the foundational context of the aBridgeAI system, outlining its core mission, the entities invested in its success, and the human actors who interact with the platform.
+
+\subsubsection{Purpose}
+The purpose of aBridgeAI is to bridge the gap between theoretical academic curricula and practical industry expectations. By operating as an AI-driven LMS and Mock Interview system, it transforms traditional, passive learning into an active, context-aware application loop. The system aims to automate the generation of assessments and provide personalized interview practices to ensure students are "Job-Ready."
+
+\subsubsection{Stakeholders and Users of the System}
+It is essential to distinguish between stakeholders (those impacted by or invested in the system's outcome) and users (those directly interacting with the software).
+
+\paragraph{Stakeholders}
+\begin{itemize}
+    \item \textbf{Higher Education Institutions and Coding Bootcamps:}
+    The host organisations that adopt aBridgeAI to improve student
+    employability rates, reduce manual assessment overhead, and
+    surface auditable evidence of progression.
+ 
+    \item \textbf{Accreditation Bodies and Industry Partners:}
+    External entities that consume institution-level reporting on progression and outcomes. These parties
+    do not interact with the system directly but rely on the
+    aggregated metrics it produces to evaluate programme quality.
+ 
+    \item \textbf{Hiring Companies:}
+    The eventual consumers of the graduate pipeline, who benefit
+    from candidates whose technical and communication competencies
+    have been verified against outcome checklists rather than
+    self-reported coursework.
+ 
+    \item \textbf{Academic Supervisor and Project Review Committee:}
+    The faculty advisors and reviewers responsible for evaluating
+    the scientific and engineering contributions of this work
+    against academic criteria.
+\end{itemize}
+
+\paragraph{Users of the System}
+\begin{itemize}
+    \item \textbf{Student:} The primary end-user. Consumes
+    multimedia lessons, participates in AI-driven quiz and spaced-repetition quiz
+    review cycles whose intervals are governed by the hybrid SM-2
+    scheduler, takes AI-conducted mock interviews in voice or text
+    mode, and tracks personal progression via the Knowledge
+    Retention Estimate, Progression Readiness, and Review Compliance
+    Rate metrics. The student receives a binary pass/fail outcome
+    per interview session.
+ 
+    \item \textbf{Teacher:} Designs lessons, uploads
+    raw materials for AI ingestion, and is
+    responsible for the human-in-the-loop review of all AI-generated
+    artefacts before publication --- including editing quiz cards,
+    confirming the per-card expected response time $T_{\text{exp}}$
+    that anchors $Q$ derivation, defining target outcomes for the
+    mock interview, and reviewing the AI-generated interview
+    question bank. Teachers additionally configure the SM-2 unlock
+    parameters ($EF_{\min}^{\text{unlock}}$, coverage threshold
+    $\tau$, prerequisite criteria) per lesson and monitor cohort
+    retention and compliance metrics via the teacher dashboard.
+ 
+    \item \textbf{Educational Manager:} The administrative authority
+    within a single organisation (e.g.\ a Dean, Vice Dean, or
+    programme lead). Defines \textit{careers}---the ordered
+    pathways of courses representing a target professional
+    competency---and assigns teachers to courses within those
+    pathways. Onboards students and teachers within the
+    organisation, including via bulk CSV import, and consumes
+    organisation-scoped reports including Career Readiness
+    progression at both the individual and cohort level. The
+    Educational Manager's authority is bounded by the organisation
+    they administer; they have no cross-tenant visibility.
+ 
+    \item \textbf{IT Administrator:} The
+    super-user responsible for cross-tenant operations. Provisions
+    new organisations, configures organisation-level limits
+    (storage quotas, concurrent-user caps), invites the initial
+    Educational Manager for each newly provisioned tenant,
+    monitors system health and infrastructure, and enforces
+    platform-wide security and compliance policies. The IT
+    Administrator does not manage course content or
+    intra-organisational user accounts; those responsibilities
+    belong to the Educational Manager.
+\end{itemize}

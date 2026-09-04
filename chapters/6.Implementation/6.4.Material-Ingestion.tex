@@ -1,0 +1,35 @@
+\subsection{Material Ingestion Pipeline}
+\label{sec:impl_ingestion}
+
+When an instructor uploads a learning material, the file is stored in Garage S3-compatible object storage and a background worker triggers the ingestion pipeline implemented in \path{abridgeai/features/materials/ingestion/pipeline.py}. The pipeline transforms raw files into searchable, embeddable document chunks in five sequential stages.
+
+\paragraph{Stage 1 — Extraction}
+The \path{dispatch_extractor(mime)} factory selects the appropriate extractor based on the file's MIME type. The extraction registry supports PDF, DOCX, PPTX, HTML, plain text, source code, images, audio, and video. Each extractor implements the \texttt{BaseExtractor} interface and returns an \texttt{ExtractedContent} object carrying the raw text and a \texttt{source\_type} tag. Audio and video files are transcribed using a speech-to-text model before text extraction proceeds.
+
+\paragraph{Stage 2 — Chunking}
+The chunker is selected based on \texttt{source\_type}:
+\begin{itemize}
+    \item \textbf{Audio / Video} — \texttt{TimestampAwareChunker}: preserves segment timestamps so retrieved chunks can be linked back to specific moments in the media.
+    \item \textbf{Image} — \path{TokenAwareChunker(max_tokens=10,000)}: treats the entire extracted text as a single chunk.
+    \item \textbf{All other types} — \texttt{SemanticChunker} when an LLM gateway is available; otherwise \path{TokenAwareChunker(max_tokens=500)} as a fallback.
+\end{itemize}
+
+The \texttt{SemanticChunker} uses an LLM to identify natural topic boundaries in the text, producing chunks that align with conceptual units rather than arbitrary token windows. Each chunk is then enriched with a \texttt{section\_title} and a \texttt{context\_sentence} via the contextual prepending technique described in Section~\ref{sec:system_sm2}.
+
+\paragraph{Stage 3 — Embedding}
+Each enriched chunk is passed to \texttt{EmbeddingClient.embed()}, which calls the configured embedding model (default: \texttt{text-embedding-3-large}, 3072 dimensions stored as \texttt{halfvec} for storage efficiency). Before calling the model, \path{build_contextual_text()} prepends the chunk's \texttt{section\_title} and \texttt{context\_sentence} to the raw content:
+
+\begin{verbatim}
+[Topic: {section_title}] {context_sentence} {content}
+\end{verbatim}
+
+This contextual prepending follows Anthropic's Contextual Retrieval technique~\cite{anthropic2024contextual}, which reduces retrieval failure rates by anchoring each chunk's embedding in its broader document context. Every embedding call writes an \texttt{ai\_model\_calls} audit row recording the model, token counts, and cost.
+
+\paragraph{Stage 4 — Persistence}
+\texttt{DocumentChunk} ORM rows are written to PostgreSQL with denormalised foreign keys to the material version, lesson, module, and course. The \texttt{embedding} column stores the \texttt{halfvec(3072)} vector. A \texttt{content\_tsv} column (populated by a database trigger) stores a \texttt{tsvector} for BM25 full-text search. A SHA-256 content hash is stored to enable deduplication on re-ingestion.
+
+\paragraph{Stage 5 — Knowledge Graph (optional)}
+When \path{settings.knowledge_graph_enabled} is true, the pipeline calls \path{build_knowledge_graph_for_material_version()} in \path{abridgeai/ai/knowledge_graph/builder.py}. For each chunk, an LLM extracts a JSON object containing \texttt{entities} (concepts with optional definitions and confidence scores) and \texttt{relationships} (typed as \texttt{RELATED\_TO} or \texttt{PREREQUISITE\_OF}). The extracted graph is upserted into Neo4j, anchored to the course–module–lesson–material hierarchy. This graph is later used during quiz and interview generation to provide structured concept context alongside the vector-retrieved chunks.
+
+\paragraph{Worker and transaction discipline}
+The pipeline is invoked by an \texttt{arq} background worker (\path{features/materials/workers/ingest.py}). The pipeline itself only flushes to the database session; the worker owns the commit. On any exception, the material version's \texttt{processing\_status} is set to \texttt{failed} and the exception is re-raised so the worker can record the failure without silently swallowing errors.

@@ -1,0 +1,23 @@
+\subsection{Development Environment and Toolchain}
+\label{sec:impl_env}
+
+The backend is implemented in Python 3.12 using the FastAPI framework for asynchronous HTTP serving. Dependency management is handled by \texttt{uv}, which resolves and locks the full dependency graph in \texttt{uv.lock} to guarantee reproducible builds across developer machines and CI. The project declares its metadata and tool configuration in a single \texttt{pyproject.toml}, covering package discovery, mypy type-checking settings, bandit security rules, and ruff linting profiles.
+
+\paragraph{Runtime dependencies}
+The core runtime stack consists of:
+\begin{itemize}
+    \item \textbf{FastAPI + Uvicorn} — ASGI web framework and server.
+    \item \textbf{SQLAlchemy 2 (async)} — ORM and query layer over PostgreSQL via the \texttt{psycopg} driver.
+    \item \textbf{Alembic} — schema migration management; 16 versioned migration files track every DDL change from the baseline schema to the current state.
+    \item \textbf{Redis (via \texttt{arq})} — task queue for background workers and cron jobs.
+    \item \textbf{Neo4j (async driver)} — knowledge graph storage for concept-relationship extraction.
+    \item \textbf{Pydantic v2} — request/response validation and settings management via \texttt{pydantic-settings}.
+    \item \textbf{tiktoken} — token counting for chunking budget enforcement.
+    \item \textbf{Jinja2} — prompt template rendering for all LLM calls.
+\end{itemize}
+
+\paragraph{Code quality gates}
+A \texttt{.pre-commit-config.yaml} wires 13 hooks that run before every commit: \texttt{ruff} for linting and formatting, \texttt{mypy} for static type checking, \texttt{bandit} for security scanning, and \texttt{gitleaks} for secret detection. The same hooks are replicated in the GitHub Actions CI pipeline (\texttt{.github/workflows/backend-new-ci.yml}) so violations are caught both locally and on every pull request.
+
+\paragraph{Local infrastructure}
+A \texttt{docker-compose.yml} defines the full local stack: PostgreSQL 16 with the \texttt{pgvector} extension, Redis 7, and Neo4j 5. Developers run \texttt{docker compose up -d} to bring up all dependencies before starting the application with \texttt{uv run uvicorn}.

@@ -1,0 +1,25 @@
+\subsection{Authentication and Identity}
+\label{sec:impl_auth}
+
+The identity subsystem handles user registration, Google OAuth sign-in, JWT session management, and multi-factor authentication (MFA). It is implemented in \texttt{abridgeai/features/identity/} and exposes four router groups: \texttt{/auth}, \texttt{/me}, \texttt{/users} (admin), and \texttt{/mfa}.
+
+\paragraph{Google OAuth flow}
+The platform uses Google OAuth 2.0 as its sole external identity provider. The sign-in flow is implemented in \texttt{features/identity/services/login.py} and proceeds as follows:
+
+\begin{enumerate}
+    \item The frontend redirects the user to Google's authorisation endpoint with the configured \texttt{client\_id} and \texttt{redirect\_uri}.
+    \item Google redirects back with an authorisation code, which the frontend forwards to \texttt{POST /auth/google/callback}.
+    \item The backend exchanges the code for a Google profile via \texttt{infrastructure/google\_oauth.py}, which calls Google's \texttt{tokeninfo} endpoint.
+    \item A pre-registration gate checks that the email already exists in the \texttt{users} table with \texttt{status = 'active'}. New OAuth profiles from unregistered emails are rejected with HTTP 403, keeping the platform invite-only.
+    \item On success, an \texttt{AuthIdentity} row linking the user to the Google provider subject is created (or reused if it already exists), and a new \texttt{AuthSession} row is written with a hashed refresh token.
+    \item The response returns a short-lived JWT access token (configurable TTL, default 15 minutes) and a long-lived refresh token.
+\end{enumerate}
+
+\paragraph{JWT and session management}
+Access tokens are signed with HS256 using a secret loaded from the \texttt{JWT\_SECRET} environment variable. The \texttt{core/security} module provides \texttt{create\_access\_token()}, \texttt{hash\_secret()} (bcrypt), and \texttt{generate\_token()} (32-byte URL-safe random). Refresh tokens are stored as bcrypt hashes in \texttt{auth\_sessions} — the plaintext is never persisted. Token rotation is enforced: each \texttt{POST /auth/refresh} call invalidates the old session row and issues a new one.
+
+\paragraph{Multi-factor authentication}
+TOTP-based MFA is implemented in \texttt{features/identity/services/mfa.py}. Enrollment generates a TOTP secret, returns a provisioning URI for authenticator apps, and stores the encrypted secret only after the user verifies a valid code. Subsequent logins that have MFA enabled require a second \texttt{POST /mfa/verify} call before the access token is issued. The MFA gate is enforced at the router level via a FastAPI dependency that checks the \texttt{mfa\_verified} claim in the JWT.
+
+\paragraph{Role-based access}
+Every authenticated request resolves the caller's roles and permissions through the access control subsystem (Section~\ref{sec:impl_access_control}). The identity layer attaches the resolved \texttt{UserContext} — containing user ID, organisation memberships, and permission set — to the request state so downstream route handlers can perform permission checks without additional database queries.

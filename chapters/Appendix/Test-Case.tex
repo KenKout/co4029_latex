@@ -1,0 +1,550 @@
+\section{Test Case Specifications}
+\label{appendix:testcases}
+
+% ============================ Module 1: Authentication & Access Control ====================
+\paragraph{Authentication and Access Control}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.06\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.10\textwidth}|m{0.20\textwidth}|m{0.22\textwidth}|m{0.23\textwidth}|}
+\caption{Test Cases: Authentication \& Access Control}
+\label{tab:tc_auth_access} \\
+\hline
+\textbf{ID} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.08\textwidth}|}{\textbf{Req}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.10\textwidth}|}{\textbf{Level}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.20\textwidth}|}{\textbf{Input}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Expected Result}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.23\textwidth}|}{\textbf{Exception}} \\
+\hline
+\endfirsthead
+
+\multicolumn{6}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.08\textwidth}|}{\textbf{Req}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.10\textwidth}|}{\textbf{Level}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.20\textwidth}|}{\textbf{Input}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Expected Result}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.23\textwidth}|}{\textbf{Exception}} \\
+\hline
+\endhead
+
+\hline \multicolumn{6}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+% --- FR-1.1: Google SSO and Logout ---
+TC-1.1.1 & FR-1.1 & System & User initiates login using Google SSO & System redirects the user to Google OAuth and authenticates the user after a successful callback & Login fails if the OAuth callback is invalid or the Google account is not authorised \\ \hline
+TC-1.1.2 & FR-1.1 & System & Authenticated user clicks logout & User is logged out and redirected to the login page & Logout remains idempotent if the session has already expired \\ \hline
+
+% --- FR-1.2: Session Management ---
+TC-1.2.1 & FR-1.2 & System & User completes Google SSO successfully & System creates an authenticated session and issues valid access and refresh tokens & Session is not created if user identity cannot be mapped or provisioned \\ \hline
+TC-1.2.2 & FR-1.2 & Integration & User sends a request with an expired access token and valid refresh token & System refreshes the session and rotates the refresh token & Refresh is rejected if the refresh token is expired, revoked, or reused \\ \hline
+TC-1.2.3 & FR-1.2 & System & IT administrator disables an active user account & All active sessions for that account are revoked and protected resources become inaccessible & Historical user data remains preserved after account disablement \\ \hline
+
+% --- FR-1.3: Two-Factor Authentication ---
+TC-1.3.1 & FR-1.3 & System & User with MFA enabled logs in and enters a valid authenticator-app code & MFA verification succeeds and the user can access protected features & Invalid or expired verification codes are rejected \\ \hline
+TC-1.3.2 & FR-1.3 & System & User enters a valid one-time recovery code & Recovery code is accepted and marked as used & Used recovery codes cannot be reused \\ \hline
+
+% --- FR-1.4: Recent Second-Factor Verification ---
+TC-1.4.1 & FR-1.4 & System & User attempts to regenerate recovery codes after recent MFA verification & Operation is allowed and new recovery codes are generated & Operation is blocked if MFA verification is outside the freshness window \\ \hline
+TC-1.4.2 & FR-1.4 & System & User attempts to disable MFA without recent second-factor verification & System requires re-verification before allowing the operation & MFA cannot be disabled through direct API bypass \\ \hline
+
+% --- FR-1.5: Role and Permission-Based Access Control ---
+TC-1.5.1 & FR-1.5 & System & User accesses a protected backend route with sufficient permission & Request is allowed and the protected resource is returned & Request is denied if the user lacks the required permission \\ \hline
+TC-1.5.2 & FR-1.5 & System & Frontend renders actions for a user with limited permissions & UI hides or disables actions outside the user's effective permissions & Hidden actions remain protected server-side if called directly \\ \hline
+
+% --- FR-1.6: Authentication and Access Audit Events ---
+TC-1.6.1 & FR-1.6 & System & User performs login, logout, and MFA verification actions & System records corresponding auditable events & Audit logging failure does not expose sensitive authentication data \\ \hline
+TC-1.6.2 & FR-1.6 & System & Administrator changes account-security or access-control settings & System records actor, action, target, and timestamp in the audit log & Audit records cannot be modified by non-authorised users \\ \hline
+
+\end{longtable}
+
+
+% ============================ Module 2: Organization & User Management ====================
+\paragraph{Organization and User Management}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.06\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.10\textwidth}|m{0.20\textwidth}|m{0.22\textwidth}|m{0.23\textwidth}|}
+\caption{Test Cases: Organization \& User Management}
+\label{tab:tc_org} \\
+\hline
+\textbf{ID} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.08\textwidth}|}{\textbf{Req}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.10\textwidth}|}{\textbf{Level}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.20\textwidth}|}{\textbf{Input}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Expected Result}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.23\textwidth}|}{\textbf{Exception}} \\
+\hline
+\endfirsthead
+
+\multicolumn{6}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.08\textwidth}|}{\textbf{Req}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.10\textwidth}|}{\textbf{Level}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.20\textwidth}|}{\textbf{Input}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Expected Result}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.23\textwidth}|}{\textbf{Exception}} \\
+\hline
+\endhead
+
+\hline \multicolumn{6}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+% --- FR-2.1: Tenant Provisioning ---
+TC-2.1.1 & FR-2.1 & System & IT administrator provisions a new tenant organisation with required details and an initial Educational Manager & Organisation is created and the selected user receives the initial manager role & Provisioning fails if required organisation information is missing or invalid \\ \hline
+
+% --- FR-2.2: Organisation Lifecycle Management ---
+TC-2.2.1 & FR-2.2 & System & IT administrator updates an existing organisation's basic information & Updated information is saved and reflected in organisation views & Duplicate or invalid organisation metadata is rejected \\ \hline
+TC-2.2.2 & FR-2.2 & System & IT administrator changes an organisation status to inactive, archived, or soft-deleted & Organisation lifecycle state is updated and access rules follow the new state & Invalid lifecycle transitions are rejected \\ \hline
+
+% --- FR-2.3: Bulk Student Enrollment ---
+TC-2.3.1 & FR-2.3 & System & Educational Manager uploads a CSV containing valid and invalid student rows & Valid student accounts are created or enrolled, and invalid rows are reported without aborting the whole batch & Duplicate or malformed email rows are listed in the validation report \\ \hline
+
+% --- FR-2.4: Career Pathways ---
+TC-2.4.1 & FR-2.4 & System & Educational Manager creates a career pathway with an ordered sequence of courses & Career pathway is saved and course order is preserved & Pathway creation is rejected if required course references are invalid \\ \hline
+TC-2.4.2 & FR-2.4 & System & Educational Manager reorders courses within a pathway & New order is saved and reflected in pathway views & Reordering fails if the manager does not belong to the organisation \\ \hline
+
+% --- FR-2.5: Teacher Assignment ---
+TC-2.5.1 & FR-2.5 & System & Educational Manager assigns a Teacher to a course within their organisation & Teacher is linked to the course and can access authoring features & Assignment fails if the teacher is inactive or outside the organisation \\ \hline
+
+% --- FR-2.6: Tenant-Scoped Manager Access ---
+TC-2.6.1 & FR-2.6 & System & Educational Manager queries users, courses, or reports from their own organisation & System returns only data within the manager's tenant organisation & Cross-tenant records are not returned \\ \hline
+TC-2.6.2 & FR-2.6 & System & Educational Manager attempts to access another tenant's data via direct URL or API call & Access is denied & No partial cross-tenant data is leaked \\ \hline
+
+% --- FR-2.7: Organisation and Org Unit Association ---
+TC-2.7.1 & FR-2.7 & Integration & New account is provisioned using an email domain registered to an organisation & Account is automatically associated with the matching organisation & Account remains unassigned or requires manual review if no matching domain exists \\ \hline
+
+% --- FR-2.8: User Profile Management ---
+TC-2.8.1 & FR-2.8 & System & Authenticated user updates display name, avatar, bio, or external links & Profile changes are saved and reflected in the user's account page & Invalid external link formats are rejected \\ \hline
+
+% --- FR-2.9: Organisation Domain Management ---
+TC-2.9.1 & FR-2.9 & System & IT administrator adds, removes, or toggles auto-provisioning for an organisation email domain & Domain settings are updated and used for future account provisioning & Duplicate domain registration is rejected \\ \hline
+
+% --- FR-2.10: Organisation Membership Records ---
+TC-2.10.1 & FR-2.10 & System & Authorised manager updates a user's organisation membership and identifier code & Membership record is saved and visible in organisation membership views & Update is denied if the manager lacks organisation-management permission \\ \hline
+
+% --- FR-2.11: Enable or Disable User Accounts ---
+TC-2.11.1 & FR-2.11 & System & IT administrator disables a user account across tenant organisations & Disabled user can no longer access protected system resources & User records and historical activity remain preserved \\ \hline
+
+\end{longtable}
+
+
+% ============================ Module 3: Course & Material Management ====================
+\paragraph{Course and Material Management}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.06\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.10\textwidth}|m{0.20\textwidth}|m{0.22\textwidth}|m{0.23\textwidth}|}
+\caption{Test Cases: Course \& Material Management}
+\label{tab:tc_course_material} \\
+\hline
+\textbf{ID} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.08\textwidth}|}{\textbf{Req}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.10\textwidth}|}{\textbf{Level}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.20\textwidth}|}{\textbf{Input}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Expected Result}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.23\textwidth}|}{\textbf{Exception}} \\
+\hline
+\endfirsthead
+
+\multicolumn{6}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.08\textwidth}|}{\textbf{Req}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.10\textwidth}|}{\textbf{Level}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.20\textwidth}|}{\textbf{Input}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Expected Result}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.23\textwidth}|}{\textbf{Exception}} \\
+\hline
+\endhead
+
+\hline \multicolumn{6}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+% --- FR-3.1: Course Lifecycle ---
+TC-3.1.1 & FR-3.1 & System & Teacher creates a course in draft state with required metadata & Course is saved as draft and is not visible to students until published & Course creation fails if required metadata is missing \\ \hline
+TC-3.1.2 & FR-3.1 & System & Authorised user archives or restores a soft-deleted course & Course lifecycle state is updated correctly & Restore fails if the user lacks administrative permission \\ \hline
+
+% --- FR-3.2: Course Structure and Unlock Rules ---
+TC-3.2.1 & FR-3.2 & System & Teacher creates ordered modules and learning items with prerequisites & Structure is saved and displayed in the configured order & Circular or invalid prerequisite rules are rejected \\ \hline
+
+% --- FR-3.3: Material Upload and Processing ---
+TC-3.3.1 & FR-3.3 & System & Teacher uploads a supported learning material using a standard or resumable upload flow & Material is stored, linked to the lesson, and queued for processing & Unsupported formats or failed uploads are rejected with an error message \\ \hline
+TC-3.3.2 & FR-3.3 & System & Teacher re-runs processing for an existing material & Processing pipeline is restarted and new processed artefacts are generated & Re-run is blocked if the material is missing or inaccessible \\ \hline
+
+% --- FR-3.4: Material Version History ---
+TC-3.4.1 & FR-3.4 & System & Teacher uploads a replacement version of an existing material & New version becomes current while prior versions remain available for rollback or re-processing & Invalid replacement files do not overwrite the current version \\ \hline
+
+% --- FR-3.5: Ingestion Progress ---
+TC-3.5.1 & FR-3.5 & System & Teacher views ingestion status for a material version & System displays processing status, percent completion, and failure reason if applicable & Failed processing jobs show actionable error information \\ \hline
+
+% --- FR-3.6: Material Visibility ---
+TC-3.6.1 & FR-3.6 & System & Teacher marks a material as hidden while the course remains published & Students cannot access the hidden material & Teachers can still view hidden material in authoring mode \\ \hline
+
+% --- FR-3.7: Student Course and Material Access ---
+TC-3.7.1 & FR-3.7 & System & Enrolled student browses published courses and opens approved material & Student can view course details and stream or download approved material via a presigned URL & Unpublished or invisible materials are not accessible \\ \hline
+
+% --- FR-3.8: Administrative Course Inspection ---
+TC-3.8.1 & FR-3.8 & System & IT administrator opens course processing history and aggregate statistics & System displays processing jobs, status history, and aggregate course statistics & Access is denied to users without administrative permission \\ \hline
+
+\end{longtable}
+
+
+% ============================ Module 4: Learning Loop & Adaptive Quiz ====================
+\paragraph{Learning Loop and Adaptive Quiz}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.06\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.10\textwidth}|m{0.20\textwidth}|m{0.22\textwidth}|m{0.23\textwidth}|}
+\caption{Test Cases: Learning Loop \& Adaptive Quiz}
+\label{tab:tc_learning_loop} \\
+\hline
+\textbf{ID} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.08\textwidth}|}{\textbf{Req}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.10\textwidth}|}{\textbf{Level}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.20\textwidth}|}{\textbf{Input}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Expected Result}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.23\textwidth}|}{\textbf{Exception}} \\
+\hline
+\endfirsthead
+
+\multicolumn{6}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.08\textwidth}|}{\textbf{Req}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.10\textwidth}|}{\textbf{Level}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.20\textwidth}|}{\textbf{Input}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Expected Result}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.23\textwidth}|}{\textbf{Exception}} \\
+\hline
+\endhead
+
+\hline \multicolumn{6}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+% --- FR-4.1: Quiz Question Authoring and Review ---
+TC-4.1.1 & FR-4.1 & Integ-ration & Teacher drafts quiz questions from ingested course content & Questions are generated from source content, retain source references, and enter review state & Questions without valid source references are flagged for review \\ \hline
+TC-4.1.2 & FR-4.1 & System & Teacher edits, approves, rejects, or reuses quiz questions & Question state and revision history are updated correctly & Students cannot access unapproved questions \\ \hline
+
+% --- FR-4.2: Quiz and SR Configuration ---
+TC-4.2.1 & FR-4.2 & System & Teacher configures quiz settings and sets $T_{\text{exp}}$ for every live question & Quiz can be published and settings are applied to student attempts & Publication is blocked if any live question has no $T_{\text{exp}}$ \\ \hline
+
+% --- FR-4.3: Student Quiz Session ---
+TC-4.3.1 & FR-4.3 & System & Student submits a quiz answer with response time and optional hint usage & System records correctness, response time, and hint usage for the answer & Attempts are blocked when retake policy or cooldown rules are violated \\ \hline
+
+% --- FR-4.4: Q Derivation and Hybrid SM-2 Update ---
+TC-4.4.1 & FR-4.4 & Unit & System receives correctness, hint usage, $T_{\text{actual}}$, and $T_{\text{exp}}$ for a card response & System derives the correct $Q$ value using the configured mapping & Invalid or missing timing data is rejected or handled by a defined fallback \\ \hline
+TC-4.4.2 & FR-4.4 & Integ-ration & Card response produces a derived $Q$ value & Student-card SM-2 state is updated with EF, interval, due date, calibration, and jitter rules & EF never falls below the configured floor \\ \hline
+
+% --- FR-4.5: Lesson Access Gate ---
+TC-4.5.1 & FR-4.5 & System & Student satisfies prerequisite completion and EF coverage threshold $\tau$ & Dependent lesson becomes accessible & Lesson remains locked if prerequisite or coverage threshold is not satisfied \\ \hline
+
+% --- FR-4.6: SR and Remediation Notifications ---
+TC-4.6.1 & FR-4.6 & Integ-ration & A student's card becomes due for review & System delivers an in-app spaced-repetition reminder & Notification is not delivered if the card has already been reviewed \\ \hline
+TC-4.6.2 & FR-4.6 & Integ-ration & Student fails a card linked to source material & System sends remediation notification linking to relevant material when available & Notification omits material link if no reliable source reference exists \\ \hline
+
+% --- FR-4.7: Teacher Learning Analytics ---
+TC-4.7.1 & FR-4.7 & System & Teacher opens learning-loop analytics for a course & System displays cohort retention, difficult cards, at-risk students, and per-student SR details & Empty state is shown if no quiz activity exists \\ \hline
+
+% --- FR-4.8: Student Learning Dashboard ---
+TC-4.8.1 & FR-4.8 & System & Student opens personal learning dashboard & System displays due cards, retention estimate, progression readiness, and course-level progress & Dashboard handles courses with no due cards gracefully \\ \hline
+
+\end{longtable}
+
+
+% ============================ Module 5: Application Loop & Mock Interview ====================
+\paragraph{Application Loop and Mock Interview}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.06\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.10\textwidth}|m{0.20\textwidth}|m{0.22\textwidth}|m{0.23\textwidth}|}
+\caption{Test Cases: Application Loop \& Mock Interview}
+\label{tab:tc_interview} \\
+\hline
+\textbf{ID} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.08\textwidth}|}{\textbf{Req}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.10\textwidth}|}{\textbf{Level}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.20\textwidth}|}{\textbf{Input}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Expected Result}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.23\textwidth}|}{\textbf{Exception}} \\
+\hline
+\endfirsthead
+
+\multicolumn{6}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.08\textwidth}|}{\textbf{Req}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.10\textwidth}|}{\textbf{Level}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.20\textwidth}|}{\textbf{Input}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Expected Result}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.23\textwidth}|}{\textbf{Exception}} \\
+\hline
+\endhead
+
+\hline \multicolumn{6}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+% --- FR-5.1: Interview Outcomes ---
+TC-5.1.1 & FR-5.1 & System & Teacher defines desired interview outcomes without model answers & Interview section is saved with outcome-based assessment criteria & Publication is blocked if no desired outcomes are defined \\ \hline
+
+% --- FR-5.2: Interview Question Drafting and Review ---
+TC-5.2.1 & FR-5.2 & Integ-ration & Teacher drafts interview questions from ingested course content & Questions are associated with desired outcomes and enter teacher review & Questions not mapped to any desired outcome are flagged \\ \hline
+TC-5.2.2 & FR-5.2 & System & Teacher edits, approves, or rejects drafted interview questions & Reviewed question set is saved for publication & Students cannot access rejected or unpublished questions \\ \hline
+
+% --- FR-5.3: Interview Session Rules ---
+TC-5.3.1 & FR-5.3 & System & Teacher configures maximum attempts, cooldown, and quiz-progression lock & Interview rules are saved and enforced for student sessions & Invalid attempt limits or cooldown values are rejected \\ \hline
+
+% --- FR-5.4: Text or Voice Mock Interview ---
+TC-5.4.1 & FR-5.4 & System & Eligible student starts a text-mode interview & AI interviewer begins adaptive turn-taking dialogue & Student is denied entry if interview prerequisites are not satisfied \\ \hline
+TC-5.4.2 & FR-5.4 & System & Eligible student starts a voice-mode interview & Voice-mode interview starts and supports turn-taking interaction & System falls back or shows guidance if microphone permission is denied \\ \hline
+
+% --- FR-5.5: Voice Mode Audio Processing ---
+TC-5.5.1 & FR-5.5 & Integ-ration & Student speaks during a voice-mode interview & Audio is streamed, transcribed, and used to generate spoken AI responses & Raw audio is not persistently archived after processing \\ \hline
+
+% --- FR-5.6: Transcript and Binary Evaluation ---
+TC-5.6.1 & FR-5.6 & Integ-ration & Student completes an interview session & Transcript and metadata are persisted, and system produces a binary pass-or-fail verdict based on desired outcomes & Evaluation is not triggered for incomplete sessions \\ \hline
+
+% --- FR-5.7: Student and Teacher Result Visibility ---
+TC-5.7.1 & FR-5.7 & System & Student opens completed interview result & Student sees only the binary pass-or-fail verdict & Per-outcome rubric scores are not exposed to the student \\ \hline
+TC-5.7.2 & FR-5.7 & System & Teacher opens a completed interview session & Teacher can review transcript and outcome-level assessment for remediation & Teacher access is denied for courses they do not manage \\ \hline
+
+% --- FR-5.8: Session Integrity Signals ---
+TC-5.8.1 & FR-5.8 & System & Student switches tabs, exits fullscreen, or changes browser focus during interview & System records session activity signals for post-session integrity review & Integrity signals do not directly expose private non-session content \\ \hline
+
+\end{longtable}
+
+
+% ============================ Module 6: Analytics, Reporting & Notifications ====================
+\paragraph{Analytics, Reporting and Notifications}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.06\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.10\textwidth}|m{0.20\textwidth}|m{0.22\textwidth}|m{0.23\textwidth}|}
+\caption{Test Cases: Analytics, Reporting \& Notifications}
+\label{tab:tc_analytics} \\
+\hline
+\textbf{ID} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.08\textwidth}|}{\textbf{Req}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.10\textwidth}|}{\textbf{Level}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.20\textwidth}|}{\textbf{Input}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Expected Result}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.23\textwidth}|}{\textbf{Exception}} \\
+\hline
+\endfirsthead
+
+\multicolumn{6}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.08\textwidth}|}{\textbf{Req}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.10\textwidth}|}{\textbf{Level}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.20\textwidth}|}{\textbf{Input}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Expected Result}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.23\textwidth}|}{\textbf{Exception}} \\
+\hline
+\endhead
+
+\hline \multicolumn{6}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+% --- FR-6.1: Student Completion Progress ---
+TC-6.1.1 & FR-6.1 & System & Student opens course progress page after viewing materials and completing lessons & System displays per-lesson and per-course completion progress separately from SR metrics & Courses with no activity show zero progress instead of an error \\ \hline
+
+% --- FR-6.2: Teacher Roster Progress ---
+TC-6.2.1 & FR-6.2 & System & Teacher opens course roster progress view & System displays roster progress and at-risk learners based on course-progress signals & Empty state is shown if no learners have activity \\ \hline
+
+% --- FR-6.3: Notification Inbox and Preferences ---
+TC-6.3.1 & FR-6.3 & System & User opens notification inbox with unread notifications & System displays unread count and allows mark-read and dismiss actions & Dismissed notifications no longer appear in the active inbox \\ \hline
+TC-6.3.2 & FR-6.3 & System & User updates notification preferences by category and channel & Preferences are saved and applied to future notifications & Invalid channel/category combinations are rejected \\ \hline
+
+% --- FR-6.4: Platform and Organisation Statistics ---
+TC-6.4.1 & FR-6.4 & System & Authorised administrator opens statistics dashboard & System displays active users, content volume, and system-health indicators according to the caller's scope & Non-authorised users cannot access administrative statistics \\ \hline
+
+% --- FR-6.5: AI Cost Telemetry ---
+TC-6.5.1 & FR-6.5 & System & IT administrator opens AI usage dashboard & System displays usage summaries by user, pipeline, and recent model calls & Missing cost data is shown as unavailable rather than zero if not computed \\ \hline
+
+% --- FR-6.6: Processing Job Inspection and Retry ---
+TC-6.6.1 & FR-6.6 & System & Administrator opens failed ingestion or AI processing jobs and selects retry & Failed job details are shown and retry is queued successfully & Retry is blocked if the underlying material or configuration no longer exists \\ \hline
+
+% --- FR-6.7: Immutable Audit Log ---
+TC-6.7.1 & FR-6.7 & System & IT administrator queries audit log by actor, event type, or date range & Matching audit events are returned without allowing modification & Non-authorised users cannot read audit logs \\ \hline
+
+% --- FR-6.8: Career Readiness Snapshots ---
+TC-6.8.1 & FR-6.8 & System & Educational Manager opens Career Readiness report for a pathway & System displays organisation-scoped pathway outcomes and drill-down to individual progress & Per-interview rubric details are excluded from the manager report \\ \hline
+
+\end{longtable}
+
+% ============================ Non-Functional Requirement Test Cases ====================
+\paragraph{Non-Functional Requirement Test Cases}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.07\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.11\textwidth}|m{0.20\textwidth}|m{0.22\textwidth}|m{0.22\textwidth}|}
+\caption{Test Cases: Non-Functional Requirements}
+\label{tab:tc_nfr} \\
+\hline
+\textbf{ID} &
+\textbf{Req} &
+\textbf{Category} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.20\textwidth}|}{\textbf{Input}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Expected Result}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Exception}} \\
+\hline
+\endfirsthead
+\multicolumn{6}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} &
+\textbf{Req} &
+\textbf{Category} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.20\textwidth}|}{\textbf{Input}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Expected Result}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Exception}} \\
+\hline
+\endhead
+\hline \multicolumn{6}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+% ── Perform-ance and Latency ───────────────────────────────────────────────────
+TC-NFR-1.1 & NFR-1.1 & Perform-ance &
+Upload a 15-minute video lecture and start ingestion &
+Video transcription and indexing complete within approximately
+10 minutes on average &
+Processing failure or unsupported video format is reported
+to the teacher \\ \hline
+
+TC-NFR-1.2 & NFR-1.2 & Perform-ance &
+Teacher generates quiz questions for a lesson with
+processed materials &
+Quiz generation completes within 5 minutes on average &
+Generation failure is logged and the teacher can retry \\ \hline
+
+TC-NFR-1.3 & NFR-1.3 & Perform-ance &
+Teacher generates an interview question bank for a lesson
+with defined target outcomes &
+Question bank generation completes within 15 minutes and
+produces at least 20 candidate questions covering all
+defined outcomes &
+Missing or invalid target outcomes prevent generation \\ \hline
+
+TC-NFR-1.4 & NFR-1.4 & Perform-ance &
+User opens major dashboard pages under normal
+network conditions &
+Dashboard pages load within 2 seconds on average &
+Slow external services degrade gracefully without
+breaking page rendering \\ \hline
+
+TC-NFR-1.5 & NFR-1.5 & Perform-ance &
+User starts playback of a course video &
+Video streaming starts within 3 seconds on average &
+Playback failure displays a clear error message \\ \hline
+
+TC-NFR-1.6 & NFR-1.6 & Perform-ance &
+User performs a course or material search query &
+Search results are returned within 0.5 seconds on average &
+Empty result set is displayed without error \\ \hline
+
+% ── Scalability and Reliability ───────────────────────────────────────────────
+TC-NFR-2.1 & NFR-2.1 & Load &
+Simulate 50 active users, 10 video streams, and
+5 AI interview sessions concurrently &
+System remains usable without major Perform-ance
+degradation &
+Excess requests are handled without crashing
+core services \\ \hline
+
+TC-NFR-2.2 & NFR-2.2 & Load &
+Populate the system with 10GB of course content
+and 10,000 student records &
+Storage remains efficient and common database queries
+respond under 0.5 seconds on average &
+Large queries are paginated or rejected safely \\ \hline
+
+TC-NFR-2.3 & NFR-2.3 & Reliability &
+Temporarily disable the AI interview module while
+other services remain active &
+Core LMS features such as video streaming and course
+access continue operating &
+Affected AI features display an unavailable status
+instead of triggering a system-wide failure \\ \hline
+
+TC-NFR-2.4 & NFR-2.4 & Reliability &
+Trigger a transient network or AI service failure
+during background processing &
+System retries or fails gracefully according to
+retry policy &
+Permanent failure is recorded with an error reason \\ \hline
+
+% ── Security and Compliance ───────────────────────────────────────────────────
+TC-NFR-3.1 & NFR-3.1 & Security &
+Inspect stored sensitive data, uploaded materials,
+credentials, and tokens &
+Sensitive data is encrypted or securely hashed
+according to specification &
+Plaintext secrets or sensitive values are treated
+as test failures \\ \hline
+
+TC-NFR-3.2 & NFR-3.2 & Security &
+Users with different roles attempt to access
+restricted resources &
+Access follows least-privilege RBAC rules &
+Unauthorised direct API access is denied \\ \hline
+
+TC-NFR-3.3 & NFR-3.3 & Security &
+Perform sensitive actions including login, permission
+change, and data modification &
+Immutable audit log records actor, timestamp, action
+type, and affected resource &
+Audit records cannot be edited by unauthorised users \\ \hline
+
+TC-NFR-3.4 & NFR-3.4 & Security &
+Leave an authenticated session idle for 30 minutes &
+System automatically logs the user out and requires
+re-authentication &
+Active interaction correctly resets the idle timer \\ \hline
+
+% ── Usability and Accessibility ───────────────────────────────────────────────
+TC-NFR-4.1 & NFR-4.1 & Usability &
+Open the system on desktop, tablet, and mobile
+screen sizes &
+UI remains responsive and visually consistent
+across supported layouts &
+Critical actions remain accessible on smaller screens \\ \hline
+
+TC-NFR-4.2 & NFR-4.2 & Accessi-bility &
+Navigate major pages using keyboard-only navigation
+and inspect contrast ratios and alt text &
+Interface satisfies key WCAG 2.1 AA checks including
+keyboard access, contrast, and image alternatives &
+Non-compliant components are recorded for
+accessibility remediation \\ \hline
+
+TC-NFR-4.3 & NFR-4.3 & Compati-bility &
+Open the system using supported Chromium-based browsers &
+System functions correctly on Chrome, Edge, Brave,
+and Opera &
+Unsupported browsers display a compatibility warning
+if major features fail \\ \hline
+
+\end{longtable}

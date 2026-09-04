@@ -1,0 +1,183 @@
+\subsection{Technology Stack Selection}
+
+The technology stack for aBridgeAI was selected by evaluating each major system component against its most viable alternatives. Each decision is grounded in the system's core technical constraints: native AI/ML orchestration, real-time WebRTC voice processing, high-throughput vector search, and graph-based knowledge representation.
+
+% ─────────────────────────────────────────────
+\subsubsection{Backend Framework}
+% ─────────────────────────────────────────────
+
+The backend must orchestrate complex AI logic — adaptive SR scheduling, knowledge retention estimation, and real-time interview evaluation — while handling asynchronous LLM API calls and audio streams simultaneously. The orchestration layer requires native access to Python AI libraries (LangChain, scikit-learn, NumPy) without inter-language bridging overhead.
+
+\begin{table}[H]
+    \caption{Backend Framework Comparison}
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|}
+        \hline
+        \textbf{Feature} & \textbf{FastAPI} & \textbf{Django REST} & \textbf{Express.js} \\
+        \hline
+        \textbf{Language} & Python & Python & JavaScript / Node.js \\
+        \textbf{AI/ML Integration} & Native (LangChain, scikit-learn, NumPy) & Native but synchronous ORM bottleneck & Requires Python sidecar microservices \\
+        \textbf{Concurrency Model} & Async I/O (\texttt{asyncio}) & Sync-first (WSGI); async support limited & Single-threaded event loop \\
+        \textbf{Performance} & High ($\sim$180MB cold start, async-native) & Moderate ($\sim$250MB, sync overhead) & Moderate ($\sim$120MB, CPU-bound limits) \\
+        \textbf{Auto Schema / Docs} & Built-in (OpenAPI, Swagger UI) & Requires \texttt{drf-spectacular} add-on & Requires manual setup \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\textbf{Decision: FastAPI.} FastAPI is the only framework that combines Python-native AI library access with a fully asynchronous request model. Django REST's synchronous ORM creates bottlenecks when streaming LLM responses; Express.js requires a separate Python sidecar to run LangChain or scikit-learn, introducing network latency and operational complexity. FastAPI's built-in OpenAPI generation also accelerates API contract development across the team.
+
+% ─────────────────────────────────────────────
+\subsubsection{Frontend Framework}
+% ─────────────────────────────────────────────
+
+The frontend must support both a standard LMS interface (course catalog, quiz editor, progress dashboards) and a real-time voice interview module with live transcript rendering and session state management. As a fully authenticated SPA with no public-facing SEO requirements, the system does not benefit from Server-Side Rendering (SSR) — making a lightweight CSR-first toolchain the optimal choice.
+
+\begin{table}[H]
+    \caption{Frontend Framework Comparison}
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|}
+        \hline
+        \textbf{Feature} & \textbf{Vite + React + TanStack Query} & \textbf{Next.js (App Router)} & \textbf{Angular} \\
+        \hline
+        \textbf{Bundle Size} & $\sim$42KB (minimal runtime) \cite{techsy2026vite} & $\sim$92KB (RSC runtime overhead) \cite{techsy2026vite} & Large (full framework) \\
+        \textbf{HMR Speed} & $<$50ms (native ESM) \cite{hygraph2024vite} & Slower (Turbopack improving) \cite{hygraph2024vite} & Moderate \\
+        \textbf{Complexity} & Low (standard React patterns) & High (RSC boundaries, App Router, Flight payload) \cite{northflank2024nextjs} & High (Zone.js, decorators) \\
+        \textbf{Data Fetching} & Fine-grained (TanStack Query: cache, invalidation, optimistic updates) \cite{tanstack2024comparison} & Coarse (fetch caching, requires manual React Query integration) \cite{tanstack2024comparison} & RxJS (steep learning curve) \\
+        \textbf{LiveKit SDK} & Official React SDK \cite{livekit2024sdk} & Official React SDK \cite{livekit2024sdk} & No official SDK \\
+        \textbf{SSR / SEO} & Not needed (authenticated SPA) & Built-in (unnecessary overhead for this use case) & Angular Universal (complex) \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\textbf{Decision: Vite + React + TanStack Query.} aBridgeAI is a fully authenticated application — all routes require login, so SSR and SEO optimizations provided by Next.js yield no benefit. Next.js App Router introduces significant architectural complexity: React Server Components (RSC) require developers to reason about server/client boundaries throughout the codebase, the Flight payload serialization adds overhead at every server-client crossing, and the framework has accumulated a reputation for instability across major versions \cite{northflank2024nextjs, appwrite2024tanstack}. Vite produces a 54\% smaller initial bundle ($\sim$42KB vs $\sim$92KB) and delivers sub-50ms Hot Module Replacement, directly improving developer iteration speed \cite{techsy2026vite, hygraph2024vite}. TanStack Query replaces Next.js's coarse fetch caching with fine-grained server-state management — cache invalidation, background refetching, and optimistic updates — using standard React patterns that require no framework-specific mental model \cite{tanstack2024comparison}.
+
+% ─────────────────────────────────────────────
+\subsubsection{Real-Time Communication}
+% ─────────────────────────────────────────────
+
+The AI interview feature requires sub-200ms voice latency, built-in Speech-to-Text (STT) integration, and AI agent turn-taking orchestration. The communication layer must handle continuous audio streams without TCP head-of-line blocking.
+
+\begin{table}[H]
+    \caption{Real-Time Communication Comparison}
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|}
+        \hline
+        \textbf{Feature} & \textbf{LiveKit} & \textbf{Twilio} & \textbf{Socket.io} \\
+        \hline
+        \textbf{Protocol} & WebRTC (UDP) & SIP / WebRTC & WebSockets (TCP) \\
+        \textbf{Voice Latency} & Ultra-low ($<$200ms) \cite{versatik2025webrtc} & Moderate (cloud routing overhead) & High (TCP head-of-line blocking) \\
+        \textbf{AI Agent SDK} & Built-in (Agents SDK, VAD, STT) & Requires manual pipeline & No native support \\
+        \textbf{STT Integration} & Integrated (Whisper, Deepgram) & Separate service required & Separate service required \\
+        \textbf{Self-Hostable} & Yes (open-source) & No (vendor lock-in) & Yes \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\textbf{Decision: LiveKit.} LiveKit is the only self-hostable, open-source WebRTC platform with a dedicated AI Agents SDK that handles turn-taking, Voice Activity Detection (VAD), and Whisper STT out of the box. Twilio introduces vendor lock-in and cloud routing latency. Socket.io's TCP transport causes head-of-line blocking that makes continuous voice streams unacceptable for real-time AI interviews \cite{versatik2025webrtc}.
+
+% ─────────────────────────────────────────────
+\subsubsection{Primary Database \& Vector Search}
+% ─────────────────────────────────────────────
+
+The system requires ACID-compliant relational storage for user profiles, enrollment records, and session history, combined with high-throughput vector similarity search for course knowledge graph retrieval during peak concurrent usage.
+
+\begin{table}[H]
+    \caption{Primary Database \& Vector Search Comparison}
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|}
+        \hline
+        \textbf{Feature} & \textbf{PostgreSQL + pgvector} & \textbf{Qdrant} & \textbf{Pinecone} \\
+        \hline
+        \textbf{Vector Throughput (99\% Recall)} & 471.57 QPS \cite{tigerdata2025pgvector} & 41.47 QPS \cite{tigerdata2025pgvector} & N/A (managed, opaque) \\
+        \textbf{ACID Transactions} & Full \cite{postgresql2024acid} & None & None \\
+        \textbf{SQL + Vector in one query} & Yes (JOIN + \texttt{<->} operator) & No & No \\
+        \textbf{Operational Overhead} & Low (single service) & Moderate (separate cluster) & Low (managed SaaS) \\
+        \textbf{Self-Hostable} & Yes & Yes & No (vendor lock-in) \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\textbf{Decision: PostgreSQL with pgvector.} PostgreSQL with \texttt{pgvector} delivers 11.4$\times$ higher vector query throughput than Qdrant at 99\% recall \cite{tigerdata2025pgvector}, while simultaneously providing full ACID compliance for transactional data. The ability to combine vector similarity search with SQL JOINs in a single query eliminates the need for a separate vector database service, significantly reducing operational complexity. Pinecone's managed-only model introduces vendor lock-in and prevents on-premise deployment.
+
+% ─────────────────────────────────────────────
+\subsubsection{Graph Database}
+% ─────────────────────────────────────────────
+
+The Course Knowledge Graph requires efficient multi-hop traversal to identify concept relationships, prerequisite chains, and knowledge gaps for adaptive question generation. These traversal patterns are prohibitively expensive in purely relational models.
+
+\begin{table}[H]
+    \caption{Graph Database Comparison}
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|p{0.28\textwidth}|p{0.30\textwidth}|p{0.30\textwidth}|}
+        \hline
+        \textbf{Feature} & \textbf{Neo4j} & \textbf{ArangoDB} \\
+        \hline
+        \textbf{Graph Traversal} & Native (Cypher, index-free adjacency) & Native (AQL, multi-model) \\
+        \textbf{Query Language} & Cypher (declarative, readable) & AQL (verbose, general-purpose) \\
+        \textbf{Plugin Ecosystem} & APOC (graph algorithms, ML, path expansion) & Foxx microservices (custom JS) \\
+        \textbf{Python Driver} & Official (\texttt{neo4j} package) & Official (\texttt{python-arango}) \\
+        \textbf{Community \& Docs} & Large, mature & Moderate \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\textbf{Decision: Neo4j.} Neo4j's index-free adjacency model makes multi-hop traversals (e.g., ``find all prerequisite concepts of topic X within 3 hops'') orders of magnitude faster than ArangoDB's document-oriented storage layer \cite{neo4j2024graph}. The APOC plugin library provides ready-made graph algorithms (PageRank, community detection) that directly support knowledge gap analysis. ArangoDB's multi-model approach adds flexibility but sacrifices graph traversal performance compared to a purpose-built graph engine.
+
+% ─────────────────────────────────────────────
+\subsubsection{Caching \& Task Queue}
+% ─────────────────────────────────────────────
+
+The system requires a high-speed in-memory store for JWT session tokens, API rate limiting, and background task scheduling (SR card scan, quiz generation jobs). Offloading these workloads from PostgreSQL prevents write contention during peak examination periods.
+
+\begin{table}[H]
+    \caption{Caching \& Task Queue Comparison}
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|}
+        \hline
+        \textbf{Feature} & \textbf{Redis} & \textbf{Memcached} & \textbf{RabbitMQ} \\
+        \hline
+        \textbf{Throughput} & $>$100K ops/sec \cite{redis2024benchmark} & $>$100K ops/sec & Moderate (AMQP overhead) \\
+        \textbf{Latency} & $<$1ms \cite{redis2024benchmark} & $<$1ms & Higher (protocol overhead) \\
+        \textbf{Data Structures} & Rich (lists, sets, sorted sets, streams) & Key-value only & Queue-only \\
+        \textbf{Task Queue Support} & Yes (via \texttt{arq}, \texttt{Celery}) & No & Yes (native) \\
+        \textbf{Persistence} & Optional (RDB / AOF) & None & Yes \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\textbf{Decision: Redis.} Redis uniquely serves three roles in a single service: session cache, rate limiter, and task queue (via \texttt{arq}). Memcached matches Redis on raw throughput but lacks the data structures needed for rate limiting (sorted sets) and task queuing (streams/lists). RabbitMQ is purpose-built for message queuing but requires a separate caching solution, doubling operational overhead. Redis's optional persistence (AOF) also ensures queued jobs survive container restarts \cite{redis2024benchmark}.
+
+% ─────────────────────────────────────────────
+\subsubsection{Final Stack Summary}
+% ─────────────────────────────────────────────
+
+\begin{table}[H]
+    \caption{Selected Technology Stack — aBridgeAI}
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|p{0.20\textwidth}|p{0.20\textwidth}|p{0.50\textwidth}|}
+        \hline
+        \textbf{Component} & \textbf{Technology} & \textbf{Primary Justification} \\
+        \hline
+        Backend & FastAPI (Python) & Native AI/ML, async I/O, auto OpenAPI \\
+        \hline
+        Frontend & Vite + React + TanStack Query & Authenticated SPA — no SSR needed; 54\% smaller bundle vs Next.js, sub-50ms HMR \\
+        \hline
+        Real-Time & LiveKit & WebRTC UDP, built-in AI Agents SDK \\
+        \hline
+        Primary DB & PostgreSQL + pgvector & Full ACID + 11.4$\times$ vector throughput vs Qdrant \\
+        \hline
+        Graph DB & Neo4j & Native multi-hop traversal for KG \\
+        \hline
+        Cache / Queue & Redis & Session cache + rate limit + task queue in one \\
+        \hline
+        Object Storage & Garage (S3-compatible) & Self-hostable, no vendor lock-in \\
+        \hline
+    \end{tabular}
+\end{table}

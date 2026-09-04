@@ -1,0 +1,87 @@
+# LaTeX auxiliary & build files
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.brf
+*.dvi
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.lof
+*.log
+*.lot
+*.out
+*.toc
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.ist
+*.loa
+*.loe
+*.maf
+*.mtc
+*.mtc0
+*.nav
+*.nlo
+*.snm
+*.synctex.gz
+*.synctex(busy)
+*.thm
+*.tdo
+*.upb
+*.upa
+*.ver
+*.vrb
+*.xdy
+*.run.xml
+*.bbl
+*.bcf
+
+# latexmk / build dirs
+_build/
+build/
+out/
+auto/
+_minted-*/
+_minted-report/
+minted/
+*.pdfsync
+*.synctex
+
+# Generated PDF (uncomment if you don't want to track compiled report)
+# report.pdf
+# *.pdf
+
+# BibTeX
+*.bib.bak
+*.bst.bak
+
+# Editors & OS junk
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.bak
+*.sav
+*.tmp
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*.code-workspace
+
+# Zip / large archives (keep repo clean)
+*.zip
+*.rar
+*.7z
+
+# Logs
+*.log
+_logs/

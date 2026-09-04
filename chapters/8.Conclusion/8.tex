@@ -1,0 +1,97 @@
+\section{Conclusion}
+
+This chapter summarises the achievements of the first development iteration of the aBridgeAI platform, identifies current limitations, and outlines the planned work for subsequent iterations.
+
+% ===========================================================
+\subsection{Achievements}
+
+The first iteration delivered a functional core of the AI-Powered Career Readiness Learning Management System, demonstrating the feasibility of the proposed architecture. The following capabilities are operational and have been verified through integration testing:
+
+\begin{enumerate}
+    \item \textbf{Authentication and Access Control} --- Full implementation of Google SSO login and logout, authenticated session management with secure cookie-based JWTs, two-factor authentication (TOTP and recovery codes), MFA freshness enforcement for sensitive operations, role-based access control with hierarchical permission resolution, and immutable audit logging of all authentication events.
+
+    \item \textbf{Course and Material Management} --- Teachers can create courses with draft and published states, upload PDF learning materials, and trigger the ingestion pipeline. Students can browse their enrolled courses, render PDF documents and stream video materials directly in the browser, and download resources via short-lived presigned URLs.
+
+    \item \textbf{AI-Powered Quiz Generation} --- The material ingestion pipeline processes uploaded PDF files through extraction, chunking, and embedding stages. From ingested content, the AI quiz generation pipeline produces multiple-choice questions with explanations. Teachers can review and approve generated questions.
+
+    \item \textbf{Quiz Taking} --- Students can take quiz sessions on published quizzes, with per-question response recording and immediate feedback on correctness.
+\end{enumerate}
+
+% ===========================================================
+\subsection{Limitations}
+
+The current iteration has the following limitations:
+
+\begin{itemize}
+    \item \textbf{Single material format} --- The ingestion pipeline currently supports PDF files only. Other declared formats (DOCX, PPTX, audio, video transcription) are architecturally supported but not yet activated.
+    \item \textbf{No spaced repetition} --- The SM-2 scheduling algorithm is implemented at the service layer but not yet connected to the quiz-taking flow. Cards do not yet accumulate EF history or schedule future reviews.
+    \item \textbf{No lesson gating} --- Prerequisite enforcement and the coverage threshold $\tau$ mechanism are not yet active. Students can access all published content without progression constraints.
+    \item \textbf{No interview capability} --- The mock interview subsystem (text and voice modes, outcome evaluation, transcript persistence) is not yet deployed.
+    \item \textbf{No notification system} --- In-app notifications, spaced-repetition reminders, and email dispatch are not yet operational.
+    \item \textbf{Limited analytics} --- Student progress tracking and teacher analytics dashboards are not yet available beyond basic quiz attempt records.
+    \item \textbf{Organisation management untested} --- Multi-tenant organisation features (provisioning, bulk enrollment, domain auto-provisioning) exist in code but have not been validated in a production-like environment.
+\end{itemize}
+
+% ===========================================================
+\subsection{Future Work}
+
+Table~\ref{tab:future_work} presents the planned development tasks for the second iteration, including expected deliverables, responsible team members, and a 15-week timeline allocation.
+
+\renewcommand{\arraystretch}{1.3}
+\small
+\begin{longtable}{|>{\centering\arraybackslash}m{0.03\textwidth}|>{\raggedright\arraybackslash}m{0.18\textwidth}|>{\raggedright\arraybackslash}m{0.22\textwidth}|>{\raggedright\arraybackslash}m{0.20\textwidth}|>{\raggedright\arraybackslash}m{0.12\textwidth}|>{\centering\arraybackslash}m{0.06\textwidth}|}
+\caption{Planned future work with assignment and timeline (15 weeks total).}
+\label{tab:future_work} \\
+\hline
+\textbf{\#} & \textbf{Task} & \textbf{Detail} & \textbf{Expected Results} & \textbf{Assigned To} & \textbf{Weeks} \\ \hline
+\endfirsthead
+
+\multicolumn{6}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{\#} & \textbf{Task} & \textbf{Detail} & \textbf{Expected Results} & \textbf{Assigned To} & \textbf{Weeks} \\ \hline
+\endhead
+
+\hline \multicolumn{6}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+1 & Organisation \& User Management validation & Multi-tenant CRUD, bulk CSV enrollment, career pathway CRUD, domain auto-provisioning & Verified in production-like environment with 3+ tenants, 500+ users & Nguyễn Hoàng Nam & 1--3 \\ \hline
+
+2 & Spaced Repetition \& Lesson Gating & SM-2 scheduling, EF updates, interval jitter, coverage threshold $\tau$ for lesson unlock & Quiz flow connected to SR engine; cards accumulate history and schedule reviews & Lê Thành Duy & 1--4 \\ \hline
+
+3 & Mock Interview --- Text Mode & Teacher-defined outcomes, AI question generation from content, adaptive turn-taking dialogue & Transcript persistence, binary pass/fail evaluation deployed & Võ Hoàng Ngân & 2--6 \\ \hline
+
+4 & Mock Interview --- Voice Mode & Real-time audio streaming via LiveKit, STT transcription, TTS synthesis & Voice-mode sessions integrated with text-mode evaluation pipeline & Võ Hoàng Ngân & 6--9 \\ \hline
+
+5 & Multi-Format Ingestion & Extractors for DOCX, PPTX, HTML, source code, audio/video transcription & All formats processed through existing chunk/embed/KG pipeline & Lê Thành Duy & 4--6 \\ \hline
+
+6 & Notifications \& Reminders & In-app notification inbox, SR review reminders, email dispatch via background worker & Push and email notifications operational; reminder cadence configurable & Nguyễn Hoàng Nam & 4--7 \\ \hline
+
+7 & Analytics \& Dashboards & Student learning-loop dashboards (due cards, retention, progress), teacher cohort analytics & At-risk learner identification, retention heatmaps, difficult-card reports & Lê Thành Duy & 7--10 \\ \hline
+
+8 & Admin Observability & Platform statistics, AI cost telemetry, processing-job inspection & Career Readiness snapshot aggregation; cost breakdown per model/tenant & Nguyễn Hoàng Nam & 8--10 \\ \hline
+
+9 & Material Version History & Version tracking for re-uploaded materials with rollback & Per-version processing status, diff view, one-click rollback & Lê Thành Duy & 10--11 \\ \hline
+
+10 & Session Integrity Monitoring & Interview session signals (focus changes, tab switching, full-screen status) & Post-session integrity review with timestamped event log & Võ Hoàng Ngân & 10--12 \\ \hline
+
+11 & Integration Testing \& Bug Fixes & End-to-end cross-module tests, performance profiling, regression suite & All modules pass integration; p95 latency within NFR targets & All members & 12--14 \\ \hline
+
+12 & Documentation \& Final Report & Complete Chapters 7 (Evaluation), update thesis, prepare defense presentation & Final report submitted; defense slides and demo script ready & All members & 13--15 \\ \hline
+
+\end{longtable}
+\normalsize
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/gantt_chart.png}
+    \caption{Gantt chart of planned future work over 15 weeks.}
+    \label{fig:gantt_chart}
+\end{figure}
+% ===========================================================
+\subsection{Concluding Remarks}
+
+The first iteration of aBridgeAI establishes the foundational infrastructure --- authentication, course management, material ingestion, and AI-powered quiz generation --- upon which the full adaptive learning experience will be built. The architecture has been validated as capable of supporting the remaining subsystems (spaced repetition, interviews, analytics) without requiring structural changes. The second iteration will focus on activating the learning-loop feedback mechanisms and the interview subsystem, transforming the platform from a content delivery system into a genuinely adaptive career readiness tool.

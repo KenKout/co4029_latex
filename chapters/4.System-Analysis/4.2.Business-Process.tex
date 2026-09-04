@@ -1,0 +1,72 @@
+\subsection{Business Process}
+
+Traditional educational workflows rely heavily on manual 
+content creation, fixed assessment schedules, and uniform grading 
+criteria, creating systematic bottlenecks in delivering personalised, 
+competency-driven feedback at scale. aBridgeAI reengineers this 
+workflow through a four-stage AI-orchestrated process that separates 
+content preparation, knowledge validation, practical assessment, and 
+longitudinal reporting into distinct, traceable phases.
+
+\begin{enumerate}
+
+    \item \textbf{Content Ingestion (Preparation).}
+    Teachers upload raw learning materials in supported formats 
+    including PDF documents, MP4 video recordings, and presentation 
+    files. The ingestion pipeline parses each source, extracts typed 
+    knowledge units — summaries, concepts, examples, and indexes 
+    them in a dense vector store to support semantic retrieval. The 
+    resulting structured knowledge base serves as the sole authoritative 
+    source for all subsequent AI generation tasks, ensuring that 
+    generated assessments are grounded exclusively in 
+    teacher-uploaded content.
+
+    \item \textbf{The Learning Loop (Knowledge Validation).}
+    Students consume published learning materials and undertake 
+    AI-generated quizzes to validate baseline knowledge retention. 
+    Each quiz card carries a teacher-confirmed expected response time 
+    $T_{\text{exp}}$. The system derives the quality response value 
+    $Q$ algorithmically from response correctness, hint usage, and 
+    the time ratio $\rho = T_{\text{actual}} / T_{\text{exp}}$, 
+    updating the student's per-card Easiness Factor $EF$ via the 
+    hybrid SM-2 scheduling model. Students remain in the learning 
+    loop — receiving SR reminders at algorithmically 
+    determined intervals — until their $EF$ distribution across the 
+    lesson's cards satisfies the teacher-configured unlock condition.
+
+    \item \textbf{The Application Loop (Practical Assessment).}
+    Upon satisfying the quiz unlock condition, students gain access 
+    to the lesson's interview section. Interview questions are drawn 
+    from a pre-generated, teacher-reviewed question bank aligned to 
+    teacher-defined outcome requirements. Students engage with the 
+    interview in text or voice mode, with each session conducted 
+    independently under a dedicated model instance. Upon session 
+    completion, the full transcript is submitted to the AI assessment 
+    model in a single batch call, which evaluates whether each defined 
+    outcome was satisfied. The student receives a binary pass or fail 
+    verdict; no rubric, per-outcome breakdown, or model reasoning is 
+    exposed. A lesson is considered complete only when both the quiz 
+    unlock condition and the interview pass condition are satisfied.
+
+    \item \textbf{Evaluation and Reporting (Feedback).}
+    The system continuously aggregates per-card SM-2 state into three 
+    learner-facing metrics: the Knowledge Retention Estimate 
+    $\hat{R}_{s,\ell}$, Progression Readiness, and Review Compliance 
+    Rate $\rho_{s,\ell}$. These metrics are surfaced in per-student 
+    and class-wide dashboard views accessible to both students and 
+    teachers. At the career level, course completion percentages are 
+    aggregated into a Career Readiness score reported to the student 
+    and the organisation manager. Teachers are additionally notified 
+    of cohort-level patterns — including systematic retention gaps and 
+    declining compliance rates — enabling intervention at the content 
+    or configuration level rather than purely at the individual 
+    student level.
+
+\end{enumerate}
+
+The four stages form a closed feedback loop: content 
+ingestion informs quiz generation, quiz performance governs interview 
+access, interview outcomes determine lesson completion, and reporting 
+surfaces the gaps that guide both student remediation and teacher 
+reconfiguration of content and assessment criteria.
+

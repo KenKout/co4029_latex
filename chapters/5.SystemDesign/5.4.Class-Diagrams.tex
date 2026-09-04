@@ -1,0 +1,15 @@
+\subsection{Class Diagrams}
+ The Class Diagram for the aBridgeAI platform illustrates the static structure of the backend system, capturing the core domain entities, their attributes, methods, and cardinal relationships. To manage the complexity of the AI-driven system, the architecture is modeled using Domain-Driven Design (DDD) principles, categorized into three distinct packages:
+
+\begin{itemize}
+    \item \textbf{User Management Domain:} Implements an inheritance structure where the base abstract \texttt{User} class handles core authentication (including 2FA attributes), while \texttt{Student} and \texttt{Teacher} classes inherit and extend specific role-based functionalities.
+    \item \textbf{Course \& Ingestion Domain:} Highlights the Composition relationships essential for the RAG pipeline. A \texttt{Course} contains multiple \texttt{Materials} (storing raw data as \texttt{BLOB}), which are sequentially processed and decomposed into \texttt{VectorChunks} containing high-dimensional embeddings.
+    \item \textbf{Assessment \& Interview Domain:} Maps the execution flow from theory validation (\texttt{QuizAttempt}) to practical application (\texttt{InterviewSession}). It details how AI interactions (\texttt{InterviewQA}) are aggregated to automatically instantiate a personalized \texttt{GapReport}.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{graphics/class_diagram.png}
+    \caption{UML Class Diagram representing the core Domain Entities of aBridgeAI}
+    \label{fig:class_diagram}
+\end{figure}

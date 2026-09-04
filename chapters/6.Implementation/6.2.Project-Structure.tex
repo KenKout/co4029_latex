@@ -1,0 +1,48 @@
+\subsection{Project Structure}
+\label{sec:impl_structure}
+
+The codebase follows a feature-first layout in which every domain is a self-contained package under \texttt{abridgeai/features/}. Each feature package contains the same internal layers: \texttt{models.py} (SQLAlchemy ORM), \texttt{schemas/} (Pydantic DTOs), \texttt{queries/} (database access functions), \texttt{services/} (business logic), \texttt{routers/} (FastAPI route handlers), and optionally \texttt{workers/} (background tasks) and \texttt{ai/} (AI pipeline stages). This uniform layout makes it straightforward to locate any piece of logic and to add new features without touching unrelated code.
+
+\begin{figure}[H]
+\centering
+\begin{verbatim}
+abridgeai/
++-- api/                  # Application entry point, router registration
++-- core/                 # Cross-cutting: config, db, cache, audit, security
+|   +-- audit/            # Async audit-log listener and worker actor
+|   +-- cache/            # Redis client, decorators, cache-key registry
+|   +-- db/               # Soft-delete mixin, conflict mapper, hard-delete guard
+|   +-- observability/    # Structured logging, HTTP audit log
+|   +-- pagination/       # Cursor-based pagination
+|   +-- security/         # JWT creation, token hashing, security headers
++-- ai/                   # Shared AI primitives
+|   +-- chunking/         # Token-aware, semantic, timestamp-aware chunkers
+|   +-- extraction/       # Multimodal extractors (PDF, DOCX, audio, video, ...)
+|   +-- knowledge_graph/  # Neo4j builder and retrieval
+|   +-- llm/              # LLM gateway, embedding client, pricing, audit
+|   +-- prompts/          # Jinja2 prompt loader
+|   +-- retrieval/        # pgvector, BM25, RRF fusion, MMR, role filter
++-- features/
+|   +-- access_control/   # Organisations, org units, RBAC
+|   +-- admin/            # Admin dashboards, AI cost tracking, audit viewer
+|   +-- career_paths/     # Career path authoring and learner enrollment
+|   +-- courses/          # Course, module, lesson authoring and learner view
+|   +-- enrollments/      # Enrollment lifecycle management
+|   +-- identity/         # Users, auth sessions, Google OAuth, MFA
+|   +-- interviews/       # AI interview generation, session taking, evaluation
+|   +-- materials/        # Learning material upload, ingestion pipeline
+|   +-- notifications/    # In-app and email notification dispatch
+|   +-- progress/         # Lesson progress tracking and analytics
+|   +-- quizzes/          # AI quiz generation, taking, grading
+|   +-- spaced_repetition/# SM-2 scheduler, card review, dashboards
++-- infrastructure/       # Third-party adapters: Neo4j, S3/Garage, Google OAuth
+\end{verbatim}
+\caption{Top-level directory layout of the aBridgeAI backend.}
+\label{fig:project_structure}
+\end{figure}
+
+\paragraph{Layered dependency rule}
+Dependencies flow strictly downward: routers depend on services, services depend on queries and AI primitives, queries depend on models. No layer imports from a layer above it. Cross-feature communication is mediated through the \texttt{api/public} module of each feature, which exposes a stable internal API surface. This prevents circular imports and keeps feature boundaries explicit.
+
+\paragraph{Database migrations}
+Schema evolution is managed by 16 Alembic migration files numbered \texttt{0001} through \texttt{0016}. Migration \texttt{0001} establishes the full baseline schema ported from a hand-managed SQL file. Subsequent migrations add partial unique indexes, cascade rules, audit columns, pgvector half-precision embeddings (\texttt{halfvec(3072)}), and full-text search vectors. Every migration is reversible via a \texttt{downgrade()} function.

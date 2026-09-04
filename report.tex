@@ -1,0 +1,207 @@
+% 'draft' mode can be used to speed up compilation
+\documentclass[twoside,final]{hcmut-report}
+\usepackage{codespace}
+\usepackage{xurl}
+
+\usepackage[toc,page]{appendix}
+\renewcommand{\appendixname}{Appendix}
+% Draft watermark
+% https://github.com/callegar/LaTeX-draftwatermark
+
+% Encodings
+\usepackage{gensymb,textcomp}
+
+% Better tables
+% Wide tables go to https://tex.stackexchange.com/q/332902
+\usepackage{array,longtable,multicol,multirow,siunitx,tabularx}
+\usepackage{seqsplit}
+
+% Better enum
+\usepackage{enumitem}
+
+% Graphics
+\usepackage{caption,float}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,shapes.geometric,positioning,fit,backgrounds}
+
+% Add options for figures, like max width, framing, etc.
+\usepackage[export]{adjustbox}
+
+% References
+% Use \Cref{} instead of \ref{}
+\usepackage[nameinlink]{cleveref}
+
+% FOR DEMONSTRATION PURPOSES, REMOVE IN PRODUCTION
+\usepackage{mwe}
+
+% References
+% \usepackage{hyperref}
+\usepackage[style=numeric,sorting=none,sortcites=true]{biblatex}
+\addbibresource{refs/references.bib}
+
+% Sub-preambles
+% https://github.com/MartinScharrer/standalone
+
+% Configurations
+\coursename{SPECIALIZED PROJECT}
+\reporttype{REPORT}
+\title{aBridgeAI: An AI-Powered Career Readiness Learning Management System}
+\advisor{& Assoc. Prof. Vo Thi Ngoc Chau, PhD &}
+\stuname{%
+  & Le Thanh Duy & 2352178 \\
+  & Vo Hoang Ngan & 2353373 \\
+  & Nguyen Hoang Nam & 2252502 \\
+}
+
+% Allow page breaks inside align* environment
+%\allowdisplaybreaks{}
+
+% Makes a lot of things blue, avoid at all costs
+%\everymath{\color{blue}}
+
+% Set depth of numbering for counters
+\AtBeginDocument{\counterwithin{lstlisting}{section}}
+
+% Rename some sections
+%\AtBeginDocument{\renewcommand*{\contentsname}{Contents}}
+%\AtBeginDocument{\renewcommand*{\refname}{References}}
+%\AtBeginDocument{\renewcommand*{\bibname}{References}}
+
+% Custom commands
+%\newcommand*\mean[1]{\bar{#1}}
+
+\usepackage{titlesec}
+
+% Redefine \paragraph to behave like a section (no run-in)
+\titleformat{\paragraph}
+  {\normalfont\normalsize\bfseries} % Format: bold, normal size
+  {\theparagraph}                   % Label (optional, usually empty for paragraph)
+  {1em}                             % Space between label and title
+  {}
+
+% Set the spacing around the title
+\titlespacing*{\paragraph}
+  {0pt}    % Left margin
+  {0.5em}  % Space before the title
+  {0.5em}  % Space AFTER the title (positive value = new line)
+
+\begin{document}
+\emergencystretch=3em
+\coverpage%
+
+%\section*{Member list \& Workload}
+%\newcounter{memberrowno}
+%\setcounter{memberrowno}{0}
+%\begin{center}
+%  \begin{tabular}{>{\stepcounter{memberrowno}\thememberrowno}llcc}
+%    \toprule
+%    \multicolumn{1}{c}{\textbf{No.}} & \textbf{Full name} & \textbf{Student ID} & \textbf{Contribution} \\
+%    \midrule
+%                                     & h                  & xxxxxxx             & 100\%                       \\
+%                                     & h                  & xxxxxxx             & 100\%                       \\
+%    \bottomrule
+%  \end{tabular}
+%\end{center}
+%\clearpage
+\pagestyle{empty}
+\input{chapters/general/signature}
+\input{chapters/general/declare}
+\input{chapters/general/acknowledgement}
+
+\cleardoublepage
+\pagestyle{plain}
+\pagenumbering{roman}
+\setcounter{page}{1}
+\tableofcontents
+\clearpage
+ \listoffigures
+ \clearpage
+ \listoftables
+% \lstlistoflistings{}
+
+\clearpage
+\pagestyle{plain}
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+%%%%%%% Section 1: Intro %%%%%%% 
+\input{chapters/1.Introduction/1}
+\input{chapters/1.Introduction/1.1.Motivation}
+\input{chapters/1.Introduction/1.2.Goals}
+\input{chapters/1.Introduction/1.3.Scope}
+\input{chapters/1.Introduction/1.4.Significance}
+\input{chapters/1.Introduction/1.5.Thesis-structure}
+
+\clearpage
+%%%%%%% Section 4: Related Worked %%%%%%% 
+\input{chapters/2.Related-Work/2}
+\input{chapters/2.Related-Work/2.1.Spaced-Repetition}
+\input{chapters/2.Related-Work/2.2.Retrieval-Practice}
+\input{chapters/2.Related-Work/2.3.Cognitive-Adaptivity}
+\input{chapters/2.Related-Work/2.4.Conclusion}
+
+\clearpage
+%%%%%%% Section 3: Theoretical Background %%%%%%% 
+\input{chapters/3.Theoretical-Background/3}
+\input{chapters/3.Theoretical-Background/3.1.Cognitive-Foundations}
+\input{chapters/3.Theoretical-Background/3.2.Algorithmic-Learner-Modeling}
+\input{chapters/3.Theoretical-Background/3.3.Core-AI}
+\input{chapters/3.Theoretical-Background/3.4.Infrastructure-Architecture}
+\input{chapters/3.Theoretical-Background/3.5.Conclusion}
+
+\clearpage
+%%%%%%% Section 4: System Analysis %%%%%%% 
+\input{chapters/4.System-Analysis/4}
+\input{chapters/4.System-Analysis/4.1.System-Overview}
+\input{chapters/4.System-Analysis/4.2.Business-Process}
+\input{chapters/4.System-Analysis/4.3.System-Requirements}
+\input{chapters/4.System-Analysis/4.4.System-Modeling}
+
+\clearpage
+%%%%%%% Section 5: System Architecture %%%%%%% 
+\input{chapters/5.SystemDesign/5}
+\input{chapters/5.SystemDesign/5.1.Tech-Stack}
+\input{chapters/5.SystemDesign/5.2.System-Architecture}
+\input{chapters/5.SystemDesign/5.x.Algorithm-Design}
+\input{chapters/5.SystemDesign/5.3.API-Design}
+\input{chapters/5.SystemDesign/5.4.Class-Diagrams}
+\input{chapters/5.SystemDesign/5.5.Sequence-Diagrams}
+\input{chapters/5.SystemDesign/5.6.Database-Design}
+\input{chapters/5.SystemDesign/5.7.UIUX-Design}
+\input{chapters/5.SystemDesign/5.8.Site-Map}
+\input{chapters/5.SystemDesign/5.9. Testcase-Design}
+
+\clearpage
+%%%%%%% Section 6: System Implementation %%%%%%% 
+\section{Implementation and Testing}
+\label{sec:implementation}
+
+This chapter describes the concrete implementation of the aBridgeAI backend, covering the development environment, project structure, and the realisation of each major subsystem. The implementation follows a feature-first architecture in which each domain (identity, courses, materials, quizzes, interviews, spaced repetition) is a self-contained package exposing its own models, queries, services, and API routers. Cross-cutting concerns — caching, audit logging, observability, and access control — are isolated in a shared \texttt{core} layer consumed by all features.
+
+\input{chapters/6.Implementation/6.1.Environment}
+\input{chapters/6.Implementation/6.2.Project-Structure}
+\input{chapters/6.Implementation/6.3.Authentication}
+\input{chapters/6.Implementation/6.4.Material-Ingestion}
+\input{chapters/6.Implementation/6.5.AI-Pipelines}
+\input{chapters/6.Implementation/6.6.Spaced-Repetition}
+\input{chapters/6.Implementation/6.7.Access-Control}
+\input{chapters/6.Implementation/6.8.Testing}
+
+\clearpage
+%%%%%%% Section 7: Evaluation %%%%%%% 
+\input{chapters/7.Evaluation/7}
+
+\clearpage
+%%%%%%% Section 8: Conclusion %%%%%%% 
+\input{chapters/8.Conclusion/8}
+
+\clearpage
+\printbibliography
+
+% \bibliographystyle{plain}
+% \bibliography{refs/references}
+% \nocite{*}
+
+\clearpage
+\input{chapters/Appendix/appendix}
+\end{document}
