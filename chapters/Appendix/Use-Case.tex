@@ -339,6 +339,113 @@ $\bullet$ If the user logs out, the active session is revoked and can no longer 
 \end{longtable}
 
 
+
+% =========================================================
+% UC-ORG-04: Organise Faculties and Staff Courses
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Organise Faculties and Staff Courses}
+\label{tab:uc_org_faculty_staffing} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-ORG-04} \\ \hline
+\textbf{Use Case Name} & \textbf{Organise Faculties and Staff Courses} \\ \hline
+\textbf{Actors} & IT Administrator and Faculty Dean for the faculty structure; Educational Manager for course staffing \\ \hline
+\textbf{Related Requirements} & FR-2.12, FR-2.13, FR-3.9, FR-3.10 \\ \hline
+\textbf{Description} & Allows administrators to organise an organisation into faculties and to maintain faculty staff affiliations, and allows managers to staff a course with instructors and teaching assistants subject to those affiliations. \\ \hline
+\textbf{Pre-conditions} &
+$\bullet$ The operator is authenticated and holds organisation-unit management rights, or dean rights over the faculty concerned. \newline
+$\bullet$ For course staffing, the course exists and the candidate teacher is active staff of the faculty owning the course. \\ \hline
+\textbf{Post-conditions} &
+$\bullet$ The organisation's faculties and their staff affiliations reflect the changes. \newline
+$\bullet$ Course staffing records the instructor and assistant titles held by each teacher. \newline
+$\bullet$ A revoked assignment is expired rather than deleted, preserving the audit trail. \\ \hline
+\textbf{Main Flow} &
+1. The administrator opens the organisation's structure page. \newline
+2. The administrator creates a faculty, or renames, re-codes, or archives an existing one. \newline
+3. The system presents the organisation's units as a flat list or as a nested tree with descendant counts. \newline
+4. The administrator assigns members into a faculty in bulk, or detaches them, and the system reports how many rows were affected. \newline
+5. A Faculty Dean grants or revokes staff affiliations for the faculty, which may span several faculties per member. \newline
+6. An Educational Manager opens a course and requests the list of assignable teachers, which the system scopes to the course's organisation and marks those already assigned. \newline
+7. The manager assigns a teacher, marking them as Course Instructor, Teaching Assistant, or both. \newline
+8. The system records the assignment and notifies the teacher with a link to the course. \newline
+9. The manager reviews the course readiness checklist, which reports staffing against the configured minimum and maximum, the gradeable units, and the learning outcomes. \newline
+10. To remove a teacher, the manager revokes one or several assignments and the system expires them. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{2a. Faculty archived while it still has subordinate units:} \newline
+\hspace*{1em}1. The system archives the subordinate units together with the faculty. \newline
+\textbf{3a. A unit's parent is missing or archived:} \newline
+\hspace*{1em}1. The system presents the unit as a root so that it is never hidden from the operator. \newline
+\textbf{7a. Teacher is not staff of the owning faculty:} \newline
+\hspace*{1em}1. The system refuses the assignment. \newline
+\textbf{7b. Teacher already actively assigned:} \newline
+\hspace*{1em}1. The system treats the request as no change and does not send a further notification. \newline
+\textbf{8a. Course is archived:} \newline
+\hspace*{1em}1. The system records the assignment without notifying the teacher. \\
+\end{longtable}
+
+% =========================================================
+% UC-ORG-05: Manage Course Enrolment and Invitation Codes
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Manage Course Enrolment and Invitation Codes}
+\label{tab:uc_org_enrolment} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-ORG-05} \\ \hline
+\textbf{Use Case Name} & \textbf{Manage Course Enrolment and Invitation Codes} \\ \hline
+\textbf{Actors} & Educational Manager, Teacher \\ \hline
+\textbf{Related Requirements} & FR-2.3, FR-2.14, FR-2.15 \\ \hline
+\textbf{Description} & Allows an Educational Manager to populate and maintain a course roster by direct selection or file import and to issue invitation codes, and allows a Teacher to adjust an individual enrolment. \\ \hline
+\textbf{Pre-conditions} &
+$\bullet$ The operator is authenticated and holds course enrolment rights for the course. \newline
+$\bullet$ The course exists. \\ \hline
+\textbf{Post-conditions} &
+$\bullet$ Accepted Students hold an active enrolment on the course. \newline
+$\bullet$ Rejected rows are reported individually without aborting the batch. \newline
+$\bullet$ An unenrolment is recorded as a dropped enrolment retaining its history. \\ \hline
+\textbf{Main Flow} &
+1. The manager opens the course roster. \newline
+2. The manager enrols Students by selecting accounts, entering e-mail addresses, or uploading a comma-separated file. \newline
+3. The system creates accounts for unknown e-mail addresses and enrols each accepted Student. \newline
+4. The system reports the number enrolled, the accounts created, and the per-row failures. \newline
+5. The manager issues an invitation code for the course, optionally limiting the number of uses and setting an expiry date. \newline
+6. The system records the code together with its usage counter and active state. \newline
+7. The manager amends a code's expiry, usage limit, or active state, or revokes it. \newline
+8. The system deactivates a revoked code while retaining its record for audit. \newline
+9. A Teacher adjusts an individual enrolment on the roster, dropping or reactivating it. \newline
+10. The manager unenrols a Student, and the system records the enrolment as dropped. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{2a. Neither accounts nor addresses supplied:} \newline
+\hspace*{1em}1. The system rejects the request as requiring at least one identifier. \newline
+\textbf{3a. Malformed or duplicate file row:} \newline
+\hspace*{1em}1. The system records the row number and the reason and continues with the remaining rows. \newline
+\textbf{10a. Student was previously dropped:} \newline
+\hspace*{1em}1. The system reactivates the existing enrolment rather than creating a duplicate. \newline
+\textbf{5a. Duplicate code string:} \newline
+\hspace*{1em}1. The system reports the conflict and the manager supplies a different code. \\
+\end{longtable}
+
 % =========================================================
 % Module 3: Course and Material Management
 % =========================================================
@@ -476,6 +583,110 @@ $\bullet$ If the user logs out, the active session is revoked and can no longer 
 \end{longtable}
 
 
+
+% =========================================================
+% UC-COURSE-04: Curate Ingested Content and Reuse a Course
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Curate Ingested Content and Reuse a Course}
+\label{tab:uc_course_curate_clone} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-COURSE-04} \\ \hline
+\textbf{Use Case Name} & \textbf{Curate Ingested Content and Reuse a Course} \\ \hline
+\textbf{Actors} & Teacher for curation; Educational Manager for cloning; Student as the reader of the published knowledge map \\ \hline
+\textbf{Related Requirements} & FR-3.11, FR-3.12, FR-3.13, FR-3.14 \\ \hline
+\textbf{Description} & Allows a Teacher to control how uploaded material is preprocessed, to review and resolve quarantined content, to curate and publish the lesson knowledge map, and allows a manager to reuse an existing course by cloning it. \\ \hline
+\textbf{Pre-conditions} &
+$\bullet$ The Teacher is authenticated and holds authoring rights on the course. \newline
+$\bullet$ At least one material has been uploaded and ingested for the lesson concerned. \\ \hline
+\textbf{Post-conditions} &
+$\bullet$ The material's preprocessing mode and the resolution of each quarantined unit are recorded. \newline
+$\bullet$ Students see the lesson knowledge map only after the Teacher has published it. \newline
+$\bullet$ A cloned course exists as a draft with a unique identifier and carries no learner runtime data. \\ \hline
+\textbf{Main Flow} &
+1. The Teacher opens a material and reviews its preprocessing report. \newline
+2. The Teacher selects the preprocessing mode appropriate to the document. \newline
+3. The system reports the units it quarantined as unsafe to index, each with a reason and its number of occurrences. \newline
+4. The Teacher restores a quarantined unit or confirms its exclusion. \newline
+5. The Teacher previews the resulting content chunks. \newline
+6. The Teacher opens the lesson knowledge map derived from the ingested material and curates its concepts and relationships. \newline
+7. The Teacher publishes the curated map, after which Students see it on the lesson reading view. \newline
+8. The Teacher may later unpublish the map, after which the panel is hidden from Students. \newline
+9. To reuse a course, a manager selects ``Clone'' and chooses the depth: the shell with its learning outcomes, the shell with the module skeleton and module prerequisites, or the full curriculum. \newline
+10. The system creates the copy as a draft in the same organisation and faculty with a generated unique identifier, excluding enrolments, attempts, and grades. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{3a. Nothing was quarantined:} \newline
+\hspace*{1em}1. The system reports a clean extraction and no action is required. \newline
+\textbf{7a. Map has never been published:} \newline
+\hspace*{1em}1. The system reports the map as unpublished and the Student view hides the panel rather than reporting an error. \newline
+\textbf{1a. Ingestion was interrupted:} \newline
+\hspace*{1em}1. The system reconciles the affected processing job and resumes or fails it explicitly, rather than leaving it pending indefinitely. \\
+\end{longtable}
+
+% =========================================================
+% UC-COURSE-05: Participate in a Lesson Discussion
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Participate in a Lesson Discussion}
+\label{tab:uc_course_discussion} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-COURSE-05} \\ \hline
+\textbf{Use Case Name} & \textbf{Participate in a Lesson Discussion} \\ \hline
+\textbf{Actors} & Course manager, being the course owner or an assigned teacher, opens and moderates topics; enrolled Student and course manager post comments \\ \hline
+\textbf{Related Requirements} & FR-3.15, FR-6.9 \\ \hline
+\textbf{Description} & Allows a course manager to open discussion topics on a lesson and moderate them, and allows enrolled Students and course managers to comment, with participants notified of new activity. \\ \hline
+\textbf{Pre-conditions} &
+$\bullet$ The participant is authenticated. \newline
+$\bullet$ A Student participant is enrolled on the course owning the lesson. \newline
+$\bullet$ For commenting, the topic is open, or the participant can manage the course. \\ \hline
+\textbf{Post-conditions} &
+$\bullet$ Topics and comments are stored with their authorship. \newline
+$\bullet$ A removed topic or comment is withdrawn from view while its record is retained. \newline
+$\bullet$ Prior participants and, for a Student comment, the course managers are notified. \\ \hline
+\textbf{Main Flow} &
+1. The participant opens the Discussion area of a lesson. \newline
+2. The system lists the lesson's topics, newest first, indicating whether the viewer may open new topics. \newline
+3. A course manager opens a new topic with a title and an optional body. \newline
+4. A participant opens a topic and the system lists its comments oldest first with each author's display name. \newline
+5. The participant posts a comment. \newline
+6. The system notifies every prior commenter on the topic, excluding the comment's own author. \newline
+7. Where the author is not a course manager, the system additionally notifies the course managers. \newline
+8. The author edits or removes their own comment; a course manager may remove any comment as moderation. \newline
+9. A course manager edits the topic, closes it to further discussion, or removes it together with its comments. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{5a. Topic is closed:} \newline
+\hspace*{1em}1. The system refuses the comment from a participant who cannot manage the course. \newline
+\hspace*{1em}2. A course manager may still post. \newline
+\textbf{6a. Notification cannot be delivered:} \newline
+\hspace*{1em}1. The system records the comment regardless and does not fail the participant's action. \newline
+\textbf{1a. Participant is not enrolled and cannot manage the course:} \newline
+\hspace*{1em}1. The system reports the discussion as unavailable without disclosing whether it exists. \newline
+\textbf{5b. Recipient has disabled the discussion notification category for e-mail:} \newline
+\hspace*{1em}1. The system creates the in-app notification and omits the e-mail. \\
+\end{longtable}
+
 % =========================================================
 % Module 4: Learning Loop and Adaptive Quiz
 % =========================================================
@@ -609,6 +820,114 @@ $\bullet$ If the user logs out, the active session is revoked and can no longer 
 \hspace*{1em}1. The Teacher dashboard displays an empty state. \\
 \end{longtable}
 
+
+
+% =========================================================
+% UC-LEARN-04: Grade Open Responses and Maintain the Gradebook
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Grade Open Responses and Maintain the Gradebook}
+\label{tab:uc_learn_grading} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-LEARN-04} \\ \hline
+\textbf{Use Case Name} & \textbf{Grade Open Responses and Maintain the Gradebook} \\ \hline
+\textbf{Actors} & Teacher for grading and regrading; Student as the recipient of the resulting grade \\ \hline
+\textbf{Related Requirements} & FR-4.9, FR-4.10, FR-4.11, FR-4.13 \\ \hline
+\textbf{Description} & Allows a Teacher to mark answers that cannot be graded automatically, to maintain a single grade of record per Student, and to correct an answer key by previewing and then committing a regrade. \\ \hline
+\textbf{Pre-conditions} &
+$\bullet$ The Teacher is authenticated and holds authoring rights on the quiz's course. \newline
+$\bullet$ At least one attempt has been submitted. \\ \hline
+\textbf{Post-conditions} &
+$\bullet$ Every answer requiring human judgement carries a mark, and the attempt's score and pass decision are computed. \newline
+$\bullet$ Each Student holds one grade of record for the quiz, derived from the quiz's grading method. \newline
+$\bullet$ A committed regrade updates the affected scores and is recorded for audit. \\ \hline
+\textbf{Main Flow} &
+1. The Teacher opens the quiz's grading queue, which lists every answer awaiting a human mark. \newline
+2. The system withholds the headline score of any attempt that still contains an unmarked answer. \newline
+3. The Teacher records a mark and optional feedback for each open response. \newline
+4. Once no answer on an attempt remains unmarked, the system computes the attempt's score, evaluates it against the pass threshold, and records the attempt as graded. \newline
+5. The system reduces the Student's completed attempts to a single grade of record using the quiz's grading method of highest, first, last, or average. \newline
+6. The system reflects the refreshed grade in the Student's course completion. \newline
+7. Where the Teacher discovers an incorrect answer key, the Teacher corrects the question and requests a regrade preview. \newline
+8. The system re-grades the affected answers against the corrected definition and reports every changed answer together with the number of affected attempts, without altering any stored result. \newline
+9. The Teacher reviews the preview and commits it. \newline
+10. The system applies the changes, recomputes the affected attempts and grades of record, and records the operation. \newline
+11. The Student opens the attempt review and sees the score together with the feedback band matching it. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{1a. Nothing awaits grading:} \newline
+\hspace*{1em}1. The queue is empty because every answer was graded automatically. \newline
+\textbf{8a. Preview reports no change:} \newline
+\hspace*{1em}1. The Teacher abandons the regrade. \newline
+\textbf{11a. Score is not disclosed to the Student by the review policy:} \newline
+\hspace*{1em}1. The system withholds the band feedback together with the score. \newline
+\textbf{6a. Course completion side effect fails:} \newline
+\hspace*{1em}1. The system retains the grade and repairs the completion state by a subsequent reconciliation. \\
+\end{longtable}
+
+% =========================================================
+% UC-LEARN-05: Administer Assessment Delivery and Integrity
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Administer Assessment Delivery and Integrity}
+\label{tab:uc_learn_delivery} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-LEARN-05} \\ \hline
+\textbf{Use Case Name} & \textbf{Administer Assessment Delivery and Integrity} \\ \hline
+\textbf{Actors} & Teacher for accommodations, the question bank, and reports; Student as the subject of delivery and monitoring \\ \hline
+\textbf{Related Requirements} & FR-4.12, FR-4.14, FR-4.15, FR-4.16, FR-4.17, FR-4.18 \\ \hline
+\textbf{Description} & Allows a Teacher to grant assessment accommodations, to build and reuse a question bank including interchange-file import and export, to review integrity signals and item analysis, while the system closes timed attempts that are never submitted. \\ \hline
+\textbf{Pre-conditions} &
+$\bullet$ The Teacher is authenticated and holds authoring rights on the quiz's course. \newline
+$\bullet$ For reports, at least one attempt has been completed. \\ \hline
+\textbf{Post-conditions} &
+$\bullet$ An accommodated Student's attempt honours the resolved availability window, time limit, attempt ceiling, and cooldown. \newline
+$\bullet$ Reusable questions are held in the course question bank with an approval state. \newline
+$\bullet$ Integrity signals and the assessment audit trail are available to the Teacher. \newline
+$\bullet$ A timed attempt is finalised even when the Student never submits it. \\ \hline
+\textbf{Main Flow} &
+1. The Teacher grants a Student or a group an accommodation overriding any of the availability window, due date, time limit, attempt ceiling, retake permission, and cooldown. \newline
+2. When the Student starts an attempt, the system resolves the effective policy by Student over group over quiz precedence and applies it. \newline
+3. The system displays the Student's own window, time limit, and attempt ceiling on the quiz detail. \newline
+4. During the attempt the client reports integrity signals such as tab switching and focus loss, and the Student is informed that monitoring is active. \newline
+5. Where the Student does not submit before the deadline, the system closes the attempt according to the quiz's overdue handling policy, either grading the work completed, extending the deadline by the configured grace period, or abandoning the attempt without a grade. \newline
+6. The Teacher curates the course question bank, authoring items as drafts and approving them for reuse. \newline
+7. The Teacher copies existing quiz questions into the bank, and the system skips items whose content already has a bank copy. \newline
+8. The Teacher imports approved bank items into a quiz, or imports questions from an interchange file, which arrive pending review. \newline
+9. The Teacher exports the quiz's questions as an interchange file. \newline
+10. The Teacher reviews the integrity timeline for an attempt and the append-only assessment audit trail for the quiz. \newline
+11. The Teacher opens the item analysis report and reviews the facility and discrimination indices per question, and downloads the reports. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{2a. Several group accommodations apply:} \newline
+\hspace*{1em}1. The system combines them into the single most generous set. \newline
+\textbf{6a. An approved bank item is edited:} \newline
+\hspace*{1em}1. The system returns the item to draft so that it re-enters review. \newline
+\textbf{8a. Bank item is not approved:} \newline
+\hspace*{1em}1. The system refuses to import it into the quiz. \newline
+\textbf{11a. Discrimination index cannot be computed:} \newline
+\hspace*{1em}1. The system reports the reason, distinguishing insufficient attempts from an absence of variance, rather than omitting the figure silently. \\
+\end{longtable}
 
 % =========================================================
 % Module 5: Application Loop and Mock Interview
@@ -748,6 +1067,101 @@ $\bullet$ If the user logs out, the active session is revoked and can no longer 
 \end{longtable}
 
 
+
+% =========================================================
+% UC-INTERVIEW-04: Curate the Interview Question Bank
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Curate the Interview Question Bank}
+\label{tab:uc_interview_bank} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-INTERVIEW-04} \\ \hline
+\textbf{Use Case Name} & \textbf{Curate the Interview Question Bank} \\ \hline
+\textbf{Actors} & Teacher, Educational Manager \\ \hline
+\textbf{Related Requirements} & FR-5.9, FR-5.2 \\ \hline
+\textbf{Description} & Allows a Teacher to build a reusable interview question bank in which one logical question carries sibling variants covering complementary interview angles, and to approve those variants before they are used in a published interview. \\ \hline
+\textbf{Pre-conditions} &
+$\bullet$ The Teacher is authenticated and holds authoring rights on the course. \newline
+$\bullet$ Course material has been ingested where generation is to be used. \\ \hline
+\textbf{Post-conditions} &
+$\bullet$ Bank items exist grouped by logical question with their sibling variants. \newline
+$\bullet$ Only Teacher-approved variants are available to a published interview. \newline
+$\bullet$ Near-duplicate questions are reported before they enter the bank. \\ \hline
+\textbf{Main Flow} &
+1. The Teacher opens the course's interview question bank. \newline
+2. The Teacher adds a question manually, or requests generation from the ingested material. \newline
+3. The system groups generated questions as one logical question with sibling variants covering complementary angles. \newline
+4. The system checks a proposed question against the existing bank and reports near-duplicates. \newline
+5. The Teacher reviews each variant and approves, edits, or rejects it. \newline
+6. The Teacher may request regeneration of a specific question or remove a variant or a whole logical group. \newline
+7. The Teacher imports approved bank items into an interview configuration. \newline
+8. The system admits only approved items. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{2a. Insufficient ingested material:} \newline
+\hspace*{1em}1. The system declines to generate rather than producing ungrounded questions. \newline
+\textbf{4a. Proposed question duplicates an existing one:} \newline
+\hspace*{1em}1. The system reports the duplicate and the Teacher amends or abandons it. \newline
+\textbf{7a. Item is not approved:} \newline
+\hspace*{1em}1. The system excludes it from the import. \\
+\end{longtable}
+
+% =========================================================
+% UC-INTERVIEW-05: Review the Interview Gap Report
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Review the Interview Gap Report}
+\label{tab:uc_interview_gap} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-INTERVIEW-05} \\ \hline
+\textbf{Use Case Name} & \textbf{Review the Interview Gap Report} \\ \hline
+\textbf{Actors} & Student as the recipient of the remediation plan; Teacher for the full assessment and notes \\ \hline
+\textbf{Related Requirements} & FR-5.10, FR-5.7 \\ \hline
+\textbf{Description} & Allows a Student to receive a qualitative gap report with an actionable study plan after an interview, while the Teacher additionally reviews criterion-level assessment and attaches remediation notes. \\ \hline
+\textbf{Pre-conditions} &
+$\bullet$ The interview session has been completed and evaluated. \newline
+$\bullet$ The Student owns the session; the Teacher holds authoring rights on the course. \\ \hline
+\textbf{Post-conditions} &
+$\bullet$ The Student sees the discrepancy summary and a study plan of topics with lesson links and suggested resources. \newline
+$\bullet$ Criterion-level scores and internal assessment rationale remain visible only to the Teacher. \newline
+$\bullet$ Teacher notes are recorded against the report. \\ \hline
+\textbf{Main Flow} &
+1. The Student opens the result of a completed interview session. \newline
+2. The system presents the pass or fail verdict together with the discrepancy summary. \newline
+3. The system presents the study plan as a list of topics, each linked to the relevant lesson with suggested resources where available. \newline
+4. The Teacher opens the same session and additionally reviews the criterion-level assessment and the transcript. \newline
+5. The Teacher attaches remediation notes to the report. \newline
+6. The system records the notes and makes them available on subsequent reviews. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{3a. The course does not support a topic that would otherwise be suggested:} \newline
+\hspace*{1em}1. The system omits the suggestion rather than inventing coverage the course does not have. \newline
+\textbf{2a. No gap report has been generated:} \newline
+\hspace*{1em}1. The system presents the verdict alone. \newline
+\textbf{4a. Student attempts to view criterion-level detail:} \newline
+\hspace*{1em}1. The system withholds it, exposing only the verdict and the qualitative remediation. \\
+\end{longtable}
+
 % =========================================================
 % Module 6: Analytics, Reporting and Notifications
 % =========================================================
@@ -876,4 +1290,298 @@ $\bullet$ If the user logs out, the active session is revoked and can no longer 
 \hspace*{1em}1. The system blocks retry and explains the missing material or configuration. \newline
 \textbf{8a. Actor lacks audit permission:} \newline
 \hspace*{1em}1. The system denies access to audit logs. \\
+\end{longtable}
+
+
+% =========================================================
+% Module 7: Learning Programs and Path Governance
+% =========================================================
+\subsection{Learning Programs and Path Governance Module}
+
+% =========================================================
+% UC-PROGRAM-01: Define and Publish a Learning Programme
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Define and Publish a Learning Programme}
+\label{tab:uc_program_define} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-PROGRAM-01} \\ \hline
+\textbf{Use Case Name} & \textbf{Define and Publish a Learning Programme} \\ \hline
+\textbf{Actors} & Faculty Dean, Educational Manager \\ \hline
+\textbf{Related Requirements} & FR-7.1, FR-7.2, FR-7.3 \\ \hline
+\textbf{Description} & Allows a Faculty Dean or Educational Manager to define a learning programme within a faculty of their organisation as an ordered selection of published career pathways, revise it under version control, and publish it for enrolment. \\ \hline
+\textbf{Pre-conditions} &
+$\bullet$ The operator is authenticated and holds learning-programme management rights. \newline
+$\bullet$ The target faculty belongs to the operator's own organisation. \newline
+$\bullet$ At least one published career pathway exists in the organisation. \\ \hline
+\textbf{Post-conditions} &
+$\bullet$ The programme exists with a version pinning each selected pathway to a specific published pathway version. \newline
+$\bullet$ A published programme is open for student enrolment. \newline
+$\bullet$ Students already enrolled remain attached to the programme version they enrolled upon. \\ \hline
+\textbf{Main Flow} &
+1. The operator opens the Learning Programmes page for their organisation. \newline
+2. The operator selects ``Create programme'' and chooses the owning faculty. \newline
+3. The system offers the organisation's career pathways, marking those that cannot be selected together with the reason. \newline
+4. The operator enters the programme name, description, and the permitted number of pathway switches, and arranges the chosen pathways in order. \newline
+5. The operator saves the programme, which the system creates as a draft together with version one. \newline
+6. The operator reviews the draft and selects ``Publish''. \newline
+7. The system verifies that every pinned pathway and pathway version is still available. \newline
+8. The system promotes the draft to published, records the publisher and the publication time, and opens the programme for enrolment. \newline
+9. To revise a published programme, the operator edits it and the system opens a new draft version carrying forward the existing pathway pins. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{3a. No published pathway is available:} \newline
+\hspace*{1em}1. The system marks every pathway as not selectable. \newline
+\hspace*{1em}2. The operator is directed to publish a career pathway first. \newline
+\textbf{4a. Faculty outside the operator's organisation:} \newline
+\hspace*{1em}1. The system rejects the programme. \newline
+\hspace*{1em}2. The operator is informed that the faculty is out of scope. \newline
+\textbf{4b. Duplicate programme identifier:} \newline
+\hspace*{1em}1. The system reports that the identifier is already taken within the organisation. \newline
+\hspace*{1em}2. The operator supplies a different one. \newline
+\textbf{7a. A pinned pathway has become unavailable:} \newline
+\hspace*{1em}1. The system refuses to publish and names the offending pathway. \newline
+\hspace*{1em}2. The operator corrects the pathway selection and retries. \newline
+\textbf{9a. Programme is archived:} \newline
+\hspace*{1em}1. The system refuses the edit because an archived programme is immutable. \\
+\end{longtable}
+
+% =========================================================
+% UC-PROGRAM-02: Enrol Students onto a Learning Programme
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Enrol Students onto a Learning Programme}
+\label{tab:uc_program_enrol} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-PROGRAM-02} \\ \hline
+\textbf{Use Case Name} & \textbf{Enrol Students onto a Learning Programme} \\ \hline
+\textbf{Actors} & Educational Manager, Faculty Dean \\ \hline
+\textbf{Related Requirements} & FR-7.4, FR-7.5, FR-7.11 \\ \hline
+\textbf{Description} & Allows an authorised operator to place Students onto a published learning programme individually or by file import, and to withdraw a Student from the programme. \\ \hline
+\textbf{Pre-conditions} &
+$\bullet$ The operator is authenticated and holds learning-programme enrolment rights for the programme's organisation. \newline
+$\bullet$ The programme is published and has a published version. \\ \hline
+\textbf{Post-conditions} &
+$\bullet$ Each accepted Student holds an enrolment awaiting initial pathway selection, pinned to the current published version. \newline
+$\bullet$ Rejected rows are reported individually and do not prevent the remaining rows from being enrolled. \newline
+$\bullet$ A withdrawn Student's enrolment records the withdrawal reason and any open pathway-change request is cancelled. \\ \hline
+\textbf{Main Flow} &
+1. The operator opens the programme's Students tab. \newline
+2. The operator either selects Students individually or uploads a comma-separated file of e-mail addresses with optional names. \newline
+3. The system validates each entry against the Student role, the programme's organisation, and the concurrent-enrolment ceiling. \newline
+4. For an unknown e-mail address in a file import, the system creates a Student account in the programme's organisation. \newline
+5. The system creates one enrolment per accepted Student awaiting initial pathway selection. \newline
+6. The system reports the outcome as the number enrolled, the accounts created, those already enrolled, and the per-row failures. \newline
+7. To remove a Student, the operator selects ``Withdraw'' and supplies a reason. \newline
+8. The system records the withdrawal, snapshots and cancels the active pathway attempt, and releases the access it granted. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{3a. A selected user is not a Student:} \newline
+\hspace*{1em}1. The system rejects the whole hand-picked batch and names the offending users. \newline
+\textbf{3b. Student already enrolled:} \newline
+\hspace*{1em}1. The system reports the existing enrolment and skips the row. \newline
+\textbf{3c. Concurrent-enrolment ceiling reached:} \newline
+\hspace*{1em}1. The system refuses the enrolment and reports the limit together with the Student's current count. \newline
+\textbf{3d. Previously withdrawn Student:} \newline
+\hspace*{1em}1. The system reinstates the existing enrolment onto the current published version instead of creating a duplicate. \newline
+\textbf{2a. Malformed file row:} \newline
+\hspace*{1em}1. The system records the row number and the reason, and continues with the remaining rows. \newline
+\textbf{7a. Enrolment is already completed:} \newline
+\hspace*{1em}1. The system refuses the withdrawal. \\
+\end{longtable}
+
+% =========================================================
+% UC-PROGRAM-03: Select and Change Career Pathway
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Select and Change Career Pathway}
+\label{tab:uc_program_path_change} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-PROGRAM-03} \\ \hline
+\textbf{Use Case Name} & \textbf{Select and Change Career Pathway} \\ \hline
+\textbf{Actors} & Student for selection and request; Faculty Dean for the decision \\ \hline
+\textbf{Related Requirements} & FR-7.6, FR-7.7, FR-7.8, FR-7.9, FR-7.10, FR-7.12, FR-7.13 \\ \hline
+\textbf{Description} & Allows a Student to choose their initial career pathway within an enrolled learning programme and subsequently to request a change of pathway, which an owning Faculty Dean acknowledges and then approves or rejects. \\ \hline
+\textbf{Pre-conditions} &
+$\bullet$ The Student holds an enrolment on a published learning programme. \newline
+$\bullet$ For a change request, the enrolment is active and the Student has not exhausted the permitted number of switches. \newline
+$\bullet$ For a decision, the reviewer is a Faculty Dean owning the programme and is not the subject of the request. \\ \hline
+\textbf{Post-conditions} &
+$\bullet$ Upon initial selection the enrolment becomes active with an open pathway attempt pinned to the chosen pathway version. \newline
+$\bullet$ Upon approval the outgoing attempt is closed with a progress snapshot, a new attempt is opened on the target pathway version, and the switch is counted against the allowance. \newline
+$\bullet$ Course completions already earned remain valid and continue to count towards the new pathway. \newline
+$\bullet$ Upon rejection the enrolment and the current pathway are unchanged and the recorded reason is visible to the Student. \\ \hline
+\textbf{Main Flow} &
+1. The Student opens their programme enrolment and reviews the pathways offered by their programme version. \newline
+2. The Student selects one pathway as their initial choice. \newline
+3. The system activates the enrolment, opens a pathway attempt pinned to that pathway version, and grants access to the pathway's courses. \newline
+4. To change pathway later, the Student selects a different pathway and submits a written justification. \newline
+5. The system verifies that the target pathway belongs to the enrolled programme version, differs from the current pathway, and that the switch allowance has not been exhausted. \newline
+6. The system records the request as pending and notifies the owning Faculty Deans. \newline
+7. A Faculty Dean opens the programme's review tab and acknowledges the request, which the system marks as in progress and notifies the Student. \newline
+8. The Faculty Dean approves or rejects the request. \newline
+9. On approval the system re-verifies the enrolment, snapshots the outgoing attempt's completed courses and overall progress, closes it, and opens a new attempt on the target pathway version. \newline
+10. The system carries over access to courses shared by both pathways, releases access that is no longer justified, and counts the switch against the allowance. \newline
+11. The system notifies the Student of the outcome. \newline
+12. When every course of the pinned pathway version is satisfied, the system completes the enrolment. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{2a. Initial pathway already chosen:} \newline
+\hspace*{1em}1. The system refuses, because the initial pathway may be selected only once. \newline
+\textbf{5a. Target pathway equals the current pathway, or lies outside the enrolled version, or is archived:} \newline
+\hspace*{1em}1. The system rejects the request and explains the reason. \newline
+\textbf{5b. A request is already open:} \newline
+\hspace*{1em}1. The system refuses a second request until the open one is decided or cancelled. \newline
+\textbf{5c. Switch allowance exhausted:} \newline
+\hspace*{1em}1. The system refuses the request and reports that the limit has been reached. \newline
+\textbf{8a. Rejection:} \newline
+\hspace*{1em}1. The Faculty Dean selects a reason from the defined vocabulary. \newline
+\hspace*{1em}2. Where the reason is recorded as other, the system requires explanatory text. \newline
+\hspace*{1em}3. The system records the decision and notifies the Student. \newline
+\textbf{8b. Reviewer is the subject of the request:} \newline
+\hspace*{1em}1. The system refuses the decision as self-approval. \newline
+\textbf{9a. Target pathway became unavailable before approval:} \newline
+\hspace*{1em}1. The system marks the request invalidated and leaves the enrolment unchanged. \newline
+\textbf{4a. Student cancels:} \newline
+\hspace*{1em}1. While the request is still open the Student withdraws it. \newline
+\hspace*{1em}2. The system retains the cancelled request in the visible history. \\
+\end{longtable}
+
+
+% =========================================================
+% Module 8: Platform Configuration and Policy Documents
+% =========================================================
+\subsection{Platform Configuration and Policy Documents Module}
+
+% =========================================================
+% UC-CONFIG-01: Tune Runtime Configuration with Preview and Rollback
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Tune Runtime Configuration with Preview and Rollback}
+\label{tab:uc_config_settings} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-CONFIG-01} \\ \hline
+\textbf{Use Case Name} & \textbf{Tune Runtime Configuration with Preview and Rollback} \\ \hline
+\textbf{Actors} & IT Administrator for deployment-wide settings; Educational Manager for organisation-scoped settings \\ \hline
+\textbf{Related Requirements} & FR-8.1, FR-8.2, FR-8.3, FR-8.4, FR-8.5, FR-8.6 \\ \hline
+\textbf{Description} & Allows an authorised administrator to retune system behaviour at run time without a redeployment, previewing the effect of a change before applying it, recording the justification, and rolling a change back when necessary. \\ \hline
+\textbf{Pre-conditions} &
+$\bullet$ The administrator is authenticated and holds configuration rights for the scope being changed. \newline
+$\bullet$ The setting being changed exists in the published settings catalogue. \\ \hline
+\textbf{Post-conditions} &
+$\bullet$ The effective value of the setting reflects the applied override according to the documented precedence. \newline
+$\bullet$ The change, clearance, or rollback is recorded with its reason and the acting administrator. \newline
+$\bullet$ The new value takes effect on the next operation that reads the setting. \\ \hline
+\textbf{Main Flow} &
+1. The administrator opens the Settings console at either deployment-wide or organisation scope. \newline
+2. The system lists the catalogue, showing for each setting its type, permitted range, the value held at each precedence layer, and the effective value together with its source. \newline
+3. The administrator selects a setting and enters a proposed value. \newline
+4. The administrator selects ``Preview''. \newline
+5. The system validates the proposed value against the setting's type and range and reports the current value, the proposed value, and the scope affected. \newline
+6. The administrator supplies a written reason and applies the change. \newline
+7. The system stores the override, records the change in the history, and invalidates its resolution cache. \newline
+8. To restore inheritance, the administrator clears the override with a reason and the next precedence layer resumes. \newline
+9. To undo a change, the administrator opens the change history and selects ``Roll back''. \newline
+10. The system restores the value the change had replaced, or removes the override when there was no previous value, and records the rollback as a new history entry. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{5a. Proposed value fails validation:} \newline
+\hspace*{1em}1. The system rejects the preview and reports the permitted type and range. \newline
+\textbf{6a. Reason omitted or too short:} \newline
+\hspace*{1em}1. The system refuses the change until an adequate reason is supplied. \newline
+\textbf{7a. Setting requires a restart to take effect:} \newline
+\hspace*{1em}1. The system records the change and indicates that a restart is required. \newline
+\textbf{2a. Stored value no longer satisfies its constraints:} \newline
+\hspace*{1em}1. The system disregards the stored value, falls through to the next precedence layer, and continues to operate. \newline
+\textbf{2b. Configuration store unreachable:} \newline
+\hspace*{1em}1. The system operates on environment configuration and code defaults without failing the calling operation. \\
+\end{longtable}
+
+% =========================================================
+% UC-CONFIG-02: Publish and Read Policy Documents
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Use Case Specification: Publish and Read Policy Documents}
+\label{tab:uc_config_policies} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-CONFIG-02} \\ \hline
+\textbf{Use Case Name} & \textbf{Publish and Read Policy Documents} \\ \hline
+\textbf{Actors} & IT Administrator for authoring; any reader, including an unauthenticated visitor, for reading \\ \hline
+\textbf{Related Requirements} & FR-8.7, FR-8.8 \\ \hline
+\textbf{Description} & Allows an administrator to maintain versioned legal and academic policy documents and to publish them, while any reader may consult the current published text without authenticating. \\ \hline
+\textbf{Pre-conditions} &
+$\bullet$ For authoring, the administrator is authenticated and holds policy administration rights. \newline
+$\bullet$ For reading, no precondition applies. \\ \hline
+\textbf{Post-conditions} &
+$\bullet$ The published version becomes the current text for its language and any previously published version in that language is archived. \newline
+$\bullet$ The document remains reachable by its stable identifier across re-issues. \newline
+$\bullet$ No record of reader acceptance is created, since reading a policy is a read-only act. \\ \hline
+\textbf{Main Flow} &
+1. The administrator opens the Policies console and creates a policy, giving it an identifier, a category of legal or academic, a title, and a language. \newline
+2. The system creates the policy together with an empty first draft version. \newline
+3. The administrator edits the draft's title, body, and change note. \newline
+4. The administrator selects ``Publish''. \newline
+5. The system records the publication time and publisher and archives any previously published version in that language. \newline
+6. The administrator optionally restricts the policy's audience to selected roles, or leaves it public. \newline
+7. To re-issue the document, the administrator opens the next draft version, which the system seeds from the latest existing version. \newline
+8. A reader opens the policy index and selects a document. \newline
+9. The system returns the current published text for the reader's language together with its version number and publication date. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{1a. Identifier already in use:} \newline
+\hspace*{1em}1. The system reports the conflict and the administrator supplies a different identifier. \newline
+\textbf{9a. Requested language has no published version:} \newline
+\hspace*{1em}1. The system returns the English version instead. \newline
+\textbf{9b. Policy does not exist or has never been published:} \newline
+\hspace*{1em}1. The system reports that the document is not available. \\
 \end{longtable}

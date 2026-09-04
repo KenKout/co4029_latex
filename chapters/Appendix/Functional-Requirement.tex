@@ -83,6 +83,14 @@ FR-2.9 & The system shall allow IT administrators to manage the list of email do
 
 FR-2.10 & The system shall maintain organisation membership records for each user, including student or employee identifier codes, and allow authorised managers to view and update those records. & IT Administrators, Educational Managers & UR-MGR-01, UR-ITA-01 & Yes & Yes & High \\ \hline
 FR-2.11 & The system shall allow IT administrators to enable or disable user accounts across tenant organisations, and disabled accounts shall be prevented from accessing protected system resources. & IT Administrators & UR-ITA-03 & Yes & Yes & High \\ \hline
+
+FR-2.12 & The system shall allow authorised administrators to organise each tenant organisation into faculties, including creating, renaming, and archiving a faculty together with its subordinate units, and shall present an organisation's units either as a flat list or as a nested tree with descendant counts. & IT Administrators, Educational Managers & UR-ITA-01, UR-MGR-04 & Yes & Yes & Medium \\ \hline
+
+FR-2.13 & The system shall maintain faculty staff affiliations as a many-to-many relationship that authorised deans may grant or revoke in bulk, and shall require a teacher to be active staff of the faculty owning a course before that teacher may be assigned to it. & Faculty Deans, IT Administrators & UR-MGR-02, UR-MGR-04 & Yes & Yes & Medium \\ \hline
+
+FR-2.14 & The system shall allow Educational Managers to issue per-course invitation codes with an optional maximum number of uses and an optional expiry date, to amend or deactivate them, and to revoke a code while retaining its record for audit purposes. & Educational Managers & UR-MGR-01 & Yes & Yes & Low \\ \hline
+
+FR-2.15 & The system shall maintain a course enrolment lifecycle of active, completed, dropped, and waitlisted states together with the origin of each enrolment, shall record an unenrolment as a dropped enrolment rather than deleting it, and shall reactivate the existing record when a previously dropped student is re-enrolled. & Educational Managers, Teachers & UR-MGR-01 & Yes & Yes & High \\
 \end{longtable}
 % ============================ Module 3: Course & Material Management ====================
 
@@ -124,7 +132,21 @@ FR-3.6 & The system shall allow Teachers to control material and resource visibi
 
 FR-3.7 & The system shall allow enrolled Students to browse the published catalogue of courses in their organisation, view course detail, and stream or download approved materials via short-lived presigned URLs. & Students & UR-STU-01 & Yes & Yes & High \\ \hline
 
-FR-3.8 & The system shall allow IT administrators to view courses across organisations, restore soft-deleted courses, inspect processing-job history, and view aggregate course statistics. & IT Administrators & UR-ITA-03 & Yes & Yes & Medium \\
+FR-3.8 & The system shall allow IT administrators to view courses across organisations, restore soft-deleted courses, inspect processing-job history, and view aggregate course statistics. & IT Administrators & UR-ITA-03 & Yes & Yes & Medium \\ \hline
+
+FR-3.9 & The system shall allow authorised managers to staff a course with multiple Course Instructors and multiple Teaching Assistants, where a single teacher may hold both titles, shall treat the re-assignment of an already active teacher as no change, shall revoke an assignment by expiring it rather than deleting it, and shall notify a newly assigned teacher. & Educational Managers, Faculty Deans & UR-MGR-02 & Yes & Yes & High \\ \hline
+
+FR-3.10 & The system shall expose a pre-publication readiness checklist for a course reporting staffing adequacy against the configured minimum and maximum teacher counts, the number of gradeable curriculum units, and the presence of learning outcomes. & Teachers, Educational Managers & UR-TCH-01 & Yes & Yes & Medium \\ \hline
+
+FR-3.11 & The system shall allow authorised managers to clone an existing course at a selectable depth --- the course shell with its learning outcomes, the shell together with the module skeleton and module prerequisites, or the full curriculum --- creating the copy as a draft with a uniquely generated slug, and shall deliberately exclude learner runtime data such as enrolments, attempts, and grades from the copy. & Educational Managers, Faculty Deans & UR-TCH-01 & Yes & Yes & Medium \\ \hline
+
+FR-3.12 & The system shall derive a knowledge map of concepts and their relationships for each lesson from that lesson's ingested materials, shall allow Teachers to curate the map, and shall expose it to Students only after the Teacher has published it. & Teachers, Students & UR-TCH-01, UR-STU-01 & Yes & Yes & Medium \\ \hline
+
+FR-3.13 & The system shall allow Teachers to select a text-preprocessing mode for each material, shall quarantine extracted units that are unsafe to index together with the reason and the number of occurrences, shall allow Teachers to restore or confirm each quarantined unit, and shall expose a preview of the resulting content chunks. & Teachers & UR-TCH-01 & Yes & Yes & Medium \\ \hline
+
+FR-3.14 & The system shall recover ingestion work that was interrupted, reconciling processing jobs left pending or running with no live background task, finalising abandoned generation runs, and periodically removing orphaned uploads. & IT Administrators & UR-ITA-03 & Yes & Yes & Medium \\ \hline
+
+FR-3.15 & The system shall provide per-lesson discussion topics that course managers may open, edit, close, and moderate, on which enrolled Students and course managers may post and edit comments, and shall refuse new comments on a closed topic from users who cannot manage the course. & Students, Teachers, Educational Managers & UR-STU-01, UR-TCH-05 & Yes & Yes & Medium \\
 
 \end{longtable}
 
@@ -166,7 +188,27 @@ FR-4.6 & The system shall deliver in-app spaced-repetition reminders for due car
 
 FR-4.7 & The system shall provide Teachers with learning-loop analytics, including cohort retention distribution, difficult-card lists, at-risk-student lists, and per-student spaced-repetition details. & Teachers & UR-TCH-05 & Yes & Yes & Medium \\ \hline
 
-FR-4.8 & The system shall provide Students with personal learning-loop dashboards, including due-card lists, per-lesson knowledge-retention estimates, progression readiness, and course-level progress overview. & Students & UR-STU-04 & Yes & Yes & Medium \\
+FR-4.8 & The system shall provide Students with personal learning-loop dashboards, including due-card lists, per-lesson knowledge-retention estimates, progression readiness, and course-level progress overview. & Students & UR-STU-04 & Yes & Yes & Medium \\ \hline
+
+FR-4.9 & The system shall route answers that cannot be graded automatically --- code answers always, and short-answer or fill-in-the-blank answers whose exact-match grading failed --- into a per-quiz manual grading queue, shall withhold the attempt score while any such answer is unmarked, and shall recompute the score and the pass decision once every answer carries a mark. & Teachers, Students & UR-TCH-02, UR-TCH-05 & Yes & Yes & High \\ \hline
+
+FR-4.10 & The system shall maintain a single grade of record for each student on each quiz, derived from that quiz's grading method of highest, first, last, or average attempt, shall refresh it whenever an attempt is graded or regraded, and shall expose the resulting gradebook to Teachers. & Teachers, Students & UR-TCH-05 & Yes & Yes & High \\ \hline
+
+FR-4.11 & The system shall allow a Teacher to correct an answer key and preview the consequences as a dry run reporting every changed answer and the number of affected attempts, and shall apply the correction only upon explicit commit, recomputing the affected scores and recording the operation for audit. & Teachers & UR-TCH-02 & Yes & Yes & Medium \\ \hline
+
+FR-4.12 & The system shall allow Teachers to grant per-student and per-group assessment accommodations that override a quiz's availability window, due date, time limit, attempt ceiling, retake permission, and cooldown, shall resolve them by student-over-group-over-quiz precedence, and shall apply the resolved policy when the Student starts an attempt. & Teachers, Students & UR-TCH-03, UR-STU-01 & Yes & Yes & Medium \\ \hline
+
+FR-4.13 & The system shall allow Teachers to define score bands on a quiz mapping a range of percentage scores to a feedback message shown to the Student on attempt review, and shall withhold that feedback whenever the score itself is not disclosed to the Student. & Teachers, Students & UR-TCH-03 & Yes & Yes & Low \\ \hline
+
+FR-4.14 & The system shall maintain a course-scoped curated question bank of reusable items with a draft, approved, and archived lifecycle, shall demote an approved item to draft when its content changes, shall skip rather than reject duplicates when copying existing questions into the bank, and shall admit only approved items when importing from the bank into a quiz. & Teachers & UR-TCH-02 & Yes & Yes & Medium \\ \hline
+
+FR-4.15 & The system shall import quiz questions from, and export them to, interchange files in the Moodle GIFT and Moodle XML formats, shall admit imported questions as pending review, and shall support bulk approval and bulk assignment of expected response time. & Teachers & UR-TCH-02 & Yes & Yes & Low \\ \hline
+
+FR-4.16 & The system shall record browser integrity signals reported during a quiz attempt in an append-only store, accepting focus loss, tab switching, full-screen exit, warnings, and connection loss, shall accept such reports only while the attempt is in progress and never allow their ingestion to interrupt the attempt, shall inform the Student that monitoring is active, and shall present the resulting timeline together with an append-only assessment audit trail to the Teacher. & Students, Teachers & UR-TCH-05 & Yes & Yes & Medium \\ \hline
+
+FR-4.17 & The system shall produce per-question item analysis for a quiz, including the facility index and the discrimination index with an explanation when the latter cannot be computed, together with per-student response reports, and shall deliver both as structured data, comma-separated, or spreadsheet downloads. & Teachers & UR-TCH-05 & Yes & Yes & Medium \\ \hline
+
+FR-4.18 & The system shall close timed quiz attempts whose deadline passes without submission, honouring the quiz's overdue handling policy by grading the work completed, extending the deadline by a configured grace period, or abandoning the attempt without a grade. & Students & UR-STU-01 & Yes & Yes & High \\
 
 \end{longtable}
 
@@ -207,7 +249,11 @@ FR-5.6 & The system shall persist the interview transcript and session metadata,
 
 FR-5.7 & The system shall expose only the binary pass-or-fail verdict to Students --- without per-outcome rubric scores --- while allowing Teachers to review the transcript and outcome-level assessment for remediation purposes. & Students, Teachers & UR-STU-03, UR-TCH-03 & Yes & Yes & High \\ \hline
 
-FR-5.8 & The system shall record interview session activity signals, such as browser focus changes, tab switching, full-screen status, and session events, to support post-session integrity review. & Students, Teachers & UR-STU-02, UR-TCH-03 & Yes & Yes & Medium \\
+FR-5.8 & The system shall record interview session activity signals, such as browser focus changes, tab switching, full-screen status, and session events, to support post-session integrity review. & Students, Teachers & UR-STU-02, UR-TCH-03 & Yes & Yes & Medium \\ \hline
+
+FR-5.9 & The system shall maintain a course-scoped interview question bank in which one logical question carries sibling variants covering complementary interview angles, shall detect near-duplicate questions before they are added, and shall require Teacher approval of generated variants before they may be used in a published interview. & Teachers, Educational Managers & UR-TCH-02 & Yes & Yes & Medium \\ \hline
+
+FR-5.10 & The system shall generate a gap report for a completed interview session summarising the observed discrepancies together with an actionable study plan of topics linked to the relevant lessons and suggested resources, shall withhold criterion-level scores and internal assessment rationale from the Student, and shall allow the Teacher to attach remediation notes. & Students, Teachers & UR-STU-03, UR-TCH-03 & Yes & Yes & Medium \\
 
 \end{longtable}
 
@@ -248,6 +294,100 @@ FR-6.6 & The system shall allow administrators to inspect ingestion and AI proce
 
 FR-6.7 & The system shall maintain an immutable audit log for role assignments, sensitive data changes, and HTTP request events, queryable by administrators for security and compliance review. & IT Administrators & UR-ITA-03 & Yes & Yes & High \\ \hline
 
-FR-6.8 & The system shall produce organisation-scoped Career Readiness snapshots that aggregate pathway-level learner outcomes with drill-down to individual progress while excluding per-interview rubric details. & Educational Managers & UR-MGR-03 & Yes & Yes & Low \\
+FR-6.8 & The system shall produce organisation-scoped Career Readiness snapshots that aggregate pathway-level learner outcomes with drill-down to individual progress while excluding per-interview rubric details. & Educational Managers & UR-MGR-03 & Yes & Yes & Low \\ \hline
 
+FR-6.9 & The system shall let each user maintain notification preferences as a matrix of category against delivery channel in which a preference is enabled unless explicitly disabled, shall consult the recipient's preference for the relevant category before sending an e-mail, shall always create the in-app notification, and shall deliver e-mail asynchronously so that no request depends upon mail delivery. & All Users & UR-STU-04, UR-ITA-05 & Yes & Yes & Medium \\
+
+\end{longtable}
+
+
+% ============================ Module 7: Learning Programs & Path Governance ====================
+\paragraph{Learning Programs and Path Governance}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.05\textwidth}|m{0.29\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Functional Requirements for Learning Programs \& Path Governance}
+\label{tab:fr_programs} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endfirsthead
+
+\multicolumn{7}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endhead
+
+\hline \multicolumn{7}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+FR-7.1 & The system shall allow Faculty Deans and Educational Managers to define a learning programme within a faculty of their own organisation as an ordered selection of published career pathways, and shall reject any pathway that is unpublished, archived, or owned by another organisation. & Faculty Deans, Educational Managers & UR-MGR-02 & Yes & Yes & High \\ \hline
+
+FR-7.2 & The system shall manage a learning programme through draft, published, and archived states, shall refuse publication when the programme has no draft version, no attached pathway, or a pathway that has since become unavailable, and shall treat an archived programme as immutable and closed to enrolment. & Faculty Deans, Educational Managers & UR-MGR-02 & Yes & Yes & High \\ \hline
+
+FR-7.3 & The system shall version a learning programme, creating a new draft version rather than modifying a published one, shall carry forward the pathway selection with each pathway pinned to a specific published pathway version, and shall retain every enrolled student on the programme version they enrolled upon. & Faculty Deans, Educational Managers & UR-MGR-02 & Yes & Yes & High \\ \hline
+
+FR-7.4 & The system shall allow authorised operators to enrol Students into a published learning programme individually or by comma-separated file import, creating accounts for unknown e-mail addresses, reporting per-row failures without aborting the batch, de-duplicating repeated addresses, and reinstating a previously withdrawn student rather than duplicating the enrolment. & Faculty Deans, Educational Managers & UR-MGR-01 & Yes & Yes & High \\ \hline
+
+FR-7.5 & The system shall enforce an organisation-configurable ceiling on the number of learning-programme enrolments a Student may hold concurrently, and shall reject an enrolment that would exceed it, reporting the limit and the current count. & Faculty Deans, Educational Managers & UR-MGR-01, UR-MGR-04 & Yes & Yes & Medium \\ \hline
+
+FR-7.6 & The system shall require an enrolled Student to select exactly one initial career pathway from those pinned in their programme version, shall grant pathway access at the pinned version, and shall permit that initial selection only once. & Students & UR-STU-01 & Yes & Yes & High \\ \hline
+
+FR-7.7 & The system shall allow a Student with an active enrolment to request a change of career pathway with a mandatory justification, shall permit at most one open request per enrolment, shall reject a request targeting the current pathway or a pathway outside the enrolled programme version, and shall refuse a request once the Student has exhausted the switch allowance defined by their programme version. & Students & UR-STU-01 & Yes & Yes & Medium \\ \hline
+
+FR-7.8 & The system shall progress a pathway-change request through pending, acknowledged, approved, rejected, cancelled, and invalidated states, shall restrict the decision to a Faculty Dean owning the programme, shall forbid a reviewer from deciding a request concerning their own enrolment, and shall require a rejection to cite a reason drawn from a fixed vocabulary with supporting detail whenever the reason is recorded as other. & Faculty Deans, Students & UR-MGR-03 & Yes & Yes & Medium \\ \hline
+
+FR-7.9 & The system shall, upon approving a pathway change, capture a snapshot of the outgoing attempt's completed courses and overall progress, close that attempt, open a new attempt pinned to the target pathway version, carry over access to courses shared by both pathways while releasing access that is no longer justified, and count the change against the Student's switch allowance. & Faculty Deans, Students & UR-MGR-03, UR-STU-01 & Yes & Yes & High \\ \hline
+
+FR-7.10 & The system shall preserve a Student's earned course completions as immutable awards that survive a pathway change, so that results already achieved continue to count towards the new pathway. & Students & UR-STU-01 & Yes & Yes & High \\ \hline
+
+FR-7.11 & The system shall allow authorised operators to withdraw a Student from a learning programme with a mandatory reason, shall refuse to withdraw a completed enrolment, and shall cancel any open pathway-change request as part of the withdrawal. & Faculty Deans, Educational Managers & UR-MGR-01 & Yes & Yes & Medium \\ \hline
+
+FR-7.12 & The system shall notify a Student when their pathway-change request is acknowledged, approved, or rejected, and shall notify the owning Faculty Deans when a request is filed. & Students, Faculty Deans & UR-STU-04, UR-MGR-03 & Yes & Yes & Medium \\ \hline
+
+FR-7.13 & The system shall complete a Student's programme enrolment once every course of their pinned pathway version is satisfied. & Students & UR-STU-01 & Yes & Yes & Medium \\
+\end{longtable}
+
+
+% ============================ Module 8: Platform Configuration & Policy Documents ====================
+\paragraph{Platform Configuration and Policy Documents}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.05\textwidth}|m{0.29\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Functional Requirements for Platform Configuration \& Policy Documents}
+\label{tab:fr_config} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endfirsthead
+
+\multicolumn{7}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
+\endhead
+
+\hline \multicolumn{7}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+FR-8.1 & The system shall expose a catalogue of runtime-tunable settings, each declaring its key, grouping, data type, default value, description, and permitted range, so that authorised administrators may retune system behaviour without a redeployment. & IT Administrators & UR-ITA-03 & Yes & Yes & Medium \\ \hline
+
+FR-8.2 & The system shall resolve the effective value of every setting by a fixed precedence of organisation override, deployment-wide override, environment configuration, and code default, and shall report all candidate values alongside the effective value and its source. & IT Administrators, Educational Managers & UR-ITA-03 & Yes & Yes & Medium \\ \hline
+
+FR-8.3 & The system shall allow an authorised administrator to preview a pending configuration change as a validated dry run reporting the current and proposed values and the scope affected, before any change is applied. & IT Administrators & UR-ITA-03 & Yes & Yes & Medium \\ \hline
+
+FR-8.4 & The system shall require a written reason for every configuration change and shall record each application, clearance, and rollback in an append-only change history identifying the setting, the scope, the previous and new values, and the acting administrator. & IT Administrators & UR-ITA-03 & Yes & Yes & Medium \\ \hline
+
+FR-8.5 & The system shall allow an authorised administrator to roll back a recorded configuration change, restoring the value it replaced or removing the override so that the next precedence layer resumes, and shall record the rollback as a new history entry rather than rewriting history. & IT Administrators & UR-ITA-03 & Yes & Yes & Medium \\ \hline
+
+FR-8.6 & The system shall continue to operate on environment configuration and code defaults when a stored setting is unreachable or no longer satisfies its declared constraints, and shall not fail the calling operation. & IT Administrators & UR-ITA-03 & Yes & Yes & Medium \\ \hline
+
+FR-8.7 & The system shall maintain policy documents, each classified as legal or academic, whose content is held in independently numbered versions progressing from draft to published, so that re-issuing a document never invalidates an existing reference to it. & IT Administrators & UR-ITA-05 & Yes & Yes & Low \\ \hline
+
+FR-8.8 & The system shall serve the index of published policies and the current text of any published policy without requiring authentication, shall substitute the English version when the requested language is unavailable, and shall allow administrators to restrict a policy's audience to selected roles or leave it public. & All Users, IT Administrators & UR-ITA-05 & Yes & Yes & Low \\
 \end{longtable}
