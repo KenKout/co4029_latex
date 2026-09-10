@@ -135,6 +135,21 @@ TC-2.10.1 & FR-2.10 & System & Authorised manager updates a user's organisation 
 % --- FR-2.11: Enable or Disable User Accounts ---
 TC-2.11.1 & FR-2.11 & System & IT administrator disables a user account across tenant organisations & Disabled user can no longer access protected system resources & User records and historical activity remain preserved \\ \hline
 
+% --- FR-2.12: Faculty Structure Management ---
+TC-2.12.1 & FR-2.12 & System & Authorised administrator creates a faculty, renames it, then archives it together with its subordinate units & Faculty is created, renamed and archived with its subordinate units, and the organisation's units are viewable both as a flat list and as a nested tree carrying descendant counts & Archiving is refused when the caller lacks organisation-unit management permission \\ \hline
+
+% --- FR-2.13: Faculty Staff Affiliation ---
+TC-2.13.1 & FR-2.13 & System & Faculty Dean grants faculty staff affiliation to several users in one bulk operation, then revokes one & All selected users become active staff of the faculty in a single operation, and the revoked user is no longer active staff; affiliation alone grants no additional role & The operation is rejected when any selected user belongs to another organisation \\ \hline
+
+% --- FR-2.13: Faculty Staffing Gates Course Staffing ---
+TC-2.13.2 & FR-2.13 & System & Manager assigns a teacher to a course whose owning faculty the teacher is not active staff of & Assignment is refused and the course's teacher list is unchanged & System reports that the teacher is not staff of the course's faculty \\ \hline
+
+% --- FR-2.14: Course Invitation Codes ---
+TC-2.14.1 & FR-2.14 & System & Educational Manager issues a course invitation code with a maximum use count and an expiry date, amends it, then revokes it & Code is issued with the configured limits, the amendment takes effect for subsequent uses, and the revoked code stops working while its record is retained for audit & Redemption is refused once the code is expired, exhausted or revoked \\ \hline
+
+% --- FR-2.15: Course Enrolment Lifecycle ---
+TC-2.15.1 & FR-2.15 & System & Manager unenrols an active student from a course, then re-enrols the same student & Unenrolment is recorded as a dropped enrolment rather than deleted, and the re-enrolment reactivates the existing record with its origin preserved & A duplicate enrolment row is never created for a student already recorded on the course \\ \hline
+
 \end{longtable}
 
 
@@ -198,6 +213,27 @@ TC-3.7.1 & FR-3.7 & System & Enrolled student browses published courses and open
 
 % --- FR-3.8: Administrative Course Inspection ---
 TC-3.8.1 & FR-3.8 & System & IT administrator opens course processing history and aggregate statistics & System displays processing jobs, status history, and aggregate course statistics & Access is denied to users without administrative permission \\ \hline
+
+% --- FR-3.9: Course Staffing with Multiple Titles ---
+TC-3.9.1 & FR-3.9 & System & Authorised manager assigns two Course Instructors and one Teaching Assistant, grants a single teacher both titles, then re-assigns an already active teacher & Course carries multiple instructors and assistants, the dual-title teacher holds both on one assignment, the redundant re-assignment is treated as no change, and each newly assigned teacher is notified & Revoking an assignment expires it rather than deleting it, so the history remains \\ \hline
+
+% --- FR-3.10: Pre-publication Readiness Checklist ---
+TC-3.10.1 & FR-3.10 & System & Manager opens the readiness checklist for a course staffed below the configured minimum teacher count & Checklist reports staffing against the configured minimum and maximum, the number of gradeable curriculum units, and whether learning outcomes are present & Checklist is unavailable to a caller without course-management permission \\ \hline
+
+% --- FR-3.11: Course Cloning at Selectable Depth ---
+TC-3.11.1 & FR-3.11 & System & Authorised manager clones a published course selecting the shell together with the module skeleton and module prerequisites & A draft copy is created with a uniquely generated slug carrying the selected depth of content, and module prerequisites are preserved & Learner runtime data such as enrolments, attempts and grades is excluded from the copy \\ \hline
+
+% --- FR-3.12: Lesson Knowledge Map ---
+TC-3.12.1 & FR-3.12 & System & Teacher opens the knowledge map derived from a lesson's ingested materials, curates it, and publishes it & Concepts and relationships are derived from the lesson's materials, the curated map is saved, and Students see the map only after publication & An unpublished map is not exposed to Students \\ \hline
+
+% --- FR-3.13: Material Preprocessing and Quarantine ---
+TC-3.13.1 & FR-3.13 & System & Teacher selects a text-preprocessing mode for a material whose extraction yields units unsafe to index & Unsafe units are quarantined with the reason and the number of occurrences, the Teacher may restore or confirm each one, and a preview of the resulting content chunks is available & Quarantined units are never indexed until the Teacher resolves them \\ \hline
+
+% --- FR-3.14: Ingestion Recovery ---
+TC-3.14.1 & FR-3.14 & System & A processing job is left pending with no live background task and an upload is abandoned midway & The stranded job is reconciled, abandoned generation runs are finalised, and orphaned uploads are removed by the periodic sweep & Recovery never re-runs work that has already completed successfully \\ \hline
+
+% --- FR-3.15: Lesson Discussion Topics ---
+TC-3.15.1 & FR-3.15 & System & Course manager opens a discussion topic on a lesson, an enrolled Student comments, then the manager closes the topic & Topic is created and editable by the manager, the enrolled Student's comment is posted, and the closed topic accepts no further Student comments while managers may still post & A user who is not enrolled and cannot manage the course receives not-found rather than a permission error \\ \hline
 
 \end{longtable}
 
@@ -264,6 +300,36 @@ TC-4.7.1 & FR-4.7 & System & Teacher opens learning-loop analytics for a course 
 % --- FR-4.8: Student Learning Dashboard ---
 TC-4.8.1 & FR-4.8 & System & Student opens personal learning dashboard & System displays due cards, retention estimate, progression readiness, and course-level progress & Dashboard handles courses with no due cards gracefully \\ \hline
 
+% --- FR-4.9: Manual Grading Queue ---
+TC-4.9.1 & FR-4.9 & System & Student submits an attempt containing a code answer and a short-answer response that fails exact-match grading & Both answers are routed into the per-quiz manual grading queue, the attempt score is withheld while any answer is unmarked, and the score and pass decision are recomputed once every answer carries a mark & The attempt cannot be reported as graded while an unmarked answer remains \\ \hline
+
+% --- FR-4.10: Grade of Record ---
+TC-4.10.1 & FR-4.10 & System & Student completes several attempts on a quiz whose grading method is highest attempt, and a Teacher then regrades one of them & A single grade of record is derived by the configured method, refreshed after the regrade, and shown in the Teacher's gradebook & Changing the grading method never rewrites the stored attempts themselves \\ \hline
+
+% --- FR-4.11: Answer-key Correction ---
+TC-4.11.1 & FR-4.11 & System & Teacher corrects an answer key and requests a dry run before committing & Dry run reports every changed answer and the number of affected attempts, and the correction is applied only on explicit commit, recomputing affected scores and recording the operation for audit & No score changes while the correction remains an uncommitted dry run \\ \hline
+
+% --- FR-4.12: Assessment Accommodations ---
+TC-4.12.1 & FR-4.12 & System & Teacher grants a per-student accommodation extending the time limit where a conflicting per-group accommodation already exists, and the Student then starts an attempt & Accommodations resolve by student-over-group-over-quiz precedence and the resolved policy governs the attempt's window, due date, time limit, attempt ceiling, retake permission and cooldown & An accommodation belonging to another quiz is never applied \\ \hline
+
+% --- FR-4.13: Score-band Feedback ---
+TC-4.13.1 & FR-4.13 & System & Teacher defines score bands mapping percentage ranges to feedback messages, and a Student reviews a completed attempt & The band matching the Student's score is shown on attempt review & Feedback is withheld whenever the score itself is not disclosed to the Student \\ \hline
+
+% --- FR-4.14: Curated Question Bank ---
+TC-4.14.1 & FR-4.14 & System & Teacher copies existing questions into the course question bank, edits an approved item, then imports from the bank into a quiz & Duplicates are skipped rather than rejected during the copy, editing an approved item demotes it to draft, and only approved items are admitted when importing into a quiz & An archived item is never offered for import \\ \hline
+
+% --- FR-4.15: Question Interchange Import and Export ---
+TC-4.15.1 & FR-4.15 & System & Teacher imports a Moodle GIFT file and a Moodle XML file, then bulk-approves the results and bulk-assigns an expected response time & Questions are imported from both formats as pending review, bulk approval and bulk expected-time assignment apply to the selection, and questions export back to both formats & A malformed interchange file is rejected with the offending entry identified \\ \hline
+
+% --- FR-4.16: Quiz Integrity Signals ---
+TC-4.16.1 & FR-4.16 & System & Student loses window focus, switches tab and exits full screen during an in-progress attempt & Each signal is recorded in the append-only integrity store without interrupting the attempt, the Student is informed that monitoring is active, and the Teacher sees the resulting timeline beside the assessment audit trail & Signals reported after the attempt has ended are refused \\ \hline
+
+% --- FR-4.17: Quiz Item Analysis ---
+TC-4.17.1 & FR-4.17 & System & Teacher opens item analysis for a quiz including one question answered identically by every student & Facility index and discrimination index are reported per question, with an explanation where discrimination cannot be computed, alongside per-student response reports & Reports download as structured data, comma-separated values or a spreadsheet without altering the underlying attempts \\ \hline
+
+% --- FR-4.18: Overdue Attempt Handling ---
+TC-4.18.1 & FR-4.18 & System & A timed attempt reaches its deadline without the Student submitting & The attempt is closed according to the quiz's overdue policy by grading the completed work, extending the deadline by the configured grace period, or abandoning the attempt without a grade & An attempt already submitted is never reopened or re-closed by the sweep \\ \hline
+
 \end{longtable}
 
 
@@ -329,6 +395,12 @@ TC-5.7.2 & FR-5.7 & System & Teacher opens a completed interview session & Teach
 % --- FR-5.8: Session Integrity Signals ---
 TC-5.8.1 & FR-5.8 & System & Student switches tabs, exits fullscreen, or changes browser focus during interview & System records session activity signals for post-session integrity review & Integrity signals do not directly expose private non-session content \\ \hline
 
+% --- FR-5.9: Interview Question Bank and Variants ---
+TC-5.9.1 & FR-5.9 & System & Teacher adds a question to the course interview bank that closely resembles an existing one, then generates sibling variants & Near-duplicates are detected before the question is added, sibling variants are grouped under one logical question covering complementary angles, and variants require Teacher approval before use & An unapproved variant is never served in a published interview \\ \hline
+
+% --- FR-5.10: Interview Gap Report ---
+TC-5.10.1 & FR-5.10 & System & Student completes an interview session and both Student and Teacher open the resulting gap report & Report summarises observed discrepancies with an actionable study plan of topics linked to the relevant lessons and suggested resources, and the Teacher may attach remediation notes & Criterion-level scores and internal assessment rationale are withheld from the Student \\ \hline
+
 \end{longtable}
 
 
@@ -392,9 +464,151 @@ TC-6.7.1 & FR-6.7 & System & IT administrator queries audit log by actor, event 
 % --- FR-6.8: Career Readiness Snapshots ---
 TC-6.8.1 & FR-6.8 & System & Educational Manager opens Career Readiness report for a pathway & System displays organisation-scoped pathway outcomes and drill-down to individual progress & Per-interview rubric details are excluded from the manager report \\ \hline
 
+% --- FR-6.9: Notification Preference Matrix ---
+TC-6.9.1 & FR-6.9 & System & User disables one notification category for the e-mail channel, and an event in that category is then raised & Preferences behave as a category-against-channel matrix enabled unless explicitly disabled, the in-app notification is always created, and the recipient's preference is consulted before any e-mail is sent & E-mail is delivered asynchronously so that no request depends upon mail delivery \\ \hline
+
 \end{longtable}
 
 % ============================ Non-Functional Requirement Test Cases ====================
+
+% ============================ Module 7: Learning Programs & Path Governance ====================
+\paragraph{Learning Programs and Path Governance}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.06\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.10\textwidth}|m{0.20\textwidth}|m{0.22\textwidth}|m{0.23\textwidth}|}
+\caption{Test Cases: Learning Programs \& Path Governance}
+\label{tab:tc_programs} \\
+\hline
+\textbf{ID} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.08\textwidth}|}{\textbf{Req}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.10\textwidth}|}{\textbf{Level}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.20\textwidth}|}{\textbf{Input}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Expected Result}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.23\textwidth}|}{\textbf{Exception}} \\
+\hline
+\endfirsthead
+
+\multicolumn{6}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.08\textwidth}|}{\textbf{Req}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.10\textwidth}|}{\textbf{Level}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.20\textwidth}|}{\textbf{Input}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Expected Result}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.23\textwidth}|}{\textbf{Exception}} \\
+\hline
+\endhead
+
+\hline \multicolumn{6}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+% --- FR-7.1: Learning Programme Definition ---
+TC-7.1.1 & FR-7.1 & System & Faculty Dean defines a learning programme within a faculty of their own organisation as an ordered selection of published career pathways & Programme is created with the selected pathways in the chosen order & A pathway that is unpublished, archived, or owned by another organisation is rejected \\ \hline
+
+% --- FR-7.2: Programme Lifecycle ---
+TC-7.2.1 & FR-7.2 & System & Faculty Dean attempts to publish a programme with no attached pathway, then publishes it after attaching one, and finally archives it & Publication is refused while the programme has no draft version or no attached pathway, succeeds once a valid pathway is attached, and the archived programme becomes immutable and closed to enrolment & Publication is refused when an attached pathway has since become unavailable \\ \hline
+
+% --- FR-7.3: Programme Versioning ---
+TC-7.3.1 & FR-7.3 & System & Faculty Dean edits a published programme and publishes the resulting version while students are enrolled on the previous one & A new draft version is created rather than modifying the published one, the pathway selection carries forward with each pathway pinned to a specific published pathway version, and enrolled students remain on the version they enrolled upon & A published version can never be edited in place \\ \hline
+
+% --- FR-7.4: Programme Enrolment and Import ---
+TC-7.4.1 & FR-7.4 & System & Authorised operator imports a comma-separated file containing a new address, a repeated address, a previously withdrawn student and a malformed row & Unknown addresses create accounts, repeats are de-duplicated, the withdrawn student is reinstated rather than duplicated, and the malformed row is reported without aborting the batch & Per-row failures are reported individually with the offending row identified \\ \hline
+
+% --- FR-7.5: Concurrent Enrolment Ceiling ---
+TC-7.5.1 & FR-7.5 & System & Operator enrols a Student who already holds the organisation's maximum number of concurrent programme enrolments & The enrolment is rejected and the response reports both the configured limit and the Student's current count & The ceiling is enforced per row so that a file import cannot bypass it \\ \hline
+
+% --- FR-7.6: Initial Pathway Selection ---
+TC-7.6.1 & FR-7.6 & System & Enrolled Student selects an initial career pathway from those pinned in their programme version, then attempts to select a second time & Exactly one pathway is selected, access is granted at the pinned version, and the second attempt is refused & A pathway outside the Student's pinned programme version cannot be selected \\ \hline
+
+% --- FR-7.7: Pathway Change Request ---
+TC-7.7.1 & FR-7.7 & System & Active Student files a pathway-change request with a justification, then files a second while the first is still open & The first request is accepted with its mandatory justification recorded and the second is refused, since at most one request may be open per enrolment & A request targeting the current pathway, a pathway outside the programme version, or one filed after the switch allowance is exhausted is rejected \\ \hline
+
+% --- FR-7.8: Pathway Change Review ---
+TC-7.8.1 & FR-7.8 & System & Faculty Dean owning the programme rejects a pending request citing a reason of other, and a second Dean attempts to decide a request concerning their own enrolment & Request progresses through its states and the rejection records a reason drawn from the fixed vocabulary with the supporting detail required for other & A reviewer deciding a request concerning their own enrolment is refused, as is a Dean who does not own the programme \\ \hline
+
+% --- FR-7.9: Pathway Change Approval Effects ---
+TC-7.9.1 & FR-7.9 & System & Faculty Dean approves a pathway change for a Student holding progress in courses shared by both pathways and in one unique to the old pathway & The outgoing attempt is snapshotted and closed, a new attempt is opened pinned to the target pathway version, access to shared courses carries over, access no longer justified is released, and the change counts against the switch allowance & Approval is refused when the active pathway has changed since the request was filed \\ \hline
+
+% --- FR-7.10: Completion Awards Survive a Change ---
+TC-7.10.1 & FR-7.10 & System & Student who has completed a course in the old pathway has a pathway change approved, where the same course also appears in the new pathway & The earned completion is preserved as an immutable award and continues to count towards the new pathway & A pathway change never removes or recalculates an award already earned \\ \hline
+
+% --- FR-7.11: Programme Withdrawal ---
+TC-7.11.1 & FR-7.11 & System & Authorised operator withdraws an active Student who has an open pathway-change request, then attempts to withdraw a completed enrolment & The active withdrawal succeeds with its mandatory reason recorded and cancels the open request as part of the operation & Withdrawal of a completed enrolment is refused \\ \hline
+
+% --- FR-7.12: Pathway Change Notifications ---
+TC-7.12.1 & FR-7.12 & System & Student files a pathway-change request which the owning Faculty Dean then acknowledges and approves & The owning Faculty Deans are notified when the request is filed, and the Student is notified when it is acknowledged, approved or rejected & A notification failure never prevents the request or the decision from being recorded \\ \hline
+
+% --- FR-7.13: Programme Completion ---
+TC-7.13.1 & FR-7.13 & System & Student satisfies the final outstanding course of their pinned pathway version & The pathway attempt and the programme enrolment are both completed & Completion is evaluated against the exact pathway version pinned to the attempt, not the pathway's current head \\ \hline
+
+\end{longtable}
+
+
+% ============================ Module 8: Platform Configuration & Policy Documents ====================
+\paragraph{Platform Configuration and Policy Documents}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|>{\centering\arraybackslash}m{0.06\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.10\textwidth}|m{0.20\textwidth}|m{0.22\textwidth}|m{0.23\textwidth}|}
+\caption{Test Cases: Platform Configuration \& Policy Documents}
+\label{tab:tc_platform} \\
+\hline
+\textbf{ID} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.08\textwidth}|}{\textbf{Req}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.10\textwidth}|}{\textbf{Level}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.20\textwidth}|}{\textbf{Input}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Expected Result}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.23\textwidth}|}{\textbf{Exception}} \\
+\hline
+\endfirsthead
+
+\multicolumn{6}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{ID} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.08\textwidth}|}{\textbf{Req}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.10\textwidth}|}{\textbf{Level}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.20\textwidth}|}{\textbf{Input}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.22\textwidth}|}{\textbf{Expected Result}} &
+\multicolumn{1}{>{\centering\arraybackslash}m{0.23\textwidth}|}{\textbf{Exception}} \\
+\hline
+\endhead
+
+\hline \multicolumn{6}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+% --- FR-8.1: Runtime Settings Catalogue ---
+TC-8.1.1 & FR-8.1 & System & Authorised administrator opens the catalogue of runtime-tunable settings & Each setting declares its key, grouping, data type, default value, description and permitted range, so behaviour can be retuned without a redeployment & A value outside a setting's declared range is refused \\ \hline
+
+% --- FR-8.2: Setting Resolution Precedence ---
+TC-8.2.1 & FR-8.2 & System & Administrator inspects a setting that carries both an organisation override and a deployment-wide override & The effective value resolves by the fixed precedence of organisation override, deployment-wide override, environment configuration and code default, and every candidate value is reported alongside the effective value and its source & Removing an override causes the next precedence layer to resume \\ \hline
+
+% --- FR-8.3: Configuration Change Preview ---
+TC-8.3.1 & FR-8.3 & System & Administrator previews a pending configuration change before applying it & A validated dry run reports the current value, the proposed value and the scope affected, and nothing is applied & An invalid proposed value is reported at preview rather than on application \\ \hline
+
+% --- FR-8.4: Configuration Change History ---
+TC-8.4.1 & FR-8.4 & System & Administrator applies a setting change, supplying a written reason & The change is recorded in an append-only history identifying the setting, the scope, the previous and new values and the acting administrator & A change submitted without a written reason is refused \\ \hline
+
+% --- FR-8.5: Configuration Rollback ---
+TC-8.5.1 & FR-8.5 & System & Administrator rolls back a recorded configuration change & The replaced value is restored, or the override removed so that the next precedence layer resumes, and the rollback is recorded as a new history entry & Rollback never rewrites or removes the original history entry \\ \hline
+
+% --- FR-8.6: Settings Fallback ---
+TC-8.6.1 & FR-8.6 & System & A stored setting becomes unreachable or no longer satisfies its declared constraints while an operation is in progress & The system continues on environment configuration and code defaults and the calling operation succeeds & The unusable stored value is never applied \\ \hline
+
+% --- FR-8.7: Policy Document Versioning ---
+TC-8.7.1 & FR-8.7 & System & Administrator publishes a policy version, then opens and publishes a further version of the same document & Content is held in independently numbered versions progressing from draft to published, and re-issuing the document leaves every existing reference to it valid & A published version is frozen and cannot be edited in place \\ \hline
+
+% --- FR-8.8: Public Policy Access and Audience ---
+TC-8.8.1 & FR-8.8 & System & Signed-out visitor requests the policy index and a published policy in a language that has no published version, and an administrator restricts another policy's audience to selected roles & Both the index and the policy text are served without authentication, the English version is substituted where the requested language is unavailable, and the audience restriction filters the index & A policy reached by its own address still opens for a reader outside its audience \\ \hline
+
+\end{longtable}
+
 \paragraph{Non-Functional Requirement Test Cases}
 
 \renewcommand{\arraystretch}{1.5}
