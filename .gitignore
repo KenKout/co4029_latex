@@ -85,3 +85,4 @@ Desktop.ini
 # Logs
 *.log
 _logs/
+compile.ps1
