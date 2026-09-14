@@ -3,12 +3,29 @@
 Traditional educational workflows rely heavily on manual 
 content creation, fixed assessment schedules, and uniform grading 
 criteria, creating systematic bottlenecks in delivering personalised, 
-competency-driven feedback at scale. aBridgeAI reengineers this 
-workflow through a four-stage AI-orchestrated process that separates 
-content preparation, knowledge validation, practical assessment, and 
-longitudinal reporting into distinct, traceable phases.
+competency-driven feedback at scale. aBridgeAI reengineers this
+workflow through a five-stage AI-orchestrated process that separates
+programme governance, content preparation, knowledge validation,
+practical assessment, and longitudinal reporting into distinct,
+traceable phases.
 
 \begin{enumerate}
+
+    \item \textbf{Programme Governance and Enrolment (Admission).}
+    Before any content is authored, the structures that give a course
+    its meaning must exist. Within a faculty, a Faculty Dean or an
+    Educational Manager defines a \textit{learning programme} that
+    bundles one or more career pathways --- the ordered, staged
+    sequences of courses that constitute a professional competency ---
+    and publishes it. Publication freezes a version: subsequent edits
+    open a new draft, so a student who enrolled under one version
+    continues to see the curriculum they joined. Authorised operators
+    then admit students, individually or by bulk import, subject to an
+    organisation-configurable ceiling on concurrent enrolments, and
+    each enrolled student pins exactly one career pathway. Enrolment is
+    what grants access to the courses that Stages~2 through~4 operate
+    upon; without it a student has no curriculum and the loop cannot
+    begin.
 
     \item \textbf{Content Ingestion (Preparation).}
     Teachers upload raw learning materials in supported formats 
@@ -55,18 +72,44 @@ longitudinal reporting into distinct, traceable phases.
     Rate $\rho_{s,\ell}$. These metrics are surfaced in per-student 
     and class-wide dashboard views accessible to both students and 
     teachers. At the career level, course completion percentages are 
-    aggregated into a Career Readiness score reported to the student 
-    and the organisation manager. Teachers are additionally notified 
-    of cohort-level patterns — including systematic retention gaps and 
-    declining compliance rates — enabling intervention at the content 
-    or configuration level rather than purely at the individual 
+    aggregated into a Career Readiness score reported to the student,
+    the Educational Manager, and the Faculty Dean who owns the
+    programme. Teachers are additionally notified
+    of cohort-level patterns — including systematic retention gaps and
+    declining compliance rates — enabling intervention at the content
+    or configuration level rather than purely at the individual
     student level.
+
+    Reporting also feeds a slower, governance-level response. A
+    student whose progression shows that they are on the wrong pathway
+    may request a change of career pathway with a written
+    justification; the Faculty Dean who owns the programme
+    acknowledges the request and then approves or rejects it against
+    the same progression evidence, and may never adjudicate their own.
+    An approval snapshots the progress earned on the outgoing pathway
+    and preserves completed courses as awards that carry across, so
+    that work shared between two pathways is credited once and never
+    repeated. The decision, and the reason behind it, are returned to
+    the student.
 
 \end{enumerate}
 
-The four stages form a closed feedback loop: content 
-ingestion informs quiz generation, quiz performance governs interview 
-access, interview outcomes determine lesson completion, and reporting 
-surfaces the gaps that guide both student remediation and teacher 
-reconfiguration of content and assessment criteria.
+The five stages form two nested feedback loops that turn at different
+speeds. The \textit{pedagogical loop} closes within a course: content
+ingestion informs quiz generation, quiz performance governs interview
+access, interview outcomes determine curriculum completion, and
+reporting surfaces the gaps that guide both student remediation and
+teacher reconfiguration of content and assessment criteria. It turns
+with every review session.
+
+The \textit{governance loop} closes around the programme and turns
+rarely. Enrolment in Stage~1 fixes the pathway a student is measured
+against; the reporting of Stage~5 evidences whether that pathway
+remains the right one; and a dean-adjudicated pathway change feeds
+back into Stage~1 by opening a new attempt under a different pathway,
+without discarding what the student has already earned. Separating the
+two matters because they fail differently: a defect in the
+pedagogical loop misjudges a single student's readiness on one lesson,
+whereas a defect in the governance loop misdirects an entire
+programme of study.
 
