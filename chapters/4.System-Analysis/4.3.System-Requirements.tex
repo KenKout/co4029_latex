@@ -128,7 +128,7 @@ Non-functional requirements define the quality attributes and operational constr
 \begin{itemize}
     \item Performance and latency targets ensure AI interview responses and core learning workflows remain responsive for users.
     \item Scalability and reliability requirements target modest peak concurrency while prioritising graceful degradation and uptime.
-    \item Security and compliance mandates cover encryption at rest, RBAC, audit logging, and session management.
+    \item Security and compliance mandates cover encryption at rest, RBAC, audit logging, session management, and the input and output guards that protect the AI interviewer against prompt injection and content leakage.
     \item Usability and accessibility requirements emphasise responsive UI and WCAG 2.1 AA alignment.
 \end{itemize}
 The complete Functional Requirements specification is provided in Appendix~\ref{appendix:nfr}.
@@ -154,6 +154,7 @@ The complete Functional Requirements specification is provided in Appendix~\ref{
 
 NFR-2.1 & The system shall support on average 50 concurrent active users, 10 simultaneous video streams, and 5 concurrent AI interview sessions during peak hours without performance degradation. & Admin & Medium \\ \hline
 NFR-3.1 & All sensitive data must be encrypted at rest using AES-256, including PII, session and refresh tokens, multi-factor authentication secrets and recovery codes, API keys, and uploaded learning materials. The platform stores no user passwords: authentication is delegated to an external identity provider, so no password hash is retained. & All Users, Admin & High \\ \hline
+NFR-3.5 & The system must screen learner input to the AI interviewer for prompt-injection attempts and must screen model output for leakage of protected content before it reaches the learner, blocking or degrading the turn rather than failing the session when a guard trips. & Students, Admin & High \\ \hline
 NFR-4.2 & The system must comply with WCAG 2.1 AA accessibility standards, supporting full keyboard navigation, sufficient color contrast ratios, and alt text for all visual elements. & Users with Disabilities & Low \\ \hline
 \end{longtable}
 
@@ -268,13 +269,61 @@ students encounter it, and the system must record prerequisite
 relationships at both module and lesson level.
 
 % ─────────────────────────────────────────────────────────────────────────────
+\paragraph{Course Provisioning and Self-Enrolment}
+
+A course need not be authored from an empty shell. Where a manager
+uploads an existing syllabus document, the system must retain each
+import attempt as a durable record in its own right: the uploaded file
+must remain addressable so that the original syllabus can be retrieved
+long after the import, the chosen parsing language and any parser
+warnings must be kept so that a course whose outcomes were renumbered
+can be explained rather than appearing as data loss, and failed
+attempts must be retained even though no course exists to attach them
+to. Import attempts are audit history rather than authored content and
+are therefore not soft-deleted; deleting an imported course must leave
+its import record and file intact.
+
+Alongside operator-driven enrolment, the system must support
+self-enrolment by invitation code. Each code is unique, belongs to one
+course within one organisation, and carries an optional expiry, an
+optional maximum number of uses, a running count of uses consumed, and
+an active flag. An enrolment created through a code must record the
+code that admitted it, so that intake can be attributed after the fact.
+
+% ─────────────────────────────────────────────────────────────────────────────
 \paragraph{Learning Material and Knowledge Ingestion}
 Teachers upload source materials — documents, videos, audio recordings, 
 and presentation files — as the raw input from which the system 
 generates structured learning content. The system must record the 
-identity of each uploaded file, its type, its storage location, its 
-association with a specific lesson, and the processing status of the 
+identity of each uploaded file, its type, its storage location, its
+association with a specific lesson, and the processing status of the
 AI ingestion pipeline acting upon it.
+
+A material is not a single file but a sequence of immutable
+\textit{versions}. Re-uploading produces a new revision rather than
+overwriting the previous one, so that content already cited by
+generated assessments remains retrievable. Visibility to students must
+be tracked separately from course publication state, so that a
+published course may still withhold an individual material.
+
+Before a version is indexed, a preprocessing cascade removes or
+de-prioritises material that would pollute the retrieval corpus —
+repeated headers and footers, boilerplate, and non-content pages. Each
+such removal must be \textit{quarantined} rather than discarded: the
+system records the unit removed, why it was removed, and how many
+times the pattern occurred, aggregating a footer repeated across three
+hundred pages into a single record rather than three hundred. A
+teacher may review the quarantine and restore a unit that was dropped
+in error, and that decision must survive re-ingestion — a restored
+page must not need restoring again after every re-upload. This is the
+one part of the derived corpus that is not rebuilt from scratch on
+reprocessing, precisely because it holds human judgement rather than
+machine output.
+
+The system must additionally record student \textit{engagement} with
+each material separately from lesson completion, since opening a
+document and discharging the lesson that contains it are distinct
+facts.
 
 The AI ingestion pipeline transforms raw uploads into a structured 
 knowledge representation. The system must store the resulting 
@@ -369,8 +418,46 @@ review of individual student trajectories.
 The SM-2 state for each student-card pair — comprising the current EF, 
 the current interval, the repetition count, and the next scheduled due 
 date — must be stored as an independent record isolated from all other 
-students. No student's scheduling state may be derived from or 
+students. No student's scheduling state may be derived from or
 influenced by the state of any peer on the same card.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\paragraph{Quiz Delivery, Grading, and the Grade of Record}
+
+Spaced-repetition state governs progression, but it is not the only
+record a quiz produces. A quiz is also a graded assessment, and the
+system must retain the data that makes that grade defensible.
+
+Per quiz, the system must capture the delivery policy: whether retakes
+are permitted and up to what maximum number of attempts, any cooldown
+between them, an optional time limit, the passing score expressed as a
+percentage, whether question order is randomised, and the handling of
+an attempt whose deadline passes without submission — automatic
+submission of the work completed, a grace period, or abandonment.
+
+Because a student may hold several attempts, the system must maintain
+a single \textit{grade of record} per student per quiz, derived from
+the attempts by the quiz's declared grading method: highest, first,
+last, or average. That record must store not only the resulting
+percentage and its pass flag but also the method applied, the attempt
+it was derived from where the method selects one, the number of
+attempts counted, and the time of computation — so that a grade can be
+explained without recomputing it.
+
+Not every answer can be marked mechanically. Code answers always, and
+short-answer or fill-in-the-blank answers whose exact-match grading
+fails, must be routed for manual marking, and the system must record
+the marker's identity and decision distinctly from an automatic one.
+Where a teacher subsequently corrects a question — a wrong answer key,
+an ambiguous stem — the system must support a \textit{regrade run}
+that re-evaluates the affected attempts as one auditable operation,
+retaining both the run and its per-attempt outcomes rather than
+silently mutating stored grades. The system must further allow
+per-student and per-group \textit{overrides} of the delivery policy,
+so that an accommodation such as extended time or additional attempts
+is recorded against the individual rather than by loosening the policy
+for the whole cohort, and must retain teacher feedback attached to a
+student's work.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \paragraph{Interview Configuration and Question Generation}
@@ -423,8 +510,51 @@ store the per-outcome verdict — met or not met — along with the
 model's internal reasoning for each verdict. The internal reasoning 
 is retained for audit and quality assurance purposes but is never 
 exposed to the student. The student-facing result is limited to a 
-binary pass or fail at the session level, with no rubric, no 
+binary pass or fail at the session level, with no rubric, no
 per-outcome breakdown, and no score.
+
+The system must additionally maintain the \textit{runtime state} of an
+in-progress adaptive interview as a durable record rather than in
+memory alone: the current phase, per-outcome coverage, the ledgers of
+questions asked, skipped, and completed, follow-up counters, and the
+most recent answer analysis. This record must carry a monotonic
+version counter so that a retried or duplicated client message
+carrying stale state is rejected and the interview cannot be advanced
+twice.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\paragraph{Assessment Integrity and AI Safety}
+
+Two distinct classes of risk attach to an assessment conducted through
+a conversational model, and each demands its own record.
+
+The first is \textit{academic integrity}. During a quiz or an
+interview the system must record session activity signals — loss of
+browser focus, tab switching, exit from full-screen, warnings issued
+to the student, and disconnections or reconnections — each classified
+by severity. These signals are evidence for post-session review by a
+teacher and must not by themselves invalidate a session: the system
+records what happened and leaves the academic judgement to a human.
+
+The second is \textit{adversarial use of the model itself}. Learner
+input to the AI interviewer must be screened for prompt-injection
+attempts, and model output must be screened for leakage of protected
+content — assessment criteria, other students' data, or the system
+instructions themselves — before it reaches the learner. Each guard
+decision must be recorded as an audit event capturing the session and
+conversational turn it applies to, the category of the attempt, the
+confidence band of the assessment, the action taken, a count of
+repeated attempts within the session, and the version of the guard
+policy in force. Two properties are mandatory. The event must be
+\textit{redacted}: it records a normalised fingerprint of the offending
+input sufficient to recognise a repeat, never the offending text
+itself, so that the audit trail cannot become a catalogue of working
+attacks. And it must be \textit{idempotent} for a given session, turn,
+and event type, so that a retried turn does not inflate the count of
+attempts and thereby misrepresent a student as a persistent offender.
+Where a guard trips, the system degrades the turn or blocks it and
+continues; a tripped guard must not fail the session and cost the
+student their attempt.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \paragraph{Progress Tracking and Career Readiness Reporting}
@@ -504,13 +634,28 @@ reminder notifications are only generated for lessons where the
 teacher has enabled the repetition reminder flag in the quiz 
 configuration.
 
-Additional notification types include lesson unlock events triggered 
-when a student satisfies the progression criteria, interview result 
-notifications delivered after AI assessment completes, and course 
-announcements initiated by teachers or managers. All notifications 
-must be associated with the entity that triggered them — card, lesson, 
-session, or course — to support deep-linking from the notification 
-to the relevant system view.
+Every notification is classified by \textit{category}, and the
+categories span more than the learning loop: spaced-repetition
+reminders, lesson unlock events, interview results, course
+announcements, system messages, material processing outcomes, quiz and
+interview generation outcomes, pathway-change review events, and
+course discussion activity. Authoring and operational categories
+matter as much as learner-facing ones, because a teacher whose
+ingestion or generation job failed must learn of it without polling a
+dashboard. All notifications must be associated with the entity that
+triggered them — card, lesson, session, course, or request — to
+support deep-linking from the notification to the relevant system
+view, and must carry a delivery status distinguishing pending, sent,
+failed, and cancelled.
+
+Notifications are delivered over more than one \textit{channel} — an
+in-application inbox and electronic mail — and the system must
+therefore maintain, per user, a preference matrix of category against
+channel, so that a user may silence announcements by mail while
+retaining them in the inbox. A category-channel pair with no stored
+preference must fall back to a defined default rather than to silence.
+The in-application inbox itself requires an unread count and
+mark-read and dismiss actions per notification.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \paragraph{AI Generation and Assessment Logging}
@@ -522,8 +667,24 @@ performance analysis. The log must capture the triggering actor and
 entity, the full prompt submitted to the model, the model identifier 
 and version, token counts for both input and output, estimated cost, 
 response latency, and the success or failure status of the call. 
-Where generation fails, the error detail must be retained to support 
+Where generation fails, the error detail must be retained to support
 retry logic and failure analysis.
+
+Token accounting must distinguish fresh input tokens from those served
+from a provider-side prompt cache, since the two are charged at
+different rates and conflating them misstates the cost of a pipeline
+that reuses a long system prompt.
+
+Cost itself is resolved against a \textit{pricing catalogue} that the
+system must maintain: one entry per model, recording the input and
+output rate per million tokens together with the administrator who
+last amended it. The catalogue holds current rates only and is edited
+in place; historical accuracy is preserved instead by freezing each
+call's estimated cost onto the call record at the time it is made, so
+that a later price change does not retroactively rewrite past spend.
+Aggregated cost telemetry must be reportable by user, by pipeline, and
+as a feed of recent calls, so that an administrator can attribute
+spend rather than only observe its total.
 
 Deduplication lock records must be maintained for generation jobs 
 that should not be triggered concurrently — specifically quiz 

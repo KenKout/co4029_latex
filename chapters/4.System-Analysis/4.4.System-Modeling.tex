@@ -240,6 +240,8 @@ This module focuses on transforming learned knowledge into applied interview per
 
 Students participate in mock interviews through text mode or voice mode. The system persists the interview transcript and session metadata, evaluates the student's responses against teacher-defined desired outcomes, and produces a binary pass-or-fail verdict. Students only see the final verdict, while Teachers can review the transcript and outcome-level assessment for remediation purposes. The module also records interview session activity signals to support post-session integrity review.
 
+Because the assessment is conducted through a conversational model, the module additionally guards the exchange in both directions: learner input is screened for prompt-injection attempts, and model output is screened for leakage of protected content before it reaches the learner. A tripped guard degrades or blocks the individual turn rather than failing the session, and each decision is written to a redacted audit trail that administrators may review without the record itself becoming a catalogue of working attacks.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.70\textwidth]{graphics/usecase-diagrams/mock_interview_usecase.png}
