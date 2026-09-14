@@ -810,3 +810,143 @@ This catalogue captures the live Swagger UI rendered by FastAPI from \texttt{/op
     \caption{Swagger UI --- Schemas --- part 3. Pydantic v2 schemas (final third).}
     \label{fig:swagger_19c_models_part3}
 \end{figure}
+
+% ────────────────────────────────────────────────────────────
+\subsection{Learning Programs}
+
+A learning programme bundles career paths into a single enrolment. Authoring is version-based: edits land on an open draft and publishing freezes it, so a student who enrolled under version~2 continues to see version~2. The change-request endpoints implement the dean-review workflow by which a student moves between paths without losing progress on courses the two paths share.
+
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{longtable}{|>{\raggedright\arraybackslash}m{0.07\textwidth}|>{\raggedright\arraybackslash}m{0.45\textwidth}|>{\raggedright\arraybackslash}m{0.38\textwidth}|}
+\caption{Learning Programs endpoints.}
+\label{tab:api_learning_programs} \\
+\hline
+\textbf{Method} & \textbf{Path} & \textbf{Purpose} \\ \hline
+\endfirsthead
+\multicolumn{3}{c}{{\bfseries Table \thetable\ -- Continued}} \\ \hline
+\textbf{Method} & \textbf{Path} & \textbf{Purpose} \\ \hline
+\endhead
+\hline
+\endfoot
+
+\texttt{GET} & \path|/management/learning-programs/options| & Faculties and career paths available when authoring, scoped to the manager's organisation. \\ \hline
+\texttt{POST} & \path|/management/learning-programs| & Create a programme as a draft version 1. \\ \hline
+\texttt{GET} & \path|/management/learning-programs| & List programmes the caller manages. \\ \hline
+\texttt{GET} & \path|/management/learning-programs/{program\_id}| & Programme detail with its current version and constituent paths. \\ \hline
+\texttt{GET} & \path|/management/learning-programs/{program\_id}/versions| & Version history; publishing freezes a version and opens the next draft. \\ \hline
+\texttt{GET} & \path|/management/learning-programs/{program\_id}/versions/{version\_id}| & One frozen version, as enrolled students see it. \\ \hline
+\texttt{PATCH} & \path|/management/learning-programs/{program\_id}| & Edit the open draft. A published version is immutable. \\ \hline
+\texttt{POST} & \path|/management/learning-programs/{program\_id}/publish| & Publish the draft; existing enrolments stay on the version they joined. \\ \hline
+\texttt{POST} & \path|/management/learning-programs/{program\_id}/archive| & Archive the programme; no new enrolments, existing ones continue. \\ \hline
+\texttt{GET} & \path|/management/learning-programs/{program\_id}/students| & Enrolment roster with each student's selected path and progress. \\ \hline
+\texttt{POST} & \path|/management/learning-programs/{program\_id}/students| & Enrol students individually; rejected as a whole if the concurrency cap would be exceeded. \\ \hline
+\texttt{POST} & \path|/management/learning-programs/{program\_id}/students/import-csv| & Bulk enrol from CSV; rows are validated and reported per row. \\ \hline
+\texttt{DELETE} & \path|/management/learning-programs/{program\_id}/students/{student\_id}| & Withdraw a student, releasing the course entitlements the programme granted. \\ \hline
+\texttt{GET} & \path|/management/learning-programs/{program\_id}/path-change-requests| & Pending and decided path-change requests for dean review. \\ \hline
+\texttt{POST} & \path|/management/learning-programs/path-change-requests/{request\_id}/in-progress| & Acknowledge a request so the student sees it is being considered. \\ \hline
+\texttt{POST} & \path|/management/learning-programs/path-change-requests/{request\_id}/approve| & Approve; transfers progress and re-grants entitlements for shared courses. \\ \hline
+\texttt{POST} & \path|/management/learning-programs/path-change-requests/{request\_id}/reject| & Reject with a reason, which the student sees. \\ \hline
+\texttt{GET} & \path|/me/learning-program-enrollments| & The student's own programme enrolments. \\ \hline
+\texttt{POST} & \path|/me/learning-program-enrollments/{enrollment\_id}/select-path| & Choose the initial career path within an enrolled programme. \\ \hline
+\texttt{POST} & \path|/me/learning-program-enrollments/{enrollment\_id}/path-change-requests| & Request a change of path; queued for dean review. \\ \hline
+\texttt{DELETE} & \path|/me/learning-program-enrollments/path-change-requests/{request\_id}| & Cancel one's own pending request before it is decided. \\ \hline
+
+\end{longtable}
+\normalsize
+
+
+% ────────────────────────────────────────────────────────────
+\subsection{Policies}
+
+Platform policies (terms, privacy, academic regulations) are authored under \path|/admin| and read under \path|/policies|. Versioning is copy-on-write --- a published version is immutable, and correcting it means opening a new draft --- so the text a reader agreed to can always be retrieved. Audience is a set of roles; an empty set means public, including signed-out visitors.
+
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{longtable}{|>{\raggedright\arraybackslash}m{0.07\textwidth}|>{\raggedright\arraybackslash}m{0.45\textwidth}|>{\raggedright\arraybackslash}m{0.38\textwidth}|}
+\caption{Policies endpoints.}
+\label{tab:api_policies} \\
+\hline
+\textbf{Method} & \textbf{Path} & \textbf{Purpose} \\ \hline
+\endfirsthead
+\multicolumn{3}{c}{{\bfseries Table \thetable\ -- Continued}} \\ \hline
+\textbf{Method} & \textbf{Path} & \textbf{Purpose} \\ \hline
+\endhead
+\hline
+\endfoot
+
+\texttt{GET} & \path|/policies| & Policies the reader is a party to, plus every public one. \\ \hline
+\texttt{GET} & \path|/policies/{slug}| & One published policy by slug, subject to the audience filter. \\ \hline
+\texttt{GET} & \path|/admin/policies| & All policies, published or not, for authoring. \\ \hline
+\texttt{POST} & \path|/admin/policies| & Create a policy; version 1 opens as a draft. \\ \hline
+\texttt{GET} & \path|/admin/policies/{policy\_id}| & Policy detail with its version history and audience. \\ \hline
+\texttt{POST} & \path|/admin/policies/{policy\_id}/versions| & Open the next draft, seeded copy-on-write from the published text. \\ \hline
+\texttt{GET} & \path|/admin/policies/{policy\_id}/versions/{version\_id}| & One version with its body, for the editor. \\ \hline
+\texttt{PATCH} & \path|/admin/policies/{policy\_id}/versions/{version\_id}| & Edit the open draft; a published version is frozen. \\ \hline
+\texttt{POST} & \path|/admin/policies/{policy\_id}/versions/{version\_id}/publish| & Publish a draft and retire the version it supersedes. \\ \hline
+\texttt{PUT} & \path|/admin/policies/{policy\_id}/audience| & Replace the audience. An empty list makes the policy public. \\ \hline
+
+\end{longtable}
+\normalsize
+
+
+% ────────────────────────────────────────────────────────────
+\subsection{Discussions}
+
+Discussion topics are opened by course managers and answered by enrolled students. A topic is scoped either to one lesson or to the course as a whole; both use the same comment, moderation and notification paths, which is why the two create endpoints differ only in their parent resource. Replies carry a parent comment, which is also what determines who is notified.
+
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{longtable}{|>{\raggedright\arraybackslash}m{0.07\textwidth}|>{\raggedright\arraybackslash}m{0.45\textwidth}|>{\raggedright\arraybackslash}m{0.38\textwidth}|}
+\caption{Discussions endpoints.}
+\label{tab:api_discussions} \\
+\hline
+\textbf{Method} & \textbf{Path} & \textbf{Purpose} \\ \hline
+\endfirsthead
+\multicolumn{3}{c}{{\bfseries Table \thetable\ -- Continued}} \\ \hline
+\textbf{Method} & \textbf{Path} & \textbf{Purpose} \\ \hline
+\endhead
+\hline
+\endfoot
+
+\texttt{GET} & \path|/lessons/{lesson\_id}/discussion/topics| & Topics on a lesson, for enrolled students and course managers. \\ \hline
+\texttt{POST} & \path|/lessons/{lesson\_id}/discussion/topics| & Open a topic on a lesson (course managers only). \\ \hline
+\texttt{GET} & \path|/courses/{course\_id}/discussion/topics| & Course-wide topics, for enrolled students and course managers. \\ \hline
+\texttt{POST} & \path|/courses/{course\_id}/discussion/topics| & Open a course-wide topic (course managers only). \\ \hline
+\texttt{PATCH} & \path|/discussion/topics/{topic\_id}| & Edit a topic or toggle it open/closed (course managers only). \\ \hline
+\texttt{DELETE} & \path|/discussion/topics/{topic\_id}| & Soft-delete a topic and its comments (course managers only). \\ \hline
+\texttt{GET} & \path|/discussion/topics/{topic\_id}/comments| & Comments on a topic, oldest first. \\ \hline
+\texttt{POST} & \path|/discussion/topics/{topic\_id}/comments| & Post a comment, or a reply when a parent comment is named. \\ \hline
+\texttt{PATCH} & \path|/discussion/comments/{comment\_id}| & Edit one's own comment body. \\ \hline
+\texttt{DELETE} & \path|/discussion/comments/{comment\_id}| & Soft-delete a comment (author, or a manager moderating). \\ \hline
+
+\end{longtable}
+\normalsize
+
+
+% ────────────────────────────────────────────────────────────
+\subsection{Course Invitation Codes}
+
+An invitation code lets a student self-enrol onto a course without a manager adding them individually. Codes carry an optional expiry and usage limit; revoking a code stops further redemptions but does not withdraw anyone already enrolled through it.
+
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{longtable}{|>{\raggedright\arraybackslash}m{0.07\textwidth}|>{\raggedright\arraybackslash}m{0.45\textwidth}|>{\raggedright\arraybackslash}m{0.38\textwidth}|}
+\caption{Course Invitation Codes endpoints.}
+\label{tab:api_invitation_codes} \\
+\hline
+\textbf{Method} & \textbf{Path} & \textbf{Purpose} \\ \hline
+\endfirsthead
+\multicolumn{3}{c}{{\bfseries Table \thetable\ -- Continued}} \\ \hline
+\textbf{Method} & \textbf{Path} & \textbf{Purpose} \\ \hline
+\endhead
+\hline
+\endfoot
+
+\texttt{GET} & \path|/management/courses/{course\_id}/invitation-codes| & Codes issued for a course, with their use counts and expiry. \\ \hline
+\texttt{POST} & \path|/management/courses/{course\_id}/invitation-codes| & Issue a code that self-enrols its redeemer onto the course. \\ \hline
+\texttt{PATCH} & \path|/management/invitation-codes/{code\_id}| & Adjust a code's expiry or usage limit. \\ \hline
+\texttt{DELETE} & \path|/management/invitation-codes/{code\_id}| & Revoke a code; enrolments already made are unaffected. \\ \hline
+
+\end{longtable}
+\normalsize

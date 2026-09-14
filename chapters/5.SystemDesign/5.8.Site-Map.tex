@@ -8,7 +8,7 @@
 
 The application is a single-page web client built with \textbf{Vite} and \textbf{TanStack Router}, served as a static bundle from a CDN and consuming the FastAPI backend over HTTPS. All authenticated routes are nested under a single \texttt{authenticatedRoute} parent that enforces a session check and an MFA gate before any child route is allowed to mount; deep-linked routes round-trip through \path|/login| with a \path|next| query parameter so users land back on the originally requested URL after authentication.
 
-Figure~\ref{fig:sitemap} summarises the full route tree, organised by the five role groups exposed by the platform: \textit{Public}, \textit{Student}, \textit{Instructor}, \textit{Educational Manager}, and \textit{Administrator}. The complete per-route URL listing --- with page name, dynamic parameters, and purpose for each of the 59 routes --- is provided in Appendix~\ref{appendix:sitemap}.
+Figure~\ref{fig:sitemap} summarises the full route tree, organised by the five role groups exposed by the platform: \textit{Public}, \textit{Student}, \textit{Instructor}, \textit{Educational Manager}, and \textit{Administrator}. The router declares 96 paths in total: 80 render a destination page, and the remaining 16 are redirect-only aliases retained so that previously published links keep resolving. The complete per-route URL listing --- with page name, dynamic parameters and purpose --- is provided in Appendix~\ref{appendix:sitemap}.
 
 \begin{figure}[H]
     \centering

@@ -1,0 +1,94 @@
+\section{Class Diagram Specification}
+\label{appendix:class-diagram}
+
+This appendix expands the three domain packages summarised in Section~\ref{fig:class_diagram}. For each package it lists the entities, the relationships that carry design intent, and --- where a reader might reasonably expect a different shape --- the reason the model does not take it.
+
+% ────────────────────────────────────────────────────────────
+\subsection{Identity \& Access}
+
+\subsubsection{Roles are assignments, not subclasses}
+
+A natural first reading of an education platform is that \texttt{Student} and \texttt{Teacher} are subclasses of an abstract \texttt{User}. The system deliberately does not do this. There is one concrete \texttt{User} entity holding identity and authentication state; every capability is derived at request time from role assignments.
+
+Three properties of the domain make inheritance the wrong tool:
+
+\begin{itemize}
+    \item \textbf{One person holds several roles at once.} A doctoral teaching assistant is an instructor on one course and an enrolled student on another. Under inheritance that person needs two rows, two identities, and two sets of credentials.
+    \item \textbf{A role is scoped, not global.} ``Instructor'' is never true in the abstract --- it is true \emph{of a particular course}. \texttt{user\_role\_assignments} carries a \texttt{scope\_kind} (\texttt{global}, \texttt{organization}, \texttt{org\_unit}, \texttt{course}) plus the matching foreign key, so the same role means different things in different places. A subclass has no room to hold that scope.
+    \item \textbf{Roles change without the person changing.} Granting and revoking is an insert and a soft delete; under inheritance it would be a change of class, which no ORM models comfortably and which would invalidate every existing reference to the row.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{tabular}{|>{\raggedright\arraybackslash}m{0.26\textwidth}|>{\raggedright\arraybackslash}m{0.66\textwidth}|}
+\hline
+\textbf{Entity} & \textbf{Role in the model} \\ \hline
+\texttt{User} & Identity and authentication state. One concrete class; no subclasses. \\ \hline
+\texttt{UserProfile} & Display name, avatar and contact details, separated so that identity can exist before a profile is completed. \\ \hline
+\texttt{Role} & A named bundle of permissions (\texttt{code}, e.g.\ \texttt{course\_instructor}). \\ \hline
+\texttt{Permission} & The atomic capability a guard checks, e.g.\ \texttt{course.update}. \\ \hline
+\texttt{UserRoleAssignment} & Binds a user to a role \emph{at a scope}. The join carrying \texttt{scope\_kind} and the scope's foreign key. \\ \hline
+\texttt{UserPermissionGrant} & A direct grant, for the exceptional case that does not justify a role. \\ \hline
+\texttt{AuthSession} & An issued session; the unit that MFA and logout act on. \\ \hline
+\texttt{AuthEvent} & The typed authentication and access-control audit trail (append-only). \\ \hline
+\end{tabular}
+\caption{Identity \& Access entities.}
+\label{tab:class_identity}
+\end{table}
+
+\noindent A permission check therefore resolves as: \emph{user} $\rightarrow$ live assignments whose scope contains the target resource $\rightarrow$ the union of those roles' permission codes $\rightarrow$ does that set contain the required code?
+
+% ────────────────────────────────────────────────────────────
+\subsection{Course \& Ingestion}
+
+\subsubsection{File bytes are not stored in the database}
+
+Material content lives in object storage (S3-compatible), never in a database column. A \texttt{LearningMaterialVersion} holds \texttt{storage\_object\_id}, a foreign key to a \texttt{StorageObject} row that records the bucket and key; the bytes themselves are fetched from, and streamed to, the object store.
+
+The reason is operational rather than stylistic. Lecture material is measured in tens or hundreds of megabytes per file; holding it in Postgres would push every backup, replica and point-in-time restore to the same scale, and every read of a row would carry the risk of dragging the payload with it. Object storage also gives presigned, expiring URLs, so a client downloads directly from the store without the API service proxying the bytes.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{tabular}{|>{\raggedright\arraybackslash}m{0.30\textwidth}|>{\raggedright\arraybackslash}m{0.62\textwidth}|}
+\hline
+\textbf{Entity} & \textbf{Role in the model} \\ \hline
+\texttt{Course} & The container a learner enrols in; owns modules and materials. \\ \hline
+\texttt{Module} $\rightarrow$ \texttt{Lesson} & The ordered curriculum tree beneath a course. \\ \hline
+\texttt{LearningMaterial} & A logical document attached to a lesson (``Week 3 slides''), independent of which upload is current. \\ \hline
+\texttt{LearningMaterialVersion} & One uploaded revision, carrying \texttt{storage\_object\_id} and the processing status of the ingestion pipeline. \\ \hline
+\texttt{StorageObject} & Bucket and key of the stored bytes. The boundary between the database and the object store. \\ \hline
+\texttt{DocumentChunk} & A retrievable passage of a version, with its text, metadata, content hash, and a 3072-dimensional embedding. \\ \hline
+\end{tabular}
+\caption{Course \& Ingestion entities.}
+\label{tab:class_ingestion}
+\end{table}
+
+\noindent Versioning is what allows a material to be re-uploaded without invalidating the work derived from it: the old version's chunks and embeddings remain queryable until the new version finishes processing, so retrieval never falls into a gap mid-ingestion.
+
+% ────────────────────────────────────────────────────────────
+\subsection{Assessment \& Interview}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{tabular}{|>{\raggedright\arraybackslash}m{0.30\textwidth}|>{\raggedright\arraybackslash}m{0.62\textwidth}|}
+\hline
+\textbf{Entity} & \textbf{Role in the model} \\ \hline
+\texttt{Quiz} $\rightarrow$ \texttt{QuizQuestion} & The assessment definition and its items. \\ \hline
+\texttt{QuizAttempt} & One learner's run at a quiz; the unit grading and integrity events attach to. \\ \hline
+\texttt{QuizAttemptAnswer} & The per-question response within an attempt. \\ \hline
+\texttt{InterviewConfig} & The teacher-authored definition of a mock interview. \\ \hline
+\texttt{InterviewSession} & One learner's run, holding the conversation and its evaluation. \\ \hline
+\texttt{GapReport} & The aggregated outcome of a session: which learning outcomes the answers did and did not evidence. \\ \hline
+\texttt{AssessmentIntegrityEvent} & Browser integrity signals recorded during an attempt or session; append-only. \\ \hline
+\end{tabular}
+\caption{Assessment \& Interview entities.}
+\label{tab:class_assessment}
+\end{table}
+
+\noindent The two assessment modes meet at the \texttt{GapReport}: quiz attempts establish whether a learner can recall and apply the material, the interview session probes whether they can explain it, and the report reconciles both against the course's declared learning outcomes.

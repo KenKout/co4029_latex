@@ -10,7 +10,7 @@
 \subsubsection{Architecture \& Design Philosophy}
 % ─────────────────────────────────────────────
 
-The aBridgeAI backend is a Python \textbf{FastAPI} service exposing a versioned RESTful API at the base path \path|/api/v1|. It serves as the single data contract between the Vite SPA and the server. The API surface is composed by a single \path|create_app()| factory that mounts every per-feature router under the shared \path|API_V1_PREFIX|; routers themselves carry their own per-feature prefix (e.g.\ \path|/teacher|, \path|/me/notifications|, \path|/admin/processing|). The full endpoint catalogue --- 195 routes across 12 features --- is documented in Appendix~\ref{appendix:api-design}; the following six principles capture the design intent.
+The aBridgeAI backend is a Python \textbf{FastAPI} service exposing a versioned RESTful API at the base path \path|/api/v1|. It serves as the single data contract between the Vite SPA and the server. The API surface is composed by a single \path|create_app()| factory that mounts every per-feature router under the shared \path|API_V1_PREFIX|; routers themselves carry their own per-feature prefix (e.g.\ \path|/teacher|, \path|/me/notifications|, \path|/admin/processing|). The full endpoint catalogue is documented in Appendix~\ref{appendix:api-design}; the following six principles capture the design intent.
 
 \begin{enumerate}
     \item \textbf{Vertical-slice feature layout.} Each feature owns a self-contained directory under \path|abridgeai/features/<feature>/| with its own \path|routers/|, \path|services/|, \path|queries/|, and \path|schemas/| sub-packages. Routers translate HTTP to application calls; they never touch persistence directly. An import-linter contract (\textit{``Routers do not call queries directly''}) enforces the boundary at CI time.
@@ -94,34 +94,13 @@ The full status-code map (200, 201, 202, 204, 400, 401, 403, 404, 409, 422, 503)
 \subsubsection{Endpoint Surface (overview)}
 % ───────────────────────────────────────────────────────────
 
-The 195 routes mounted under \path|/api/v1| are partitioned across 12 features. Table~\ref{tab:api_features_main} summarises the feature breakdown; per-route specifications are catalogued in Appendix~\ref{appendix:api-design}.
+Rather than being enumerated here, the surface is summarised by top-level path prefix in Table~\ref{tab:api_surface_by_prefix} and catalogued per operation --- method, path, request and response shape --- in Appendix~\ref{appendix:api-design}.
 
-\begin{longtable}{|p{0.22\textwidth}|p{0.1\textwidth}|p{0.56\textwidth}|}
-    \caption{Feature breakdown of the API surface.} \label{tab:api_features_main} \\
-    \hline
-    \textbf{Feature} & \textbf{Routes} & \textbf{Audience routers} \\
-    \hline
-    \endfirsthead
-    \multicolumn{3}{c}{\small\tablename~\thetable{} \textit{(continued)}} \\
-    \hline
-    \textbf{Feature} & \textbf{Routes} & \textbf{Audience routers} \\
-    \hline
-    \endhead
-    \hline
-    \endfoot
-    Identity         & 16 & \path|auth|, \path|me|, \path|users|, \path|mfa| \\ \hline
-    Access control   & 26 & \path|admin|, \path|organizations| \\ \hline
-    Courses          & 48 & \path|learner| (\path|/me/courses|), \path|authoring| (\path|/teacher|), \path|assignment| (\path|/dept|), \path|administration| (\path|/admin|) \\ \hline
-    Materials        & 17 & \path|authoring| (\path|/teacher|), \path|learner| (\path|/materials|) \\ \hline
-    Quizzes          & 22 & \path|authoring| (\path|/teacher|), \path|learner| \\ \hline
-    Interviews       & 21 & \path|authoring| (\path|/teacher|), \path|learner| \\ \hline
-    Progress         &  7 & \path|learner| (\path|/me/progress|), \path|authoring| (\path|/teacher|) \\ \hline
-    Career paths     &  2 & \path|learner| \\ \hline
-    Spaced repetition&  7 & \path|learner| (\path|/me|), \path|teacher| \\ \hline
-    Notifications    &  7 & \path|learner| (\path|/me/notifications|) \\ \hline
-    Admin operations & 19 & \path|stats|, \path|users|, \path|processing|, \path|ai_costs|, \path|audit| \\ \hline
-    Health           &  3 & root and \path|/api/v1| (K8s probes + SPA reach) \\ \hline
-\end{longtable}
+Both the table below and the appendix catalogue are \emph{generated} from the application's own OpenAPI schema by \path|scripts/gen_api_tables.py|, not maintained by hand. This is a deliberate response to how the two drifted apart: a surface this size changes every release, and a count that has to be retyped is a count that silently goes stale. Regenerating is one command, and the output cannot contradict the code it was read from.
+
+The distribution itself is the design point. Roughly two thirds of all operations sit under three prefixes --- \path|/teacher|, \path|/admin| and \path|/management| --- because authoring, platform operations and programme governance are where the system's complexity lives. The learner-facing surface (\path|/me|, \path|/courses|, \path|/attempts|) is deliberately narrow: a student's interaction is guided by the curriculum rather than assembled from arbitrary queries, so it needs few endpoints and each does one thing.
+
+\input{generated/api_surface_by_prefix}
 
 % ────────────────────────────────────────────────────────────
 \subsubsection{Pagination, Filtering and Idempotency}

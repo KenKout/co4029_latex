@@ -1,0 +1,41 @@
+% PROVISIONAL -- seeded by a static scan of the router decorators so the
+% document compiles before the generator has been run. Replace it by running,
+% from the backend repo:
+%
+%     uv run python scripts/gen_api_tables.py --out ../co4029_latex/generated
+%
+% That reads the live OpenAPI schema and is the authority. Expect the totals to
+% differ slightly from the figures below: a static scan cannot see routers
+% mounted under more than one prefix, nor app-level health routes.
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{tabular}{|l|r|}
+\hline
+\textbf{Path prefix} & \textbf{Operations} \\ \hline
+\path|/teacher| & 153 \\ \hline
+\path|/admin| & 93 \\ \hline
+\path|/management| & 49 \\ \hline
+\path|/me| & 32 \\ \hline
+\path|/courses| & 18 \\ \hline
+\path|/dept| & 15 \\ \hline
+\path|/users| & 14 \\ \hline
+\path|/auth| & 11 \\ \hline
+\path|/interview-sessions| & 9 \\ \hline
+\path|/discussion| & 6 \\ \hline
+\path|/attempts| & 6 \\ \hline
+\path|/materials| & 5 \\ \hline
+\path|/lessons| & 4 \\ \hline
+\path|/modules| & 3 \\ \hline
+\path|/career-paths| & 3 \\ \hline
+\path|/quizzes| & 3 \\ \hline
+\path|/policies| & 2 \\ \hline
+\path|/interview-configs| & 2 \\ \hline
+\path|/lesson-resources| & 1 \\ \hline
+health/root & 3 \\ \hline
+\textbf{Total} & \textbf{432} \\ \hline
+\end{tabular}
+\caption{REST operations by top-level path prefix.}
+\label{tab:api_surface_by_prefix}
+\end{table}

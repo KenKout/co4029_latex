@@ -185,3 +185,48 @@ IT Administrator & 14 \\ \hline
 \textbf{Total unique routes} & \textbf{59} \\ \hline
 \end{tabular}
 \end{table}
+
+% ────────────────────────────────────────────────────────────
+\subsection{Redirect-Only Routes}
+\label{sec:sitemap_redirects}
+
+The router declares 96 paths. The 80 documented in the preceding subsections render a
+destination page; the 16 below render nothing and immediately redirect. They exist because the
+paths were published in an earlier release --- in bookmarks, in notification deep links, in
+course announcements --- and removing them would break those references. They are listed
+separately so that the counts in Section~\ref{fig:sitemap} reconcile: destinations plus
+redirects equals declared paths.
+
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{longtable}{|>{\raggedright\arraybackslash}m{0.45\textwidth}|>{\raggedright\arraybackslash}m{0.45\textwidth}|}
+\caption{Redirect-only routes retained for backward compatibility.}
+\label{tab:sitemap_redirects} \
+\hline
+\textbf{Legacy path} & \textbf{Redirects to} \ \hline
+\endfirsthead
+\multicolumn{2}{c}{{\bfseries Table \thetable\ -- Continued}} \ \hline
+\textbf{Legacy path} & \textbf{Redirects to} \ \hline
+\endhead
+\hline
+\endfoot
+
+\path|/admin/health| & \path|/admin/operations| \\ \hline
+\path|/admin/stats/health| & \path|/admin/operations| \\ \hline
+\path|/admin/stats/active| & \path|/admin/stats| \\ \hline
+\path|/admin/stats/content| & \path|/admin/stats| \\ \hline
+\path|/admin/processing| & \path|/admin/operations| \\ \hline
+\path|/management/enrolment| & \path|/management/courses| \\ \hline
+\path|/progress| & \path|/me/progress| \\ \hline
+\path|/dashboard/sr| & \path|/me/study| \\ \hline
+\path|/study/cards-due| & \path|/me/study/cards-due| \\ \hline
+\path|/study/review| & \path|/me/study/review| \\ \hline
+\path|/learning-programs| & \path|/me/learning-programs| \\ \hline
+\path|/career-paths| & \path|/catalog/career-paths| \\ \hline
+\path|/career-paths/$slug| & \path|/catalog/career-paths/$slug| \\ \hline
+\path|/dept| & \path|/management/courses| \\ \hline
+\path|/dept/courses/$courseId| & \path|/management/courses/$courseId| \\ \hline
+\path|/profile| & \path|/me/profile| \\ \hline
+
+\end{longtable}
+\normalsize
