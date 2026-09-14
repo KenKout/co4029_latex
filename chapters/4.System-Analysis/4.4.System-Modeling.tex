@@ -1,12 +1,12 @@
 \subsection{System Modeling}
 This section provides a visual and structured representation of the functional behavior of the aBridgeAI system. The system is modeled using Unified Modeling Language (UML) artifacts, primarily Use Case Diagrams, to describe how each actor interacts with the major functional modules of the platform.
 
-The system is decomposed into six functional modules: Authentication and Access Control, Organization and User Management, Course and Material Management, Learning Loop and Adaptive Quiz, Application Loop and Mock Interview, and Analytics, Reporting and Notifications.
+The system is decomposed into eight functional modules: Authentication and Access Control, Organization and User Management, Course and Material Management, Learning Loop and Adaptive Quiz, Application Loop and Mock Interview, Analytics, Reporting and Notifications, Learning Programs and Path Governance, and Platform Configuration and Policy Documents.
 
 % ==========================================
 \subsubsection{Overall Use Case Diagram}
 
-The Overall Use Case Diagram provides a macroscopic view of the aBridgeAI system boundary and the major interactions between the system and its authorised actors. The primary actors include Students, Teachers, Educational Managers, and IT Administrators.
+The Overall Use Case Diagram provides a macroscopic view of the aBridgeAI system boundary and the major interactions between the system and its authorised actors. The primary actors include Students, Teachers, Educational Managers, Faculty Deans, and IT Administrators. A Faculty Dean inherits every use case available to an Educational Manager within their faculty, so the diagram shows only the governance use cases that are distinctively theirs.
 
 
 
@@ -265,6 +265,96 @@ Students can view completion progress and receive notifications, while Teachers 
     \caption{Detailed Use Case Diagram: Analytics, Reporting and Notifications Module}
     \label{fig:analytics_reporting_usecase}
 \end{figure}
+The full set of use case specifications for this module is provided in Appendix~\ref{appendix:usecase-specifications}.
+
+% ====================7 Learning Programs and Path Governance Module======================
+\paragraph{Learning Programs and Path Governance Module}
+
+This module governs the enrolment structure that sits above individual courses. A \textit{learning programme} bundles one or more career pathways into a single enrolment offered by a faculty, and this module covers programme authoring, versioning, student enrolment, pathway selection, and the dean-adjudicated workflow by which a student moves between pathways.
+
+Faculty Deans and Educational Managers author programmes within their own faculty and move them through draft, published, and archived states. Authoring is version-based: an edit opens a new draft rather than mutating a published version, so a student who enrolled under version~2 continues to see version~2 for the life of their enrolment. Authorised operators enrol students individually or by bulk import, subject to an organisation-configurable ceiling on concurrent programme enrolments.
+
+The student-facing side requires each enrolled student to pin exactly one initial career pathway from those offered by their programme version. A student may subsequently request a change of pathway with a mandatory written justification; the request is adjudicated by a Faculty Dean who owns the programme and who may not be the subject of the request. Approval closes the outgoing pathway attempt with a progress snapshot and opens a new attempt on the target pathway. Course completions already earned are preserved as immutable awards, so work shared between the two pathways is never repeated.
+
+% TODO: draw graphics/usecase-diagrams/learning_programs_usecase.png, then uncomment.
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.70\textwidth]{graphics/usecase-diagrams/learning_programs_usecase.png}
+%     \caption{Detailed Use Case Diagram: Learning Programs and Path Governance Module}
+%     \label{fig:learning_programs_usecase}
+% \end{figure}
+
+\noindent\textit{Representative use case.} The following use case specification illustrates pathway selection and the change-request workflow. The full set of use case specifications for this module is provided in Appendix~\ref{appendix:usecase-specifications}.
+
+% =========================================================
+% Representative UC-PROGRAM-03: Select and Change Career Pathway
+% =========================================================
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
+\caption{Representative Use Case Specification: Select and Change Career Pathway}
+\label{tab:rep_uc_program_path_change} \\
+\hline
+\endfirsthead
+
+\multicolumn{2}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\endhead
+
+\hline \multicolumn{2}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+\hline
+\endlastfoot
+
+\textbf{Use Case ID} & \textbf{UC-PROGRAM-03} \\ \hline
+\textbf{Use Case Name} & \textbf{Select and Change Career Pathway} \\ \hline
+\textbf{Actors} & Student for selection and request; Faculty Dean for the decision \\ \hline
+\textbf{Related Requirements} & FR-7.6, FR-7.7, FR-7.8, FR-7.9, FR-7.10, FR-7.12, FR-7.13 \\ \hline
+\textbf{Description} & Allows a Student to choose their initial career pathway within an enrolled learning programme and subsequently to request a change of pathway, which an owning Faculty Dean acknowledges and then approves or rejects. \\ \hline
+\textbf{Pre-conditions} & The Student holds an enrolment on a published learning programme. For a change request, the enrolment is active and the switch allowance is not exhausted. For a decision, the reviewer is a Faculty Dean owning the programme and is not the subject of the request. \\ \hline
+\textbf{Post-conditions} & Upon selection the enrolment becomes active with an open attempt pinned to the chosen pathway version. Upon approval the outgoing attempt is closed with a progress snapshot, a new attempt opens on the target pathway, and earned course completions continue to count. \\ \hline
+\textbf{Main Flow} &
+1. The Student reviews the pathways offered by their programme version and selects one as their initial choice. \newline
+2. The system activates the enrolment, opens a pathway attempt pinned to that pathway version, and grants access to its courses. \newline
+3. To change pathway later, the Student selects a different pathway and submits a written justification. \newline
+4. The system verifies that the target pathway belongs to the enrolled programme version, differs from the current one, and that the switch allowance remains. \newline
+5. The system records the request as pending and notifies the owning Faculty Deans. \newline
+6. A Faculty Dean acknowledges the request, which the system marks in progress and notifies the Student. \newline
+7. The Faculty Dean approves or rejects the request. \newline
+8. On approval the system snapshots the outgoing attempt, closes it, and opens a new attempt on the target pathway version. \newline
+9. The system carries over access to courses shared by both pathways, releases access no longer justified, and counts the switch against the allowance. \newline
+10. The system notifies the Student, and completes the enrolment once every course of the pinned pathway version is satisfied. \\ \hline
+\textbf{Alternative Flows} &
+\textbf{4a. Invalid target pathway:} \newline
+\hspace*{1em} 1. Where the target equals the current pathway, lies outside the enrolled version, or is archived, the system rejects the request and explains why. \newline
+\textbf{4b. A request is already open:} \newline
+\hspace*{1em} 1. The system refuses a second request until the open one is decided or cancelled. \newline
+\textbf{4c. Switch allowance exhausted:} \newline
+\hspace*{1em} 1. The system refuses the request and reports that the limit has been reached. \newline
+\textbf{7a. Reviewer is the subject of the request:} \newline
+\hspace*{1em} 1. The system refuses the decision as self-approval. \newline
+\textbf{8a. Target pathway became unavailable before approval:} \newline
+\hspace*{1em} 1. The system marks the request invalidated and leaves the enrolment unchanged. \\
+\end{longtable}
+
+% ====================8 Platform Configuration and Policy Documents Module======================
+\paragraph{Platform Configuration and Policy Documents Module}
+
+This module covers the operational surfaces through which the platform itself is tuned and through which its governing documents are published. It comprises two related concerns: a catalogue of runtime-tunable settings, and a versioned store of policy documents.
+
+Every setting declares its key, grouping, data type, default value, and description. The effective value of a setting is resolved by a fixed precedence of organisation override, deployment-wide value, and code default, so that an IT Administrator tunes the deployment while an Educational Manager tunes only their own organisation. Because a mis-set value can affect every tenant, a change may first be previewed as a validated dry run that reports what it would alter; every applied change carries a mandatory written reason and is recorded so that it can later be cleared or rolled back to the value it replaced. Should a stored setting become unreachable or unreadable, the system continues to operate on environment configuration and code defaults rather than failing.
+
+Policy documents — each classified as legal or academic — hold their content in independently numbered versions, so that the text in force on a given date remains recoverable. The index of published policies and the current text of any published policy are served without requiring authentication, since a prospective user must be able to read the terms before holding an account.
+
+% TODO: draw graphics/usecase-diagrams/platform_config_usecase.png, then uncomment.
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.70\textwidth]{graphics/usecase-diagrams/platform_config_usecase.png}
+%     \caption{Detailed Use Case Diagram: Platform Configuration and Policy Documents Module}
+%     \label{fig:platform_config_usecase}
+% \end{figure}
+
 The full set of use case specifications for this module is provided in Appendix~\ref{appendix:usecase-specifications}.
 
 

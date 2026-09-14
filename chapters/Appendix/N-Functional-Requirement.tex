@@ -81,7 +81,7 @@ NFR-2.4 & The system shall provide fault tolerance through redundant AI servers,
 \hline
 \endlastfoot
 
-NFR-3.1 & All sensitive data must be encrypted at rest using AES-256, including user passwords (hashed with bcrypt, cost factor $\geq$ 12), personally identifiable information (PII), session tokens, API keys, and uploaded learning materials. & All Users, Admin & Yes & Yes & High \\ \hline
+NFR-3.1 & All sensitive data must be encrypted at rest using AES-256, including personally identifiable information (PII), session and refresh tokens, multi-factor authentication secrets and recovery codes, API keys, and uploaded learning materials. The platform stores no user passwords: authentication is delegated to an external identity provider, so no password hash is retained. & All Users, Admin & Yes & Yes & High \\ \hline
 NFR-3.2 & The system must enforce Role-Based Access Control (RBAC) following the principle of least privilege, ensuring users can only access resources and perform actions authorized for their assigned role. & Managers, Admin & Yes & Yes & High \\ \hline
 NFR-3.3 & The system must maintain immutable audit logs for all sensitive operations, including authentication events, permission changes, data modifications, and administrative actions, with each log entry capturing the actor, timestamp, action type, and affected resource. & Managers, Admin & Yes & Yes & High \\ \hline
 NFR-3.4 & The system must enforce a 30-minute idle session timeout, automatically logging out users after the period of inactivity and requiring re-authentication. & All Users & Yes & Yes & High \\

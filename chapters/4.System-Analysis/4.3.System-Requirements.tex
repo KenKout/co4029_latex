@@ -38,7 +38,7 @@ User Requirements articulate the functional needs of the system from the perspec
 \end{itemize}
 \subsubsection{Functional Requirements}
 
-The functional requirements of aBridgeAI specify the concrete system behaviours, processes, and user interactions that the platform must support. They are organised into six functional modules: (1)~Authentication and Access Control, (2)~Organisation and User Management, (3)~Course and Material Management, (4)~Learning Loop and Adaptive Quiz, (5)~Application Loop and Mock Interview, and (6)~Analytics, Reporting, and Notifications. Each requirement is traced to one or more User Requirements to ensure comprehensive coverage and end-to-end traceability. The complete Functional Requirements specification is provided in Appendix~\ref{appendix:fr}.
+The functional requirements of aBridgeAI specify the concrete system behaviours, processes, and user interactions that the platform must support. They are organised into eight functional modules: (1)~Authentication and Access Control, (2)~Organisation and User Management, (3)~Course and Material Management, (4)~Learning Loop and Adaptive Quiz, (5)~Application Loop and Mock Interview, (6)~Analytics, Reporting, and Notifications, (7)~Learning Programs and Path Governance, and (8)~Platform Configuration and Policy Documents. Each requirement is traced to one or more User Requirements to ensure comprehensive coverage and end-to-end traceability. The complete Functional Requirements specification is provided in Appendix~\ref{appendix:fr}.
 
 
 \renewcommand{\arraystretch}{1.5}
@@ -96,8 +96,24 @@ FR-5.4 & The system shall allow Students to start mock interview sessions in tex
 \multicolumn{7}{|l|}{\textit{Module 6 --- Analytics, Reporting \& Notifications}} \\ \hline
  
  
-FR-6.7 & The system shall maintain an immutable audit log for role assignments, sensitive data changes, and HTTP request events, queryable by administrators for security and compliance review. & IT Administrators & UR-ITA-03 & Yes & Yes & High \\
- 
+FR-6.7 & The system shall maintain an immutable audit log for role assignments, sensitive data changes, and HTTP request events, queryable by administrators for security and compliance review. & IT Administrators & UR-ITA-03 & Yes & Yes & High \\ \hline
+
+\multicolumn{7}{|l|}{\textit{Module 7 --- Learning Programs \& Path Governance}} \\ \hline
+
+FR-7.3 & The system shall version a learning programme, creating a new draft version rather than modifying a published one, so that a Student remains on the version under which they enrolled. & Faculty Deans, Educational Managers & UR-MGR-02 & Yes & Yes & High \\ \hline
+
+FR-7.7 & The system shall allow a Student with an active enrolment to request a change of career pathway with a mandatory justification, for adjudication by the Faculty Dean. & Students & UR-STU-01 & Yes & Yes & Medium \\ \hline
+
+FR-7.10 & The system shall preserve a Student's earned course completions as immutable awards that survive a pathway change, so that progress shared between pathways is not repeated. & Students & UR-STU-01 & Yes & Yes & High \\ \hline
+
+\multicolumn{7}{|l|}{\textit{Module 8 --- Platform Configuration \& Policy Documents}} \\ \hline
+
+FR-8.2 & The system shall resolve the effective value of every runtime setting by a fixed precedence of organisation override, deployment-wide value, and code default. & IT Administrators, Educational Managers & UR-ITA-03 & Yes & Yes & Medium \\ \hline
+
+FR-8.4 & The system shall require a written reason for every configuration change and shall record each application, clearance, and rollback for audit. & IT Administrators & UR-ITA-03 & Yes & Yes & Medium \\ \hline
+
+FR-8.7 & The system shall maintain policy documents, each classified as legal or academic, whose content is held in independently numbered versions. & IT Administrators & UR-ITA-05 & Yes & Yes & Low \\
+
 \end{longtable}
 
 
@@ -137,7 +153,7 @@ The complete Functional Requirements specification is provided in Appendix~\ref{
 \endlastfoot
 
 NFR-2.1 & The system shall support on average 50 concurrent active users, 10 simultaneous video streams, and 5 concurrent AI interview sessions during peak hours without performance degradation. & Admin & Medium \\ \hline
-NFR-3.1 & All sensitive data must be encrypted at rest using AES-256, including user passwords (hashed with bcrypt, cost factor $\geq$ 12), PII, session tokens, API keys, and uploaded learning materials. & All Users, Admin & High \\ \hline
+NFR-3.1 & All sensitive data must be encrypted at rest using AES-256, including PII, session and refresh tokens, multi-factor authentication secrets and recovery codes, API keys, and uploaded learning materials. The platform stores no user passwords: authentication is delegated to an external identity provider, so no password hash is retained. & All Users, Admin & High \\ \hline
 NFR-4.2 & The system must comply with WCAG 2.1 AA accessibility standards, supporting full keyboard navigation, sufficient color contrast ratios, and alt text for all visual elements. & Users with Disabilities & Low \\ \hline
 \end{longtable}
 
@@ -170,20 +186,38 @@ compliance reporting, dispute resolution, and system monitoring.
 % NOTE: 2026/04/22: Add role lại
 The system must maintain a unified identity record for every 
 participant, capturing sufficient information to authenticate the 
-individual, associate them with one or more organisations, and enforce 
-access control across all system functions. Identity data includes 
-credentials, profile attributes, and organisational membership.
+individual, associate them with an organisation, and enforce
+access control across all system functions. Identity data includes
+federated identity references, profile attributes, and organisational
+membership.
+
+Every regular account belongs to at most one organisation at a time. A
+membership reserves that tenant boundary while its status is active,
+invited, inactive, or suspended; only memberships that have been ended
+as \textit{left}, together with soft-deleted rows, are retained as
+historical records and release the boundary. Platform administrators
+are global accounts and hold no organisation membership. This release
+provides no organisation-transfer workflow: an account is offboarded
+by ending its membership, not by moving it between organisations.
 
 Access control in aBridgeAI is fully dynamic: permissions are not 
 hardcoded to roles but are defined and modified at runtime by 
 authorised actors. The system must therefore maintain a permission 
 model that records which actions each role may perform, which roles 
-are assigned to which users within which organisational scope, and 
-which role assignments were granted by whom and when. Four canonical 
-roles exist — administrator, organisation manager, teacher, and 
-student — but the permission sets associated with these roles must be 
-configurable rather than fixed, and role assignments must be scoped 
-to the organisational or course context in which they apply.
+are assigned to which users within which organisational scope, and
+which role assignments were granted by whom and when. Five canonical
+roles exist — IT administrator, faculty dean, organisation manager,
+teacher, and student — but the permission sets associated with these
+roles must be configurable rather than fixed. The faculty dean holds
+departmental oversight together with the full authority of an
+organisation manager within their assigned scope, so that the dean
+permission set subsumes the manager one.
+
+Role assignments must be scoped to one of four levels: global,
+organisation, organisational unit, or course. The organisational-unit
+level carries the faculty and departmental structure against which
+dean authority and staff affiliation are resolved; the global level is
+reserved for platform administrators.
 
 The system must support the case where a single user holds different 
 roles in different contexts: a user may be a teacher in one course 
@@ -194,24 +228,44 @@ rather than a single global assignment.
 % ─────────────────────────────────────────────────────────────────────────────
 \paragraph{Organisations, Careers, and Courses}
 
-Organisation managers are responsible for defining the structural 
-containers within which learning occurs. The system must capture the 
-definition of each organisation and its associated managers. Within 
-each organisation, managers define \textit{careers} — structured 
-learning pathways representing a target professional competency or 
-qualification. A career groups an ordered collection of courses that 
-together constitute the pathway, and the system must record this 
-membership and ordering so that career-level progress can be computed 
-from course-level outcomes.
+Organisation managers and faculty deans are responsible for defining
+the structural containers within which learning occurs. The system
+must capture the definition of each organisation, its associated
+managers, and the email domains attached to it for domain-based
+account provisioning. Each organisation is subdivided into
+\textit{organisational units} — faculties, departments, offices,
+programmes, or campuses — of which faculties are the top-level roots.
+The system must record each unit, its parent, and the staff affiliated
+with it, because this structure is the scope against which dean
+authority is resolved.
+
+Within each organisation, authorised operators define
+\textit{career paths} — structured learning pathways representing a
+target professional competency or qualification. A career path is
+\textit{versioned}: edits produce a new draft version rather than
+mutating a published one, so that a student who enrolled under an
+earlier version continues to see the pathway they joined. Each version
+organises its courses into ordered \textit{stages}, and the system
+must record stage membership and ordering so that stage-level unlock
+and career-level progress can be computed from course-level outcomes.
+Per-student progress must be tracked against the stage, not only
+against the pathway as a whole.
 
 Each course must be described by its title, subject domain, and 
 associated tags that enable discovery and categorisation. The system 
 must record which teachers are assigned to deliver the course, which 
 students are enrolled, and the dates on which these assignments were 
-made. Course publication state must be tracked so that content remains 
-invisible to students until explicitly released. Courses are 
-subdivided into lessons, each of which carries an ordering index that 
-determines the sequence in which students encounter the material.
+made. Course publication state must be tracked so that content remains
+invisible to students until explicitly released.
+
+Courses are subdivided into \textit{modules}, and each module holds an
+ordered sequence of \textit{curriculum items} of three kinds: lessons,
+quizzes, and interviews. These three are siblings within the module
+rather than nested inside one another — a quiz is owned by its module
+and a mock interview by its course, not by an individual lesson. Each
+item carries an ordering index that determines the sequence in which
+students encounter it, and the system must record prerequisite
+relationships at both module and lesson level.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \paragraph{Learning Material and Knowledge Ingestion}
@@ -331,11 +385,15 @@ post-session assessment are performed.
 From these outcomes, the AI generation model produces a bank of sample 
 questions. The system must record each generated question, its 
 association with the outcome it is designed to probe, and whether it 
-has been reviewed and approved by the teacher. Critically, no expected 
-answer or model answer is stored alongside interview questions — by 
-design, the assessment is outcome-based rather than answer-keyed, and 
-exposing model answers would undermine the open-ended nature of the 
-interview.
+has been reviewed and approved by the teacher. A question may carry an
+optional teacher-authored reference answer, but this is strictly an
+authoring aid: it is never shown to the student and is never used to
+score a response. Assessment remains outcome-based rather than
+answer-keyed, because grading a transcript against a stored answer key
+would undermine the open-ended nature of the interview. Questions are
+additionally maintained in a course-scoped bank in which one logical
+question may carry sibling variants that probe the same outcome from
+different angles, with semantic duplicate detection over the bank.
 
 The system must capture teacher-defined interview configuration 
 parameters including the maximum number of attempts permitted per 
@@ -374,20 +432,50 @@ The system must aggregate assessment outcomes into progress
 representations at multiple levels of granularity for both students 
 and teachers.
 
-At the \textit{lesson level}, progress must reflect the student's 
-current SM-2 state across quiz cards — specifically the Knowledge 
-Retention Estimate $\hat{R}_{s,\ell}$, the Progression Readiness 
-against the teacher-configured unlock threshold, and the Review 
-Compliance Rate $\rho_{s,\ell}$ — as well as the pass/fail status of 
-the associated interview section if one exists. A lesson is 
-considered complete only when both the quiz unlock condition and the 
-interview pass condition are satisfied.
+A distinction must be drawn between \textit{unlock} — whether a
+student may enter a piece of curriculum — and \textit{completion} —
+whether they have discharged it. The two are governed by different
+rules and must be recorded separately.
 
-At the \textit{course level}, progress must be computed as the 
-proportion of lessons completed relative to the total lessons in the 
-course, weighted or unweighted according to teacher configuration. 
-This course completion percentage is surfaced to both the student and 
-the assigned teachers.
+At the \textit{lesson level}, the unlock gate combines the student's
+current SM-2 state across quiz cards — specifically the Knowledge
+Retention Estimate $\hat{R}_{s,\ell}$, the Progression Readiness
+against the teacher-configured unlock threshold
+$EF_{\min}^{\text{unlock}}$ and coverage threshold $\tau$, and the
+Review Compliance Rate $\rho_{s,\ell}$ — with the satisfaction of any
+declared lesson prerequisites and, where the module requires it, a
+passing interview for that module. Lesson \textit{completion} is
+recorded independently, as an explicit completion state on the
+student's lesson progress record.
+
+At the \textit{course level}, progress must be computed over
+\textit{curriculum units} rather than over lessons alone. Each
+published curriculum item — lesson, quiz, or interview — contributes
+exactly one unit, and the course is complete when every unit is
+satisfied. The per-kind rules are deliberately asymmetric:
+
+\begin{itemize}
+    \item a \textbf{lesson} is satisfied when its progress record is
+    marked complete;
+    \item a \textbf{quiz} is satisfied when it becomes terminal —
+    either the student has passed the teacher's milestone, or they
+    have failed with every permitted attempt consumed and none still
+    in flight;
+    \item an \textbf{interview} is satisfied only on a pass: at least
+    one attempt must carry a passing verdict, since a merely finished
+    interview is not a discharged one.
+\end{itemize}
+
+Counting lessons alone would leave a course carrying quizzes
+completable without a single answered question, and would in turn
+unlock every career-path stage gated behind it. The unit population
+must therefore match exactly what the student sees on the curriculum
+screen: an item the student cannot see is an item they cannot satisfy,
+and counting it would lock the course permanently. Completion must
+also be revocable — withdrawing a lesson completion or regrading a
+quiz can move a course back out of the completed state. This course
+completion percentage is surfaced to both the student and the
+assigned teachers.
 
 At the \textit{career level}, the system must aggregate course 
 completion percentages across all courses belonging to a career to 
