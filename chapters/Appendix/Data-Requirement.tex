@@ -303,7 +303,20 @@ are permitted and up to what maximum number of attempts, any cooldown
 between them, an optional time limit, the passing score expressed as a
 percentage, whether question order is randomised, and the handling of
 an attempt whose deadline passes without submission — automatic
-submission of the work completed, a grace period, or abandonment.
+submission of the work completed, a grace period, or abandonment. The
+policy additionally records whether the quiz \textit{requires a
+camera}.
+
+A live attempt must also carry \textit{ownership}. Because a learner
+may open the same attempt in a second tab, on a second device, or
+after an accidental close, the system must bind a running attempt to
+exactly one client and record which one. Ownership is deliberately
+ephemeral rather than a durable lease: it is held against the owning
+authentication session for a short, renewed lifetime, so an
+abandoned client releases the attempt by simply falling silent. The
+authoritative timer belongs to the server and is unaffected by any of
+this — closing a tab or losing focus never pauses it, and an attempt
+left by an accidental close remains resumable.
 
 Because a student may hold several attempts, the system must maintain
 a single \textit{grade of record} per student per quiz, derived from
@@ -405,6 +418,18 @@ to the student, and disconnections or reconnections — each classified
 by severity. These signals are evidence for post-session review by a
 teacher and must not by themselves invalidate a session: the system
 records what happened and leaves the academic judgement to a human.
+
+The integrity policy under which an attempt is judged must be
+\textit{frozen onto the attempt} when it begins — the signal weights,
+the flag threshold, and whether a camera was required. A quiz edited
+or retuned mid-cohort must never re-judge an attempt that started
+under the earlier rules. Where a camera is required, the current
+implementation satisfies the requirement by the presence of an active
+local video track and nothing more, so the integrity record holds the
+policy and the resulting signals rather than any media. Retaining or
+examining the video itself would introduce data demands of its own ---
+storage, retention, and consent --- and is out of scope for this
+release.
 
 The second is \textit{adversarial use of the model itself}. Learner
 input to the AI interviewer must be screened for prompt-injection

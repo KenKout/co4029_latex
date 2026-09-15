@@ -208,7 +208,11 @@ FR-4.16 & The system shall record browser integrity signals reported during a qu
 
 FR-4.17 & The system shall produce per-question item analysis for a quiz, including the facility index and the discrimination index with an explanation when the latter cannot be computed, together with per-student response reports, and shall deliver both as structured data, comma-separated, or spreadsheet downloads. & Teachers & UR-TCH-05 & Yes & Yes & Medium \\ \hline
 
-FR-4.18 & The system shall close timed quiz attempts whose deadline passes without submission, honouring the quiz's overdue handling policy by grading the work completed, extending the deadline by a configured grace period, or abandoning the attempt without a grade. & Students & UR-STU-01 & Yes & Yes & High \\
+FR-4.18 & The system shall close timed quiz attempts whose deadline passes without submission, honouring the quiz's overdue handling policy by grading the work completed, extending the deadline by a configured grace period, or abandoning the attempt without a grade. & Students & UR-STU-01 & Yes & Yes & High \\ \hline
+
+FR-4.19 & The system shall admit only one client at a time to a live quiz attempt, binding the attempt to the owning authentication session, refusing answer saves, integrity events and submission from any other client, and allowing the learner to transfer ownership to a new client by explicit confirmation. & Students & UR-STU-01 & Yes & Yes & Medium \\ \hline
+
+FR-4.20 & The system shall allow Teachers to require a camera for a quiz, in which case the learner must grant local camera access before starting or resuming an attempt and the workspace is blocked while no active video track is present. The requirement in force is frozen onto the attempt when it starts. In the current implementation the requirement is satisfied by the presence of an active video track alone. & Teachers, Students & UR-TCH-04 & Yes & Yes & Medium \\
 
 \end{longtable}
 

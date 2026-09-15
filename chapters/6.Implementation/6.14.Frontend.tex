@@ -20,5 +20,3 @@ Component and integration tests run under Vitest with Testing Library, against a
 
 \paragraph{A note on type checking}
 The repository root holds a solution-style \path{tsconfig.json} that lists project references and no files of its own. Running \texttt{tsc --noEmit} against it therefore type-checks \emph{nothing} while appearing to succeed --- the build script uses \texttt{tsc -b}, which walks the referenced projects, and that is the only invocation whose success is meaningful.
-
-\diagramplaceholder{fig:impl_frontend_data}{Client data flow and cache invalidation}{Show a route component reading server state through a TanStack Query hook, the generated API types sitting between client and backend contract, and a mutation invalidating declared query keys so dependent views refetch. Mark where the OpenAPI codegen check enforces contract agreement at build time, and where Mock Service Worker substitutes the network in tests.}

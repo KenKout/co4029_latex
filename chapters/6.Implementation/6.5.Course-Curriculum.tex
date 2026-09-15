@@ -9,10 +9,10 @@ A course owns ordered modules, and each module owns ordered items --- lessons, q
 \paragraph{Publication gating}
 A course, like every other authored artefact in the system, moves through \texttt{draft}, \texttt{published}, and \texttt{archived}. Draft content is invisible to learners at the query level rather than filtered in the presentation layer, so an unpublished lesson cannot leak through an endpoint that forgot to check.
 
+Neither transition is reversible, and the asymmetry is deliberate. Publication is a one-way door: a published course can never return to draft, because its learning outcomes double as the graded assessment scale and re-opening it for editing would move the goalposts under students already enrolled against them. Archival is the separate terminal state, reached from either of the others, and it withdraws a course from new enrolment without disturbing the enrolments already running through it. A course removed in error is recovered not by a state change but by restoring the soft-deleted row, which is an operator action with its own audit trail rather than an ordinary edit.
+
 \paragraph{Syllabus import}
 \path{syllabus_import.py} accepts a structured syllabus and materialises an entire module tree in one operation. It follows the same per-row discipline as the programme roster import: a malformed entry is reported against its position and the remainder still imports, because a syllabus with one bad row is the normal case rather than the exception.
 
 \paragraph{Enrolment and entitlement}
 Learners reach a course three ways --- operator enrolment, a career path or programme that grants it, and self-enrolment by invitation code --- and all three converge on one enrolment row whose status is \texttt{active}, \texttt{completed}, \texttt{dropped}, or \texttt{waitlisted}. Keeping the grant paths separate from the enrolment record is what allows a programme path change to release an entitlement without disturbing an enrolment the learner obtained independently.
-
-\diagramplaceholder{fig:impl_course_tree}{Course curriculum structure and publication states}{Show the course $\rightarrow$ module $\rightarrow$ item tree with the uniform item abstraction over lessons, quizzes and interviews; alongside it, the \texttt{draft} $\rightarrow$ \texttt{published} $\rightarrow$ \texttt{archived} state machine and which transitions are reversible. Mark the point at which content becomes visible to learners.}

@@ -84,7 +84,7 @@ The diagram also shows the student-facing side of the module, where enrolled Stu
 
 This module represents the core learning mechanism of aBridgeAI, combining AI-assisted quiz question authoring, teacher review, adaptive quiz attempts, quality-score derivation, and hybrid SM-2 spaced-repetition scheduling.
 
-Teachers create or review quiz questions, configure expected response time $T_{\text{exp}}$, spaced-repetition parameters, unlock thresholds, and prerequisites. Students take quiz sessions, during which correctness, hint usage, and response time are recorded. These values are used to derive the per-card quality score $Q$ and update each student's spaced-repetition state. The module also supports lesson access gating, due-card reminders, remediation links, and learning-loop dashboards.
+Teachers create or review quiz questions, configure expected response time $T_{\text{exp}}$, spaced-repetition parameters, unlock thresholds, and prerequisites, and may require a camera for a given quiz. Students take quiz sessions, during which correctness, hint usage, and response time are recorded. These values are used to derive the per-card quality score $Q$ and update each student's spaced-repetition state. A live attempt admits only one client at a time, with the learner able to transfer it to another device by explicit confirmation; where a camera is required, the current implementation checks only that an active video track is present and keeps the stream local to the browser. The module also supports lesson access gating, due-card reminders, remediation links, and learning-loop dashboards.
 
 \begin{figure}[H]
     \centering

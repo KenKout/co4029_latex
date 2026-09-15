@@ -1,11 +1,11 @@
-\section{Implementation Details}
+﻿\section{Implementation Details}
 \label{appendix:implementation}
 
-This appendix carries the material that Chapter~\ref{sec:implementation} states only in summary: the full lifecycle vocabulary the system enforces, and the specifications for the diagrams that accompany each subsystem.
+This appendix carries the material that Chapter~\ref{sec:implementation} states only in summary: the full lifecycle vocabulary the system enforces, the cross-cutting conventions every feature package observes, the end-to-end path a learner takes through those packages, and the per-case detail behind the reported test results.
 
 \subsection{Entity lifecycle reference}
 
-Every lifecycle below is enforced by a database \texttt{CHECK} constraint rather than by application code alone, so a state outside the declared set cannot be written by any path --- including a migration or a manual correction. The table is the authoritative vocabulary; the transitions between the states are given by the diagrams that follow.
+Every lifecycle below is enforced by a database \texttt{CHECK} constraint rather than by application code alone, so a state outside the declared set cannot be written by any path --- including a migration or a manual correction. The table is the authoritative vocabulary; the transitions between the states, and the reasons for them, are described in the corresponding subsection of Chapter~\ref{sec:implementation}.
 
 \begin{longtable}{|>{\raggedright\arraybackslash}m{0.17\textwidth}|>{\raggedright\arraybackslash}m{0.22\textwidth}|>{\raggedright\arraybackslash}m{0.28\textwidth}|>{\raggedright\arraybackslash}m{0.25\textwidth}|}
 \caption{Entity lifecycle states enforced by database constraints.}
@@ -51,14 +51,129 @@ Cross-feature calls are confined to each feature's \path{api/public.py}, and the
 \paragraph{Concurrency}
 Decisions that must not race --- a path request being approved, an interview being evaluated, a grade of record being recomputed --- take a row lock or a reservation before reading the state they will act on, and re-verify their preconditions inside it. Optimistic locking is used instead where a retry is cheap and a conflict is expected to be rare, notably on interview turn state, where a lost race surfaces as an explicit stale-state error rather than an overwrite.
 
-\subsection{Diagram specifications}
+\subsection{The learner journey across subsystems}
 
-The diagrams below are specified but not yet drawn. Each placeholder states what the finished artwork must show; replacing it with the drawn figure keeps the same label, so cross-references remain valid.
+The preceding sections each describe one feature package. Read end to end, they compose into a single path that is worth tracing once, because the handoffs between packages are where the design decisions actually bind.
 
-\diagramplaceholder{fig:impl_learner_journey}{End-to-end learner journey across subsystems}{A single flow spanning the whole platform: programme enrolment and automatic placement on the default career path, the courses that path entitles, a lesson's materials and their ingestion, the quiz attempt and its grading, the review cards that attempt seeds, the unlock rule that gates the next lesson, and the mock interview that probes explanation. Mark the boundary of each feature package so the reader can see where one subsystem hands off to the next.}
+A learner enters through a programme enrolment, which pins a programme version and places them on its default career path. That path entitles a set of courses; entitlement is recorded separately from enrolment, so a later path change can withdraw access without disturbing a course the learner reached by another route. Within a course, modules hold lessons, quizzes and interviews as sibling items in one ordered walk. A lesson's materials have already passed through ingestion --- extracted, chunked, embedded and indexed --- and that derived corpus is what the generation pipelines retrieve from when a teacher drafts a quiz or an interview question bank, every draft of which waits for human approval before any learner sees it.
 
-\diagramplaceholder{fig:impl_unlock_evaluation}{Lesson unlock evaluation}{A flow chart evaluating whether a lesson unlocks for one learner: prerequisite lesson completion, quiz grade against the pass mark, and the spaced-repetition standard --- ease factor above the configured minimum across a required coverage proportion of the lesson's cards. Show which inputs are per-lesson configuration and which are per-learner state, and show the outcome when a prerequisite has no data at all as distinct from failing it.}
+The learner then attempts the quiz. Grading produces a grade of record; the same responses seed spaced-repetition cards, whose ease factors and intervals evolve on a schedule of their own. The unlock rule reads both: prerequisite completion, the quiz result, and the proportion of the lesson's cards standing above the configured ease floor. Passing it opens the next lesson, and where the module requires it, the mock interview probes whether the learner can explain what the quiz established they can recognise. Completion propagates upward --- units satisfy a course, courses satisfy a career-path stage, stages satisfy the pathway, and the pathway completes the programme enrolment the learner started from.
 
-\diagramplaceholder{fig:impl_async_jobs}{Background job dispatch and outcome reporting}{Show the asynchronous work the platform performs outside the request path --- material ingestion, quiz and interview generation, notification e-mail, audit writes, retention sweeps --- dispatched through the job queue, with the per-job status surfaced back to the originating teacher as a notification. Mark which failures are retried, which are reported, and which are swallowed by design.}
+Two properties hold along the whole of that path and are easier to see here than in any one section. Nothing generated by a model reaches a learner without a human approving it, and every rule that judges a learner is frozen at the moment it starts applying to them --- the integrity policy onto the attempt, the pathway version onto the enrolment, the programme version onto the student --- so that editing the curriculum never retroactively changes what someone already under way is being measured against.
 
-\diagramplaceholder{fig:impl_deployment}{Deployment and service topology}{A deployment view showing the SPA, the API service, the worker pool, PostgreSQL with pgvector, Redis, the object store, and the graph store, together with the external model providers. Mark the trust boundary crossed by learner-supplied content and the point at which presigned URLs let a client reach the object store without proxying bytes through the API.}
+\subsection{Unlock evaluation in detail}
+
+Whether a lesson opens for a particular learner is decided by three inputs of different kinds, and the distinction between them matters when a result looks wrong.
+
+The first two are per-lesson configuration: which lesson, if any, is a prerequisite, and the standard the learner must reach --- the minimum ease factor, the proportion of the lesson's cards that must stand above it, and whether a passing interview is also required. The third is per-learner state: the learner's actual card ease factors, their quiz grade, and their interview verdicts. Configuration is authored once and applies to a cohort; state is personal and changes with every review.
+
+The evaluation is deliberately conservative about missing data. A prerequisite on which the learner has no card history at all is not treated as failed but as unevaluated, and the distinction is surfaced rather than collapsed: a learner who has never attempted the prerequisite needs a different intervention from one who attempted it and fell short. Collapsing the two would present an untouched lesson and a failed one identically, which is the most common way a gating rule becomes untrustworthy to the teacher relying on it.
+
+\subsection{Work performed outside the request path}
+
+Several operations are too slow, too failure-prone, or too unrelated to the caller to run inside an HTTP request, and are dispatched to the background worker pool instead: material ingestion, quiz and interview generation, notification e-mail, audit writes, and the retention sweeps that expire old records.
+
+They differ in how failure is handled, and the differences are deliberate rather than incidental. Ingestion and generation failures are \emph{reported}: the job's status is recorded against the entity and surfaced to the teacher who started it, because a teacher who uploaded a document is waiting on an outcome and silence would read as success. Audit and notification failures are \emph{swallowed}: they are logged, but they never propagate into the transaction that triggered them, because losing a dean's approval to a failed inbox write would be far worse than losing the notification. Retention sweeps are \emph{retried}, being idempotent by construction --- deleting what is already deleted is a no-op --- so a transient database error simply means the sweep runs again on its next schedule.
+
+\subsection{Deployment topology}
+
+The deployed system is a single-page application served to the browser, a FastAPI service handling requests, and a worker pool consuming the job queue, over four stores: PostgreSQL with \texttt{pgvector} for relational and vector data, Redis for caching, rate limiting and the queue itself, an S3-compatible object store for uploaded media, and Neo4j for the course knowledge graph. External model providers sit outside all of it, reached only through the LLM gateway.
+
+Two boundaries in that picture carry more weight than the rest. The first is the trust boundary crossed by learner-supplied content: uploaded material and interview utterances originate outside the system and are treated as untrusted wherever they meet a model prompt, which is what the interview input and output guards exist to enforce. The second is the object store path: clients upload and download through presigned URLs issued by the API rather than streaming bytes through it, so the API handles the authorisation decision while the store handles the transfer. That split is why material size is bounded by storage policy rather than by request timeouts.
+
+\subsection{Test execution detail}
+
+The summary in Section~\ref{sec:impl_testing} reports the per-module totals. The tables below list the individual cases behind those totals.
+\subsubsection{Authentication and Access Control}
+\label{sec:impl_test_auth}
+
+Table~\ref{tab:tc_detail_auth} details the test cases covering the authentication and access control module.
+
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{longtable}{|>{\centering\arraybackslash}m{0.10\textwidth}|>{\raggedright\arraybackslash}m{0.30\textwidth}|>{\raggedright\arraybackslash}m{0.35\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Test Results: Authentication and Access Control}
+\label{tab:tc_detail_auth} \\
+\hline
+\textbf{TC-ID} & \textbf{Description} & \textbf{Test File} & \textbf{Result} \\ \hline
+\endfirsthead
+\multicolumn{4}{c}{{\bfseries Table \thetable\ -- Continued}} \\ \hline
+\textbf{TC-ID} & \textbf{Description} & \textbf{Test File} & \textbf{Result} \\ \hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+
+TC-1.1.1 & Google SSO login callback & \path{test_oauth_flow.py} & Pass \\ \hline
+TC-1.1.2 & Idempotent logout & \path{test_oauth_flow.py} & Pass \\ \hline
+TC-1.2.1 & Session creation and refresh-token rotation & \path{test_identity_full.py} & Pass \\ \hline
+TC-1.2.2 & Session revocation on account disable & \path{test_identity_queries.py} & Pass \\ \hline
+TC-1.3.1 & TOTP verification and recovery-code consumption & \path{test_mfa_router.py} & Pass \\ \hline
+TC-1.3.2 & Recovery-code reuse prevention & \path{test_mfa_gate.py} & Pass \\ \hline
+TC-1.5.1 & Recursive permission resolution & \path{test_access_control_full.py} & Pass \\ \hline
+TC-1.5.2 & Endpoint enforcement by role & \path{test_access_control_membership_resolution.py} & Pass \\ \hline
+
+\end{longtable}
+\normalsize
+
+% ------------------------------------------------------------------
+\subsubsection{Course and Material Management}
+\label{sec:impl_test_course}
+
+Table~\ref{tab:tc_detail_course} details the test cases for course and material management features implemented in this iteration.
+
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{longtable}{|>{\centering\arraybackslash}m{0.10\textwidth}|>{\raggedright\arraybackslash}m{0.30\textwidth}|>{\raggedright\arraybackslash}m{0.35\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Test Results: Course and Material Management}
+\label{tab:tc_detail_course} \\
+\hline
+\textbf{TC-ID} & \textbf{Description} & \textbf{Test File} & \textbf{Result} \\ \hline
+\endfirsthead
+\multicolumn{4}{c}{{\bfseries Table \thetable\ -- Continued}} \\ \hline
+\textbf{TC-ID} & \textbf{Description} & \textbf{Test File} & \textbf{Result} \\ \hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+
+TC-3.1.1 & Course lifecycle (draft $\to$ publish) & \path{test_courses_e2e.py} & Pass \\ \hline
+TC-3.1.2 & Course archive and restore & \path{test_courses_e2e.py} & Pass \\ \hline
+TC-3.3.1 & PDF material upload and ingestion trigger & \path{test_materials_e2e.py} & Pass \\ \hline
+TC-3.3.2 & Ingestion pipeline processing & \path{test_materials_worker.py} & Pass \\ \hline
+TC-3.7.1 & Student material access (presigned URL) & \path{test_materials_learner_router.py} & Pass \\ \hline
+
+\end{longtable}
+\normalsize
+
+% ------------------------------------------------------------------
+\subsubsection{Quiz Generation and Taking}
+\label{sec:impl_test_quiz}
+
+Table~\ref{tab:tc_detail_quiz} details the test cases for the AI quiz generation and student quiz-taking features.
+
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{longtable}{|>{\centering\arraybackslash}m{0.10\textwidth}|>{\raggedright\arraybackslash}m{0.30\textwidth}|>{\raggedright\arraybackslash}m{0.35\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
+\caption{Test Results: Quiz Generation and Taking}
+\label{tab:tc_detail_quiz} \\
+\hline
+\textbf{TC-ID} & \textbf{Description} & \textbf{Test File} & \textbf{Result} \\ \hline
+\endfirsthead
+\multicolumn{4}{c}{{\bfseries Table \thetable\ -- Continued}} \\ \hline
+\textbf{TC-ID} & \textbf{Description} & \textbf{Test File} & \textbf{Result} \\ \hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+
+TC-4.1.1 & AI quiz generation from PDF content & \path{test_quiz_full_pipeline.py} & Pass \\ \hline
+TC-4.1.2 & Teacher review (approve/reject/edit) & \path{test_quiz_authoring_service.py} & Pass \\ \hline
+TC-4.3.1 & Student quiz session submission & \path{test_quiz_taking_service.py} & Pass \\ \hline
+TC-4.3.2 & Per-question response and feedback & \path{test_quizzes_e2e.py} & Pass \\ \hline
+
+\end{longtable}
+\normalsize

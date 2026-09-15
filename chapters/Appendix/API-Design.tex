@@ -420,6 +420,10 @@ Quiz authoring follows a draft / generate / review / publish pipeline. \path|POS
     POST   & \path|/attempts/{attempt_id}/submit|                                               & Bearer & Finalise the attempt; trigger scoring. \\ \hline
     GET    & \path|/attempts/{attempt_id}|                                                      & Bearer & Attempt detail. \\ \hline
     GET    & \path|/attempts/{attempt_id}/review|                                               & Bearer & Per-question review with correct answers. \\ \hline
+    POST   & \path|/attempts/{attempt_id}/session/claim|                                        & Bearer & Claim single-client ownership of a live attempt. \\ \hline
+    POST   & \path|/attempts/{attempt_id}/session/heartbeat|                                    & Bearer & Renew ownership while the attempt is open. \\ \hline
+    POST   & \path|/attempts/{attempt_id}/session/takeover|                                     & Bearer & Transfer ownership to this client on explicit confirmation. \\ \hline
+    POST   & \path|/attempts/{attempt_id}/session/release|                                      & Bearer & Release ownership; the attempt stays resumable. \\ \hline
     GET    & \path|/me/quizzes/{quiz_id}/attempts|                                              & Bearer & Caller's attempt history for the quiz. \\ \hline
 \end{longtable}
 

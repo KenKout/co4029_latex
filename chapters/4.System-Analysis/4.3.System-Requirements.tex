@@ -211,7 +211,11 @@ demands are as follows.
     \item \textbf{Integrity and safety.} Session activity signals and
     AI guard decisions are recorded as evidence for human review; the
     guard trail is redacted by design, holding a fingerprint of an
-    offending input rather than the input itself.
+    offending input rather than the input itself. The integrity policy
+    is frozen onto an attempt when it starts, so a later edit cannot
+    re-judge work already under way. Where a quiz requires a camera,
+    the current implementation checks only that an active video track
+    is present and keeps the stream local to the learner's browser.
 
     \item \textbf{Operational telemetry.} Every external AI call is
     logged with its tokens, latency, outcome, and a cost frozen at the
