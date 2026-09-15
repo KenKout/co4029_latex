@@ -1,6 +1,6 @@
-\section{Conclusion}
+﻿\section{Conclusion}
 
-This chapter summarises the achievements of the first development iteration of the aBridgeAI platform, identifies current limitations, and outlines the planned work for subsequent iterations.
+This chapter summarises what the aBridgeAI platform delivers, states the limitations of both the implementation and the evaluation behind it, and records the work that remains.
 
 % ===========================================================
 \subsection{Achievements}
@@ -10,9 +10,9 @@ The first iteration delivered a functional core of the AI-Powered Career Readine
 \begin{enumerate}
     \item \textbf{Authentication and Access Control} --- Full implementation of Google SSO login and logout, authenticated session management with secure cookie-based JWTs, two-factor authentication (TOTP and recovery codes), MFA freshness enforcement for sensitive operations, role-based access control with hierarchical permission resolution, and immutable audit logging of all authentication events.
 
-    \item \textbf{Course and Material Management} --- Teachers can create courses with draft and published states, upload PDF learning materials, and trigger the ingestion pipeline. Students can browse their enrolled courses, render PDF documents and stream video materials directly in the browser, and download resources via short-lived presigned URLs.
+    \item \textbf{Course and Material Management} --- Teachers can create courses with draft, published and archived states, organise them into modules holding lessons, quizzes and interviews, upload learning materials, and trigger the ingestion pipeline. Students can browse their enrolled courses, render documents and stream video materials directly in the browser, and download resources via short-lived presigned URLs.
 
-    \item \textbf{AI-Powered Quiz Generation} --- The material ingestion pipeline processes uploaded PDF files through extraction, chunking, and embedding stages. From ingested content, the AI quiz generation pipeline produces multiple-choice questions with explanations. Teachers can review and approve generated questions.
+    \item \textbf{AI-Powered Quiz Generation} --- The material ingestion pipeline processes uploads through extraction, chunking, and embedding stages, with extractors covering documents, presentations, web and plain text, source code, images, and transcribed audio and video. From ingested content, the AI quiz generation pipeline produces questions with explanations over hybrid dense and sparse retrieval. Teachers review, edit, approve or reject every generated question before publication.
 
     \item \textbf{Quiz Taking} --- Students can take quiz sessions on published quizzes, with per-question response recording and immediate feedback on correctness.
 \end{enumerate}
@@ -20,78 +20,80 @@ The first iteration delivered a functional core of the AI-Powered Career Readine
 % ===========================================================
 \subsection{Limitations}
 
-The current iteration has the following limitations:
+The limitations below are separated into two kinds, because they carry different weight. The first concern what the system does not yet do; the second concern what this work has not yet established, and it is the second that bounds the claims this report is entitled to make.
 
+\paragraph{Limitations of the implementation}
 \begin{itemize}
-    \item \textbf{Single material format} --- The ingestion pipeline currently supports PDF files only. Other declared formats (DOCX, PPTX, audio, video transcription) are architecturally supported but not yet activated.
-    \item \textbf{No spaced repetition} --- The SM-2 scheduling algorithm is implemented at the service layer but not yet connected to the quiz-taking flow. Cards do not yet accumulate EF history or schedule future reviews.
-    \item \textbf{No lesson gating} --- Prerequisite enforcement and the coverage threshold $\tau$ mechanism are not yet active. Students can access all published content without progression constraints.
-    \item \textbf{No interview capability} --- The mock interview subsystem (text and voice modes, outcome evaluation, transcript persistence) is not yet deployed.
-    \item \textbf{No notification system} --- In-app notifications, spaced-repetition reminders, and email dispatch are not yet operational.
-    \item \textbf{Limited analytics} --- Student progress tracking and teacher analytics dashboards are not yet available beyond basic quiz attempt records.
-    \item \textbf{Organisation management untested} --- Multi-tenant organisation features (provisioning, bulk enrollment, domain auto-provisioning) exist in code but have not been validated in a production-like environment.
+    \item \textbf{Assessment integrity is deterrent, not proof.} A live attempt is bound to one client through a session-scoped key rather than a durable lease, so a copied token carrying the same session identifier cannot be distinguished from the original client, and a modified client can ignore the browser-side coordination entirely. Where a camera is required, the system verifies only that a video track is live; nothing is captured, so the requirement discourages casual misconduct rather than evidencing its absence. Integrity signals are collected under one fixed policy with fixed weights, which cannot be tuned to the stakes of a particular assessment.
+
+    \item \textbf{Code answers cannot be marked automatically.} \texttt{code} is an accepted question type, but a submission is stored as text and routed to a teacher for manual marking. The platform therefore grades its most objectively checkable assessment type by its least scalable means.
+
+    \item \textbf{Administrative movement is constrained.} An account belongs to at most one organisation and there is no transfer workflow, so relocating a person between institutions means discarding their history and re-creating them. The organisational-unit tree supports arbitrary depth, but the administrative and reporting surfaces assume a flat membership beneath a faculty.
+
+    \item \textbf{Institutional obligations are not yet met.} The platform holds identifiable student records but offers no path to export everything held about one person, nor to erase it on request while preserving aggregate reporting.
+\end{itemize}
+
+\paragraph{Limitations of the evaluation}
+\begin{itemize}
+    \item \textbf{No learning-outcome study.} The pedagogical premise of this work --- that algorithmically derived quality scoring and spaced scheduling improve durable retention --- has not been tested against learners. The scheduler is shown to behave as specified; it is not shown to teach better than the alternative it replaces. Establishing that requires a controlled study over a cohort and a term, which this project's timeframe did not permit.
+
+    \item \textbf{Load testing exercised read paths only.} The three scenarios are authenticated \texttt{GET} requests sustained for thirty seconds on a development machine over a LAN without TLS. Write paths, concurrent attempts on one quiz, the AI generation pipelines, and the background worker pool are not represented, and these are precisely the paths where contention and cost would be expected to appear. The reported headroom against NFR-2.1 should be read as evidence about read-heavy traffic on that configuration, not as a capacity result for the system as deployed.
+
+    \item \textbf{Generation quality is model-assessed.} Quiz quality was scored by an independent judge model under a reference-guided protocol with anti-bias guardrails and bootstrap confidence intervals. That protocol is well founded and materially reduces judge error, but it remains an automated proxy: no subject-matter expert has rated the generated questions, and no learner has sat them. Groundedness and distractor plausibility as measured are properties the judge recognised, not outcomes observed in teaching.
+
+    \item \textbf{Multi-tenant operation is unvalidated at scale.} Organisation provisioning, bulk enrolment, and domain-based auto-provisioning are implemented and integration-tested, but have not been exercised with the number of concurrent tenants, users, or stored materials that an institutional deployment implies.
 \end{itemize}
 
 % ===========================================================
 \subsection{Future Work}
 
-Table~\ref{tab:future_work} presents the planned development tasks for the second iteration, including expected deliverables, responsible team members, and a 15-week timeline allocation.
+The work below is recorded as scope rather than as a schedule: each item states what remains to be built and why the system needs it, without committing to an ordering or an allocation. Several follow directly from boundaries stated earlier in this report; the rest are capabilities the present design accommodates but does not yet provide.
 
-\renewcommand{\arraystretch}{1.3}
-\small
-\begin{longtable}{|>{\centering\arraybackslash}m{0.03\textwidth}|>{\raggedright\arraybackslash}m{0.18\textwidth}|>{\raggedright\arraybackslash}m{0.22\textwidth}|>{\raggedright\arraybackslash}m{0.20\textwidth}|>{\raggedright\arraybackslash}m{0.12\textwidth}|>{\centering\arraybackslash}m{0.06\textwidth}|}
-\caption{Planned future work with assignment and timeline (15 weeks total).}
-\label{tab:future_work} \\
-\hline
-\textbf{\#} & \textbf{Task} & \textbf{Detail} & \textbf{Expected Results} & \textbf{Assigned To} & \textbf{Weeks} \\ \hline
-\endfirsthead
+\paragraph{Domain identity and records}
+\begin{itemize}
+    \item \textbf{Human-readable business codes for domain entities.} Students, organisations, courses, learning programmes and career paths are identified internally by opaque UUIDs. Institutions administer these entities by their own codes --- a student number, a course code, a programme code --- and reconciling platform records against a registrar's system currently depends on matching names. Each entity needs a business code that is unique within its scope, stable across edits, and usable in import, search, and export.
 
-\multicolumn{6}{c}%
-{{\bfseries Table \thetable\ -- Continued from previous page}} \\
-\hline
-\textbf{\#} & \textbf{Task} & \textbf{Detail} & \textbf{Expected Results} & \textbf{Assigned To} & \textbf{Weeks} \\ \hline
-\endhead
+    \item \textbf{Data export and erasure.} The platform holds personal data and assessment records for identifiable students, but provides no path to export everything held about one person, nor to erase it on request while preserving the aggregate record. Both are ordinary obligations for an institutional deployment and neither exists today.
+\end{itemize}
 
-\hline \multicolumn{6}{|r|}{{Continued on next page}} \\ \hline
-\endfoot
+\paragraph{Assessment integrity}
+\begin{itemize}
+    \item \textbf{Configurable integrity policy.} Integrity signals are presently recorded under one fixed policy with fixed weights. Institutions differ in how strictly they invigilate, and a formative weekly quiz does not warrant the treatment of a summative examination. What is needed is a security mode selectable per quiz or per organisation, governing which signals are collected, how they are weighted, and what threshold constitutes a flag.
 
-\hline
-\endlastfoot
+    \item \textbf{Retained and reviewable video.} A quiz may require a camera, but the current implementation only tests that a video track is live; nothing is captured. Making the recording retrievable for review, or analysing it for indications of misconduct, is a substantial addition rather than an extension: it introduces storage, retention, access-control, consent, and jurisdictional obligations that the present design deliberately avoids by never holding the media at all. Those obligations must be settled before the capability is built, not after.
 
-1 & Organisation \& User Management validation & Multi-tenant CRUD, bulk CSV enrollment, career pathway CRUD, domain auto-provisioning & Verified in production-like environment with 3+ tenants, 500+ users & Nguyễn Hoàng Nam & 1--3 \\ \hline
+    \item \textbf{Persistent assessment lease.} Ownership of a live quiz attempt is bound to an authentication session in Redis, which is enough to separate two ordinary browsers but not a durable lease. A copied token carrying the same session identifier is indistinguishable from the original client; losing Redis loses ownership; and a modified client can ignore the coordination entirely. Closing these gaps requires a lease shared by quizzes and interviews, with opaque per-client credentials, generation counters, audit history, invalidation on a cache reset, and enforcement extended into the interview transport.
+\end{itemize}
 
-2 & Spaced Repetition \& Lesson Gating & SM-2 scheduling, EF updates, interval jitter, coverage threshold $\tau$ for lesson unlock & Quiz flow connected to SR engine; cards accumulate history and schedule reviews & Lê Thành Duy & 1--4 \\ \hline
+\paragraph{Assessment authoring and delivery}
+\begin{itemize}
+    \item \textbf{Code questions with execution.} \texttt{code} is already an accepted question type, but a submitted answer is stored as text and routed to a teacher for manual marking. What is missing is the surface and the machinery around it: an editor with language support in the learner's workspace, and a sandboxed runner that executes a teacher-authored test suite against the submission and returns the result as the mark. This turns the platform's weakest assessment type --- the one that cannot currently be graded automatically at all --- into its most objective.
+\end{itemize}
 
-3 & Mock Interview --- Text Mode & Teacher-defined outcomes, AI question generation from content, adaptive turn-taking dialogue & Transcript persistence, binary pass/fail evaluation deployed & Võ Hoàng Ngân & 2--6 \\ \hline
+\paragraph{Collaboration}
+\begin{itemize}
+    \item \textbf{Media in discussions.} Lesson discussions accept text only. A learner asking about a diagram, an error message, or a rendering problem is usually trying to show something, and describing it in prose is both laborious and lossy. Attachments need the same storage, access-control, and moderation treatment that learning materials already receive rather than a separate path.
+\end{itemize}
 
-4 & Mock Interview --- Voice Mode & Real-time audio streaming via LiveKit, STT transcription, TTS synthesis & Voice-mode sessions integrated with text-mode evaluation pipeline & Võ Hoàng Ngân & 6--9 \\ \hline
+\paragraph{Organisation and pathway administration}
+\begin{itemize}
+    \item \textbf{Transferring an account between organisations.} An account belongs to at most one organisation, and this release provides no transfer: an account is offboarded by ending its membership, and a genuine move must be performed as a deletion and a re-creation, which discards the person's history. A transfer must be an explicit, audited transaction that reconciles roles, faculty assignments, enrolments, content ownership, and reporting scope in one step.
 
-5 & Multi-Format Ingestion & Extractors for DOCX, PPTX, HTML, source code, audio/video transcription & All formats processed through existing chunk/embed/KG pipeline & Lê Thành Duy & 4--6 \\ \hline
+    \item \textbf{Stronger constraints on pathway changes, with automatic rejection.} Every pathway-change request currently reaches a dean, including those that could never be approved. Requests that fail a determinable rule --- an exhausted switch allowance, a target outside the enrolled programme version, an archived target, a request duplicating an open one --- should be refused at submission with the reason shown to the student, leaving deans only the requests that genuinely require academic judgement. Institutions should additionally be able to express their own eligibility rules, such as a minimum progress threshold or a deadline in the academic calendar.
 
-6 & Notifications \& Reminders & In-app notification inbox, SR review reminders, email dispatch via background worker & Push and email notifications operational; reminder cadence configurable & Nguyễn Hoàng Nam & 4--7 \\ \hline
+    \item \textbf{Deeper faculty hierarchies.} The organisational-unit tree supports faculties, departments and further sub-units, but the administrative surfaces and the reporting views assume a faculty with a flat membership beneath it. Institutions organise themselves more deeply than that --- divisions within departments, programme groups within divisions --- and both dean authority and cohort reporting need to resolve correctly at any depth rather than only at the top.
+\end{itemize}
 
-7 & Analytics \& Dashboards & Student learning-loop dashboards (due cards, retention, progress), teacher cohort analytics & At-risk learner identification, retention heatmaps, difficult-card reports & Lê Thành Duy & 7--10 \\ \hline
+\paragraph{Platform configuration}
+\begin{itemize}
+    \item \textbf{Richer setting types.} The runtime settings registry admits boolean, integer and floating-point values only. Operational knobs that are naturally textual or enumerated --- a default locale, a provider selection, a retention policy name --- cannot be expressed and must therefore remain deployment constants, which is the very coupling the registry exists to remove.
+\end{itemize}
 
-8 & Admin Observability & Platform statistics, AI cost telemetry, processing-job inspection & Career Readiness snapshot aggregation; cost breakdown per model/tenant & Nguyễn Hoàng Nam & 8--10 \\ \hline
-
-9 & Material Version History & Version tracking for re-uploaded materials with rollback & Per-version processing status, diff view, one-click rollback & Lê Thành Duy & 10--11 \\ \hline
-
-10 & Session Integrity Monitoring & Interview session signals (focus changes, tab switching, full-screen status) & Post-session integrity review with timestamped event log & Võ Hoàng Ngân & 10--12 \\ \hline
-
-11 & Integration Testing \& Bug Fixes & End-to-end cross-module tests, performance profiling, regression suite & All modules pass integration; p95 latency within NFR targets & All members & 12--14 \\ \hline
-
-12 & Documentation \& Final Report & Complete Chapters 7 (Evaluation), update thesis, prepare defense presentation & Final report submitted; defense slides and demo script ready & All members & 13--15 \\ \hline
-
-\end{longtable}
-\normalsize
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{graphics/gantt_chart.png}
-    \caption{Gantt chart of planned future work over 15 weeks.}
-    \label{fig:gantt_chart}
-\end{figure}
 % ===========================================================
 \subsection{Concluding Remarks}
 
-The first iteration of aBridgeAI establishes the foundational infrastructure --- authentication, course management, material ingestion, and AI-powered quiz generation --- upon which the full adaptive learning experience will be built. The architecture has been validated as capable of supporting the remaining subsystems (spaced repetition, interviews, analytics) without requiring structural changes. The second iteration will focus on activating the learning-loop feedback mechanisms and the interview subsystem, transforming the platform from a content delivery system into a genuinely adaptive career readiness tool.
+aBridgeAI set out to close the distance between what a curriculum certifies and what an employer interviews for, and the platform now implements that loop end to end. Material uploaded by a teacher becomes a retrieval corpus; that corpus grounds generated assessment that no learner sees until a teacher has approved it; performance on that assessment drives a scheduler that decides when the material should be seen again; the resulting card state gates progression; and a mock interview asks the learner to explain what the quiz established they could recognise. Around that loop sits the governance structure an institution actually needs --- faculties, versioned career pathways, programme enrolment, and dean-adjudicated pathway change --- so that progress means something to a registrar and not only to a dashboard.
+
+Two commitments shaped the design more than any individual feature, and both were kept. The first is that a model never decides anything a teacher is accountable for: every generated artefact is a draft awaiting human approval, and the retrieval work exists to make review cheap rather than to make review unnecessary. The second is that any rule which judges a learner is frozen at the moment it starts applying to them --- the integrity policy onto the attempt, the pathway version onto the enrolment, the programme version onto the student --- so that editing a curriculum can never retroactively change what somebody already under way is measured against. Both cost more to build than their absence would have, and both are the reason the system's outputs can be defended to the person they affect.
+
+What remains is honest to state plainly. The engineering is in place and behaves as specified; the pedagogical claim behind it is not yet demonstrated. Whether deriving the quality signal from observed behaviour rather than self-assessment produces better retention than standard SM-2 is a question that needs a cohort, a term, and a control group, and answering it is the natural continuation of this work. The contribution offered here is a platform on which that question can now be asked --- one where the scheduling state, the assessment record, and the progression decision are all recorded well enough to be studied.
