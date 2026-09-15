@@ -271,26 +271,31 @@ $\bullet$ If the user logs out, the active session is revoked and can no longer 
 \textbf{Use Case ID} & \textbf{UC-ORG-02} \\ \hline
 \textbf{Use Case Name} & \textbf{Manage Users and Memberships} \\ \hline
 \textbf{Actors} & Educational Manager, IT Administrator, All Users \\ \hline
-\textbf{Related Requirements} & FR-2.3, FR-2.6, FR-2.8, FR-2.10 \\ \hline
-\textbf{Description} & Supports user onboarding, organisation membership management, tenant-scoped manager actions, and authenticated user profile updates. \\ \hline
+\textbf{Related Requirements} & FR-2.3, FR-2.6, FR-2.8, FR-2.10, FR-2.16 \\ \hline
+\textbf{Description} & Supports user onboarding by individual invitation and by roster import, organisation membership management, tenant-scoped manager actions, and authenticated user profile updates. \\ \hline
 \textbf{Pre-conditions} & The actor is authenticated and has the required organisation-management or profile-management permission. \\ \hline
-\textbf{Post-conditions} & User membership records, profile data, or account status are updated according to the actor's permission scope. \\ \hline
+\textbf{Post-conditions} & User accounts, membership records, profile data, or account status are updated according to the actor's permission scope. \\ \hline
 \textbf{Main Flow} &
 1. The Educational Manager opens the User Management area for their organisation. \newline
-2. The manager uploads a CSV file to bulk-enroll students into a course. \newline
-3. The system validates each row and creates accounts for unseen email addresses. \newline
-4. The system reports per-row validation errors without aborting the whole batch. \newline
-5. The manager views or updates organisation membership records, including student or employee identifier codes. \newline
-6. The system ensures that every manager query and action is scoped to the manager's tenant organisation. \newline
-7. Separately, an authenticated user may view and update their own profile information. \\ \hline
+2. To onboard one person --- a Teacher or a Student --- the manager invites them by e-mail address and names the role they are to hold; the system creates the account, profile, organisation membership and org-scoped role together. \newline
+3. To onboard a cohort, the manager instead opens the enrolment screen of the target course or learning programme and uploads a roster as a CSV file. \newline
+4. The system validates each row and creates accounts for unseen email addresses, enrolling every valid row. \newline
+5. The system reports per-row validation errors without aborting the whole batch. \newline
+6. The manager views or updates organisation membership records, including student or employee identifier codes. \newline
+7. The system ensures that every manager query and action is scoped to the manager's tenant organisation. \newline
+8. Separately, an authenticated user may view and update their own profile information. \\ \hline
 \textbf{Alternative Flows} &
-\textbf{3a. CSV contains invalid rows:} \newline
+\textbf{2a. Manager invites a peer role:} \newline
+\hspace*{1em}1. The system refuses: a manager administers teachers and students, not peer accounts. \newline
+\textbf{4a. CSV contains invalid rows:} \newline
 \hspace*{1em}1. The system imports valid rows. \newline
 \hspace*{1em}2. The system reports invalid rows with validation errors. \newline
-\textbf{6a. Manager attempts cross-tenant access:} \newline
+\textbf{4b. A row names an account that is not a Student:} \newline
+\hspace*{1em}1. The system reports the row as failed, since roster import enrols Students only. \newline
+\textbf{7a. Manager attempts cross-tenant access:} \newline
 \hspace*{1em}1. The system denies the request. \newline
 \hspace*{1em}2. No cross-tenant data is returned. \newline
-\textbf{7a. Profile data is invalid:} \newline
+\textbf{8a. Profile data is invalid:} \newline
 \hspace*{1em}1. The system rejects invalid profile fields or external links. \newline
 \hspace*{1em}2. The user is prompted to correct the profile information. \\
 \end{longtable}

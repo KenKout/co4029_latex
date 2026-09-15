@@ -58,9 +58,10 @@ It is essential to distinguish between stakeholders (those impacted by or invest
     within a single organisation (e.g.\ a programme lead). Defines
     \textit{career paths}---the staged, versioned pathways of courses
     representing a target professional competency---and assigns
-    teachers to courses within those pathways. Onboards students and
-    teachers within the organisation, including via bulk CSV import,
-    and consumes organisation-scoped reports including Career
+    teachers to courses within those pathways. Onboards teachers and
+    students into the organisation by invitation, and enrols student
+    cohorts onto a course or learning programme in bulk from a CSV
+    roster, and consumes organisation-scoped reports including Career
     Readiness progression at both the individual and cohort level. The
     Educational Manager's authority is bounded by the organisation
     they administer; they have no cross-tenant visibility.
@@ -81,12 +82,16 @@ It is essential to distinguish between stakeholders (those impacted by or invest
  
     \item \textbf{IT Administrator:} The
     super-user responsible for cross-tenant operations. Provisions
-    new organisations, configures organisation-level limits
-    (storage quotas, concurrent-user caps), invites the initial
-    Educational Manager for each newly provisioned tenant,
-    monitors system health and infrastructure, and enforces
-    platform-wide security and compliance policies. The IT
-    Administrator does not manage course content or
-    intra-organisational user accounts; those responsibilities
-    belong to the Educational Manager.
+    new organisations and their email domains, tunes the platform's
+    runtime configuration both deployment-wide and per organisation,
+    invites the initial Educational Manager for each newly
+    provisioned tenant, monitors system health, processing backlog
+    and AI spend, and enforces platform-wide security and compliance
+    policies. The IT Administrator holds the full platform permission
+    set, since recovering a tenant from an operational failure
+    requires it; in normal operation, however, course content and
+    assessment configuration remain the responsibility of the
+    Educational Manager and the Teachers of each tenant, and every
+    administrative action taken inside a tenant is recorded in the
+    immutable audit trail.
 \end{itemize}
