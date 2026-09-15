@@ -324,9 +324,9 @@ FR-6.9 & The system shall let each user maintain notification preferences as a m
 \hline
 \endlastfoot
 
-FR-7.1 & The system shall allow Faculty Deans and Educational Managers to define a learning programme within a faculty of their own organisation as an ordered selection of published career pathways, and shall reject any pathway that is unpublished, archived, or owned by another organisation. & Faculty Deans, Educational Managers & UR-MGR-02 & Yes & Yes & High \\ \hline
+FR-7.1 & The system shall allow Faculty Deans and Educational Managers to define a learning programme within a faculty of their own organisation as an ordered selection of published career pathways, and shall reject any pathway that is unpublished, archived, or owned by another organisation, and shall require exactly one of the selected pathways to be designated the programme default. & Faculty Deans, Educational Managers & UR-MGR-02 & Yes & Yes & High \\ \hline
 
-FR-7.2 & The system shall manage a learning programme through draft, published, and archived states, shall refuse publication when the programme has no draft version, no attached pathway, or a pathway that has since become unavailable, and shall treat an archived programme as immutable and closed to enrolment. & Faculty Deans, Educational Managers & UR-MGR-02 & Yes & Yes & High \\ \hline
+FR-7.2 & The system shall manage a learning programme through draft, published, and archived states, shall refuse publication when the programme has no draft version, no attached pathway, a pathway that has since become unavailable, no designated default pathway or more than one, or a pathway selection limit exceeding the number of attached pathways, and shall treat an archived programme as immutable and closed to enrolment. & Faculty Deans, Educational Managers & UR-MGR-02 & Yes & Yes & High \\ \hline
 
 FR-7.3 & The system shall version a learning programme, creating a new draft version rather than modifying a published one, shall carry forward the pathway selection with each pathway pinned to a specific published pathway version, and shall retain every enrolled student on the programme version they enrolled upon. & Faculty Deans, Educational Managers & UR-MGR-02 & Yes & Yes & High \\ \hline
 
@@ -334,9 +334,9 @@ FR-7.4 & The system shall allow authorised operators to enrol Students into a pu
 
 FR-7.5 & The system shall enforce an organisation-configurable ceiling on the number of learning-programme enrolments a Student may hold concurrently, and shall reject an enrolment that would exceed it, reporting the limit and the current count. & Faculty Deans, Educational Managers & UR-MGR-01, UR-MGR-04 & Yes & Yes & Medium \\ \hline
 
-FR-7.6 & The system shall require an enrolled Student to select exactly one initial career pathway from those pinned in their programme version, shall grant pathway access at the pinned version, and shall permit that initial selection only once. & Students & UR-STU-01 & Yes & Yes & High \\ \hline
+FR-7.6 & The system shall place a Student onto the default career pathway of their programme version at the moment of enrolment, shall record that assignment as system-originated rather than student-chosen, shall grant pathway access at the pinned version, and shall abort the enrolment rather than admit a Student without a pathway where the default has become unavailable. & Students & UR-STU-01 & Yes & Yes & High \\ \hline
 
-FR-7.7 & The system shall allow a Student with an active enrolment to request a change of career pathway with a mandatory justification, shall permit at most one open request per enrolment, shall reject a request targeting the current pathway or a pathway outside the enrolled programme version, and shall refuse a request once the Student has exhausted the switch allowance defined by their programme version. & Students & UR-STU-01 & Yes & Yes & Medium \\ \hline
+FR-7.7 & The system shall allow a Student with an active enrolment to request a change of career pathway with a mandatory justification, shall permit at most one open request per enrolment irrespective of whether that request seeks to change a pathway or to drop one, shall reject a request targeting the current pathway or a pathway outside the enrolled programme version, and shall refuse a request once the Student has exhausted the switch allowance defined by their programme version. & Students & UR-STU-01 & Yes & Yes & Medium \\ \hline
 
 FR-7.8 & The system shall progress a pathway-change request through pending, acknowledged, approved, rejected, cancelled, and invalidated states, shall restrict the decision to a Faculty Dean owning the programme, shall forbid a reviewer from deciding a request concerning their own enrolment, and shall require a rejection to cite a reason drawn from a fixed vocabulary with supporting detail whenever the reason is recorded as other. & Faculty Deans, Students & UR-MGR-03 & Yes & Yes & Medium \\ \hline
 
@@ -348,7 +348,13 @@ FR-7.11 & The system shall allow authorised operators to withdraw a Student from
 
 FR-7.12 & The system shall notify a Student when their pathway-change request is acknowledged, approved, or rejected, and shall notify the owning Faculty Deans when a request is filed. & Students, Faculty Deans & UR-STU-04, UR-MGR-03 & Yes & Yes & Medium \\ \hline
 
-FR-7.13 & The system shall complete a Student's programme enrolment once every course of their pinned pathway version is satisfied. & Students & UR-STU-01 & Yes & Yes & Medium \\
+FR-7.13 & The system shall complete a Student's programme enrolment only once every pathway the Student holds is itself complete, a pathway counting as complete when every course of the version at which it was pinned is satisfied. & Students & UR-STU-01 & Yes & Yes & Medium \\ \hline
+
+FR-7.14 & The system shall allow a Student to add further career pathways from those pinned in their programme version without approval, up to a per-programme limit that may exceed neither the number of pathways attached to that programme nor an organisation-configurable ceiling, and shall refuse a pathway that is already held or that lies outside the enrolled version. & Students & UR-STU-01 & Yes & Yes & Medium \\ \hline
+
+FR-7.15 & The system shall allow a Student with an active enrolment to request that one of their career pathways be dropped without replacement, citing the pathway to be dropped and a mandatory justification, shall refuse the request where it would leave the Student with no pathway in progress, and shall subject it to the same single-open-request rule and the same switch allowance as a change of pathway. & Students & UR-STU-01 & Yes & Yes & Medium \\ \hline
+
+FR-7.16 & The system shall, upon approving the dropping of a pathway, re-verify that at least one other pathway remains in progress and refuse the approval otherwise, capture a snapshot of the dropped attempt's completed courses and overall progress, close that attempt without opening a replacement, release access no longer justified by any remaining pathway, and count the decision against the Student's switch allowance without restoring it on any later request. & Faculty Deans, Students & UR-MGR-03, UR-STU-01 & Yes & Yes & Medium \\
 \end{longtable}
 
 

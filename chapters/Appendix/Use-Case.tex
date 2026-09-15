@@ -1333,10 +1333,10 @@ $\bullet$ Students already enrolled remain attached to the programme version the
 1. The operator opens the Learning Programmes page for their organisation. \newline
 2. The operator selects ``Create programme'' and chooses the owning faculty. \newline
 3. The system offers the organisation's career pathways, marking those that cannot be selected together with the reason. \newline
-4. The operator enters the programme name, description, and the permitted number of pathway switches, and arranges the chosen pathways in order. \newline
+4. The operator enters the programme name, description, the permitted number of pathway switches, and the number of pathways a Student may hold at once, arranges the chosen pathways in order, and designates one of them as the programme default. \newline
 5. The operator saves the programme, which the system creates as a draft together with version one. \newline
 6. The operator reviews the draft and selects ``Publish''. \newline
-7. The system verifies that every pinned pathway and pathway version is still available. \newline
+7. The system verifies that every pinned pathway and pathway version is still available, that exactly one pathway is designated the default, and that the number of pathways a Student may hold does not exceed the number attached. \newline
 8. The system promotes the draft to published, records the publisher and the publication time, and opens the programme for enrolment. \newline
 9. To revise a published programme, the operator edits it and the system opens a new draft version carrying forward the existing pathway pins. \\ \hline
 \textbf{Alternative Flows} &
@@ -1411,11 +1411,11 @@ $\bullet$ A withdrawn Student's enrolment records the withdrawal reason and any 
 \end{longtable}
 
 % =========================================================
-% UC-PROGRAM-03: Select and Change Career Pathway
+% UC-PROGRAM-03: Hold, Change, and Drop Career Pathways
 % =========================================================
 \renewcommand{\arraystretch}{1.3}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
-\caption{Use Case Specification: Select and Change Career Pathway}
+\caption{Use Case Specification: Hold, Change, and Drop Career Pathways}
 \label{tab:uc_program_path_change} \\
 \hline
 \endfirsthead
@@ -1429,41 +1429,48 @@ $\bullet$ A withdrawn Student's enrolment records the withdrawal reason and any 
 \endlastfoot
 
 \textbf{Use Case ID} & \textbf{UC-PROGRAM-03} \\ \hline
-\textbf{Use Case Name} & \textbf{Select and Change Career Pathway} \\ \hline
+\textbf{Use Case Name} & \textbf{Hold, Change, and Drop Career Pathways} \\ \hline
 \textbf{Actors} & Student for selection and request; Faculty Dean for the decision \\ \hline
-\textbf{Related Requirements} & FR-7.6, FR-7.7, FR-7.8, FR-7.9, FR-7.10, FR-7.12, FR-7.13 \\ \hline
-\textbf{Description} & Allows a Student to choose their initial career pathway within an enrolled learning programme and subsequently to request a change of pathway, which an owning Faculty Dean acknowledges and then approves or rejects. \\ \hline
+\textbf{Related Requirements} & FR-7.6, FR-7.7, FR-7.8, FR-7.9, FR-7.10, FR-7.12, FR-7.13, FR-7.14, FR-7.15, FR-7.16 \\ \hline
+\textbf{Description} & Describes the life of a Student's career pathways within an enrolled learning programme: the default pathway they receive on enrolment, the further pathways they may add without approval, and the two reviewed requests --- to change a pathway or to drop one --- which an owning Faculty Dean acknowledges and then approves or rejects. \\ \hline
 \textbf{Pre-conditions} &
 $\bullet$ The Student holds an enrolment on a published learning programme. \newline
-$\bullet$ For a change request, the enrolment is active and the Student has not exhausted the permitted number of switches. \newline
+$\bullet$ For a change or a drop request, the enrolment is active, no other request is open, and the Student has not exhausted the permitted number of switches. \newline
+$\bullet$ For a drop request, the Student holds at least two pathways in progress. \newline
 $\bullet$ For a decision, the reviewer is a Faculty Dean owning the programme and is not the subject of the request. \\ \hline
 \textbf{Post-conditions} &
-$\bullet$ Upon initial selection the enrolment becomes active with an open pathway attempt pinned to the chosen pathway version. \newline
-$\bullet$ Upon approval the outgoing attempt is closed with a progress snapshot, a new attempt is opened on the target pathway version, and the switch is counted against the allowance. \newline
+$\bullet$ Upon enrolment the enrolment is active with an open attempt pinned to the version of the programme's default pathway. \newline
+$\bullet$ Upon adding a pathway a further open attempt exists, no review having taken place. \newline
+$\bullet$ Upon approval of a change the outgoing attempt is closed with a progress snapshot, a new attempt is opened on the target pathway version, and the switch is counted against the allowance. \newline
+$\bullet$ Upon approval of a drop the dropped attempt is closed with a progress snapshot and no replacement is opened, at least one pathway remains in progress, and the decision is counted against the allowance and never restored. \newline
 $\bullet$ Course completions already earned remain valid and continue to count towards the new pathway. \newline
 $\bullet$ Upon rejection the enrolment and the current pathway are unchanged and the recorded reason is visible to the Student. \\ \hline
 \textbf{Main Flow} &
-1. The Student opens their programme enrolment and reviews the pathways offered by their programme version. \newline
-2. The Student selects one pathway as their initial choice. \newline
-3. The system activates the enrolment, opens a pathway attempt pinned to that pathway version, and grants access to the pathway's courses. \newline
-4. To change pathway later, the Student selects a different pathway and submits a written justification. \newline
-5. The system verifies that the target pathway belongs to the enrolled programme version, differs from the current pathway, and that the switch allowance has not been exhausted. \newline
+1. On enrolment the system activates the enrolment, opens an attempt pinned to the version of the programme's default pathway, records the assignment as system-originated, and grants access to that pathway's courses. \newline
+2. The Student opens their programme enrolment and reviews the pathways offered by their programme version. \newline
+3. While the programme's pathway limit permits, the Student may add a further pathway; the system opens an additional attempt and grants access without any review. \newline
+4. To change pathway later, the Student names the pathway to leave, selects a different pathway, and submits a written justification; to drop a pathway instead, the Student names the pathway to end and submits a written justification without naming a destination. \newline
+5. For a change, the system verifies that the target pathway belongs to the enrolled programme version, is not already held, and differs from the pathway being left; for a drop, it verifies that a further pathway would remain in progress. In both cases it verifies that no other request is open and that the switch allowance has not been exhausted. \newline
 6. The system records the request as pending and notifies the owning Faculty Deans. \newline
 7. A Faculty Dean opens the programme's review tab and acknowledges the request, which the system marks as in progress and notifies the Student. \newline
 8. The Faculty Dean approves or rejects the request. \newline
-9. On approval the system re-verifies the enrolment, snapshots the outgoing attempt's completed courses and overall progress, closes it, and opens a new attempt on the target pathway version. \newline
-10. The system carries over access to courses shared by both pathways, releases access that is no longer justified, and counts the switch against the allowance. \newline
+9. On approval the system re-verifies the enrolment and snapshots the outgoing attempt's completed courses and overall progress before closing it. For a change it opens a new attempt on the target pathway version; for a drop it opens none, having first re-confirmed that another pathway remains in progress. \newline
+10. The system carries over access to courses still justified by a pathway the Student holds, releases the rest, and counts the decision against the allowance whichever kind it was. \newline
 11. The system notifies the Student of the outcome. \newline
-12. When every course of the pinned pathway version is satisfied, the system completes the enrolment. \\ \hline
+12. When every pathway the Student holds is complete --- each judged against the version at which it was pinned --- the system completes the enrolment. \\ \hline
 \textbf{Alternative Flows} &
-\textbf{2a. Initial pathway already chosen:} \newline
-\hspace*{1em}1. The system refuses, because the initial pathway may be selected only once. \newline
+\textbf{3a. Pathway limit already reached:} \newline
+\hspace*{1em}1. The system refuses the addition and reports the programme's limit. \newline
+\textbf{3b. Pathway already held:} \newline
+\hspace*{1em}1. The system refuses the addition. \newline
 \textbf{5a. Target pathway equals the current pathway, or lies outside the enrolled version, or is archived:} \newline
 \hspace*{1em}1. The system rejects the request and explains the reason. \newline
 \textbf{5b. A request is already open:} \newline
 \hspace*{1em}1. The system refuses a second request until the open one is decided or cancelled. \newline
 \textbf{5c. Switch allowance exhausted:} \newline
 \hspace*{1em}1. The system refuses the request and reports that the limit has been reached. \newline
+\textbf{5d. The drop would leave no pathway in progress:} \newline
+\hspace*{1em}1. The system refuses the request, since leaving the programme entirely is a withdrawal performed by an authorised operator rather than a pathway decision. \newline
 \textbf{8a. Rejection:} \newline
 \hspace*{1em}1. The Faculty Dean selects a reason from the defined vocabulary. \newline
 \hspace*{1em}2. Where the reason is recorded as other, the system requires explanatory text. \newline
@@ -1472,6 +1479,8 @@ $\bullet$ Upon rejection the enrolment and the current pathway are unchanged and
 \hspace*{1em}1. The system refuses the decision as self-approval. \newline
 \textbf{9a. Target pathway became unavailable before approval:} \newline
 \hspace*{1em}1. The system marks the request invalidated and leaves the enrolment unchanged. \newline
+\textbf{9b. The Student's other pathway ended between filing and decision:} \newline
+\hspace*{1em}1. The system refuses to approve the drop, because it would now leave the Student with no pathway in progress. \newline
 \textbf{4a. Student cancels:} \newline
 \hspace*{1em}1. While the request is still open the Student withdraws it. \newline
 \hspace*{1em}2. The system retains the cancelled request in the visible history. \\

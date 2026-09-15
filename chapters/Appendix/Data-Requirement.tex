@@ -90,6 +90,38 @@ and career-level progress can be computed from course-level outcomes.
 Per-student progress must be tracked against the stage, not only
 against the pathway as a whole.
 
+Career paths are offered to students through \textit{learning programmes},
+each owned by a faculty and versioned on the same principle: a
+published version is frozen and an edit opens a new draft, so the
+system must record which programme version each enrolment is pinned
+to. A programme version records the career paths it bundles, their
+order, the number a student may hold at once, the number of pathway
+changes permitted, and which single bundled pathway is its
+\textit{default} --- the one a student is placed on automatically at
+enrolment.
+
+Because a student may hold more than one pathway, the system must
+record each as a separate \textit{attempt} rather than as a single
+field on the enrolment. Each attempt must carry the pathway version
+it was pinned to, its state, when it began and ended, how it came
+about --- assigned by default, chosen by the student, or produced by
+an approved change --- and, once ended, a snapshot of the progress
+earned on it. The provenance matters because an enrolment that was
+never a student's own choice reads differently in an audit from one
+that was, and the snapshot matters because a closed attempt must
+remain accountable after access to its courses has been released.
+
+Requests to leave a pathway must be recorded as reviewable items in
+their own right, holding the enrolment and attempt concerned, whether
+the student asked to change pathway or to drop one, the justification
+given, the destination where one exists, the review state, and the
+reviewer's decision with its reason and any note. A drop has no
+destination, so the system must permit that absence while still
+distinguishing it from a change whose destination is merely missing.
+The full history must be retained, including rejected and cancelled
+requests, since a student's record of asking is as much a part of
+the account as the outcome.
+
 Each course must be described by its title, subject domain, and 
 associated tags that enable discovery and categorisation. The system 
 must record which teachers are assigned to deliver the course, which 

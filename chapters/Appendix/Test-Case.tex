@@ -521,11 +521,11 @@ TC-7.4.1 & FR-7.4 & System & Authorised operator imports a comma-separated file 
 % --- FR-7.5: Concurrent Enrolment Ceiling ---
 TC-7.5.1 & FR-7.5 & System & Operator enrols a Student who already holds the organisation's maximum number of concurrent programme enrolments & The enrolment is rejected and the response reports both the configured limit and the Student's current count & The ceiling is enforced per row so that a file import cannot bypass it \\ \hline
 
-% --- FR-7.6: Initial Pathway Selection ---
-TC-7.6.1 & FR-7.6 & System & Enrolled Student selects an initial career pathway from those pinned in their programme version, then attempts to select a second time & Exactly one pathway is selected, access is granted at the pinned version, and the second attempt is refused & A pathway outside the Student's pinned programme version cannot be selected \\ \hline
+% --- FR-7.6: Automatic Assignment to the Default Pathway ---
+TC-7.6.1 & FR-7.6 & System & Operator enrols a Student onto a published programme whose default pathway is available, then onto one whose default has since been archived & The first Student is active immediately with an attempt pinned to the default pathway version, the assignment recorded as system-originated, and access granted; the second enrolment is refused outright & No Student is ever admitted to a programme without a pathway \\ \hline
 
 % --- FR-7.7: Pathway Change Request ---
-TC-7.7.1 & FR-7.7 & System & Active Student files a pathway-change request with a justification, then files a second while the first is still open & The first request is accepted with its mandatory justification recorded and the second is refused, since at most one request may be open per enrolment & A request targeting the current pathway, a pathway outside the programme version, or one filed after the switch allowance is exhausted is rejected \\ \hline
+TC-7.7.1 & FR-7.7 & System & Active Student files a pathway-change request with a justification, then files a second while the first is still open & The first request is accepted with its mandatory justification recorded and the second is refused, since at most one request may be open per enrolment & A request targeting the current pathway, a pathway outside the programme version, a pathway already held, or one filed after the switch allowance is exhausted is rejected; the single open slot is shared with drop requests \\ \hline
 
 % --- FR-7.8: Pathway Change Review ---
 TC-7.8.1 & FR-7.8 & System & Faculty Dean owning the programme rejects a pending request citing a reason of other, and a second Dean attempts to decide a request concerning their own enrolment & Request progresses through its states and the rejection records a reason drawn from the fixed vocabulary with the supporting detail required for other & A reviewer deciding a request concerning their own enrolment is refused, as is a Dean who does not own the programme \\ \hline
@@ -543,7 +543,16 @@ TC-7.11.1 & FR-7.11 & System & Authorised operator withdraws an active Student w
 TC-7.12.1 & FR-7.12 & System & Student files a pathway-change request which the owning Faculty Dean then acknowledges and approves & The owning Faculty Deans are notified when the request is filed, and the Student is notified when it is acknowledged, approved or rejected & A notification failure never prevents the request or the decision from being recorded \\ \hline
 
 % --- FR-7.13: Programme Completion ---
-TC-7.13.1 & FR-7.13 & System & Student satisfies the final outstanding course of their pinned pathway version & The pathway attempt and the programme enrolment are both completed & Completion is evaluated against the exact pathway version pinned to the attempt, not the pathway's current head \\ \hline
+TC-7.13.1 & FR-7.13 & System & Student holding two pathways satisfies the final outstanding course of the first, then of the second & The first pathway attempt completes while the enrolment stays active, and only the second completion closes the enrolment & Completion is evaluated against the exact pathway version pinned to each attempt, not the pathway's current head \\ \hline
+
+% --- FR-7.14: Adding a Further Pathway ---
+TC-7.14.1 & FR-7.14 & System & Student adds a second pathway within a programme permitting two, then attempts a third, and separately attempts to add one already held & The second is added at once without review; the third and the duplicate are both refused & The per-programme limit may exceed neither the pathways attached nor the organisation ceiling \\ \hline
+
+% --- FR-7.15: Pathway Drop Request ---
+TC-7.15.1 & FR-7.15 & System & Student holding two pathways files a drop request for one, then a Student holding only one attempts the same & The first is accepted with its justification recorded; the second is refused because no pathway would remain in progress & A drop occupies the same single open-request slot and the same switch allowance as a change \\ \hline
+
+% --- FR-7.16: Pathway Drop Approval Effects ---
+TC-7.16.1 & FR-7.16 & System & Faculty Dean approves a drop for a Student holding two pathways, and separately approves one after the Student's other pathway has ended since filing & The first closes the dropped attempt with a snapshot, opens no replacement, releases access no longer justified, and spends one of the allowance; the second is refused & The remaining-pathway rule is re-checked at approval, not trusted from filing time, and the allowance is never restored \\ \hline
 
 \end{longtable}
 
