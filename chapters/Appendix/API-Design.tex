@@ -814,7 +814,7 @@ This catalogue captures the live Swagger UI rendered by FastAPI from \texttt{/op
 % ────────────────────────────────────────────────────────────
 \subsection{Learning Programs}
 
-A learning programme bundles career paths into a single enrolment. Authoring is version-based: edits land on an open draft and publishing freezes it, so a student who enrolled under version~2 continues to see version~2. The change-request endpoints implement the dean-review workflow by which a student moves between paths without losing progress on courses the two paths share.
+A learning programme bundles career paths into a single enrolment. Authoring is version-based: edits land on an open draft and publishing freezes it, so a student who enrolled under version~2 continues to see version~2. Enrolment places a student on the programme version's default path at once; further paths may be added directly, up to the limit the version declares. The request endpoints implement the dean-review workflow by which a student leaves a path --- moving to another without losing progress on courses the two share, or dropping one outright --- and both kinds share one queue, one open-request slot and one switch allowance.
 
 \renewcommand{\arraystretch}{1.25}
 \small
@@ -839,18 +839,19 @@ A learning programme bundles career paths into a single enrolment. Authoring is 
 \texttt{PATCH} & \path|/management/learning-programs/{program\_id}| & Edit the open draft. A published version is immutable. \\ \hline
 \texttt{POST} & \path|/management/learning-programs/{program\_id}/publish| & Publish the draft; existing enrolments stay on the version they joined. \\ \hline
 \texttt{POST} & \path|/management/learning-programs/{program\_id}/archive| & Archive the programme; no new enrolments, existing ones continue. \\ \hline
-\texttt{GET} & \path|/management/learning-programs/{program\_id}/students| & Enrolment roster with each student's selected path and progress. \\ \hline
+\texttt{GET} & \path|/management/learning-programs/{program\_id}/students| & Enrolment roster with each student's held paths and progress. \\ \hline
 \texttt{POST} & \path|/management/learning-programs/{program\_id}/students| & Enrol students individually; rejected as a whole if the concurrency cap would be exceeded. \\ \hline
 \texttt{POST} & \path|/management/learning-programs/{program\_id}/students/import-csv| & Bulk enrol from CSV; rows are validated and reported per row. \\ \hline
 \texttt{DELETE} & \path|/management/learning-programs/{program\_id}/students/{student\_id}| & Withdraw a student, releasing the course entitlements the programme granted. \\ \hline
-\texttt{GET} & \path|/management/learning-programs/{program\_id}/path-change-requests| & Pending and decided path-change requests for dean review. \\ \hline
+\texttt{GET} & \path|/management/learning-programs/{program\_id}/path-change-requests| & Pending and decided path requests, of both kinds, for dean review. \\ \hline
 \texttt{POST} & \path|/management/learning-programs/path-change-requests/{request\_id}/in-progress| & Acknowledge a request so the student sees it is being considered. \\ \hline
-\texttt{POST} & \path|/management/learning-programs/path-change-requests/{request\_id}/approve| & Approve; transfers progress and re-grants entitlements for shared courses. \\ \hline
+\texttt{POST} & \path|/management/learning-programs/path-change-requests/{request\_id}/approve| & Approve. A change transfers progress and re-grants entitlements for shared courses; a drop closes the path against a snapshot and grants nothing, and is refused if it would leave the student with no path in progress. \\ \hline
 \texttt{POST} & \path|/management/learning-programs/path-change-requests/{request\_id}/reject| & Reject with a reason, which the student sees. \\ \hline
 \texttt{GET} & \path|/me/learning-program-enrollments| & The student's own programme enrolments. \\ \hline
-\texttt{POST} & \path|/me/learning-program-enrollments/{enrollment\_id}/select-path| & Choose the initial career path within an enrolled programme. \\ \hline
+\texttt{POST} & \path|/me/learning-program-enrollments/{enrollment\_id}/select-path| & Take on a further career path within an enrolled programme, up to the version's limit. Needs no approval. \\ \hline
 \texttt{POST} & \path|/me/learning-program-enrollments/{enrollment\_id}/path-change-requests| & Request a change of path; queued for dean review. \\ \hline
-\texttt{DELETE} & \path|/me/learning-program-enrollments/path-change-requests/{request\_id}| & Cancel one's own pending request before it is decided. \\ \hline
+\texttt{POST} & \path|/me/learning-program-enrollments/{enrollment\_id}/path-drop-requests| & Request that one held path be dropped with no replacement; refused while it is the student's only path in progress. \\ \hline
+\texttt{DELETE} & \path|/me/learning-program-enrollments/path-change-requests/{request\_id}| & Cancel one's own pending request, of either kind, before it is decided. \\ \hline
 
 \end{longtable}
 \normalsize

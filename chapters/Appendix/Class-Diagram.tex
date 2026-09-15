@@ -92,3 +92,51 @@ The reason is operational rather than stylistic. Lecture material is measured in
 \end{table}
 
 \noindent The two assessment modes meet at the \texttt{GapReport}: quiz attempts establish whether a learner can recall and apply the material, the interview session probes whether they can explain it, and the report reconciles both against the course's declared learning outcomes.
+
+% ────────────────────────────────────────────────────────────
+\subsection{Programme \& Path Governance}
+
+\subsubsection{A held pathway is an attempt, not a foreign key}
+
+The obvious model gives \texttt{ProgramEnrollment} a \texttt{career\_path\_id} column: one
+student, one pathway. The system deliberately does not do this. An enrolment owns a
+collection of \texttt{ProgramPathAttempt} rows, and the pathway a student is on is read from
+the live ones.
+
+Three properties of the domain make the single column the wrong tool:
+
+\begin{itemize}
+    \item \textbf{A student may hold several pathways at once.} A programme version declares how many may be held concurrently, so the relationship is one-to-many by definition and a scalar column cannot express it.
+    \item \textbf{A pathway that ends must remain readable.} Changing or dropping a pathway closes the attempt against an \texttt{exit\_snapshot} of the progress it had earned; overwriting a column would destroy exactly the record the decision has to be justified against later.
+    \item \textbf{How a pathway was acquired is itself evidence.} \texttt{selection\_source} distinguishes a pathway the system assigned from the programme default, one the student chose, and one a dean's approval produced. An enrolment that was never the student's own choice reads differently in an audit from one that was, and a foreign key carries no room to say which it is.
+\end{itemize}
+
+Each attempt pins a career-path \emph{version}, not the pathway's current head, so a student continues to be judged against the curriculum they joined even after the pathway is revised beneath them.
+
+\subsubsection{Leaving a pathway is a reviewable record}
+
+Taking on a pathway and laying one down are deliberately asymmetric. Adding is a direct write within the programme's declared limit; leaving --- whether by switching to another pathway or by dropping one outright --- creates a \texttt{PathChangeRequest} that a Faculty Dean must decide.
+
+Both kinds share one table rather than each having their own, because they share everything that matters: the review queue, the rule of one open request per enrolment, the finite switch allowance an approval spends, and the rejection vocabulary. They differ only in whether a destination exists, so \texttt{kind} discriminates them and the target columns are nullable, constrained so that a change must carry a destination and a drop must not. The alternative --- a second table --- would have duplicated the queue and the allowance, and made ``one open request per enrolment'' a rule no single constraint could enforce.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{tabular}{|>{\raggedright\arraybackslash}m{0.30\textwidth}|>{\raggedright\arraybackslash}m{0.62\textwidth}|}
+\hline
+\textbf{Entity} & \textbf{Role in the model} \\ \hline
+\texttt{LearningProgram} & The offering a faculty owns; the unit that is published and enrolled into. \\ \hline
+\texttt{LearningProgramVersion} & One frozen revision, carrying the pathway switch allowance and the number of pathways a student may hold at once. An edit opens a new draft rather than mutating this. \\ \hline
+\texttt{LearningProgramVersionPath} & The join binding a version to one career-path version, with its order and the \texttt{is\_default} flag. A partial unique index permits at most one default per version. \\ \hline
+\texttt{ProgramEnrollment} & One student on one programme, pinned to the version they joined. \\ \hline
+\texttt{ProgramPathAttempt} & One pathway held, with its state, \texttt{selection\_source}, and the \texttt{exit\_snapshot} written when it ends. Many per enrolment. \\ \hline
+\texttt{PathChangeRequest} & A request to change or drop a pathway, discriminated by \texttt{kind}, with its justification, review state, and the dean's decision. \\ \hline
+\texttt{CourseCompletionAward} & An earned course result, held independently of any pathway so that it survives one ending and is never recomputed. \\ \hline
+\end{tabular}
+\caption{Programme \& Path Governance entities.}
+\label{tab:class\_programme}
+\end{table}
+
+\noindent The award is what makes a pathway change cheap for the student: completions are attached to the course, not to the attempt, so work shared between two pathways is credited once and never repeated when the pathway beneath it changes.
+

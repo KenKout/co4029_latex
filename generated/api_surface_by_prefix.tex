@@ -7,6 +7,9 @@
 % That reads the live OpenAPI schema and is the authority. Expect the totals to
 % differ slightly from the figures below: a static scan cannot see routers
 % mounted under more than one prefix, nor app-level health routes.
+%
+% Hand-adjusted since seeding: /me and the total each carry +1 for the
+% learner path-drop request endpoint. Regenerating supersedes this.
 \begin{table}[H]
 \centering
 \renewcommand{\arraystretch}{1.25}
@@ -17,7 +20,7 @@
 \path|/teacher| & 153 \\ \hline
 \path|/admin| & 93 \\ \hline
 \path|/management| & 49 \\ \hline
-\path|/me| & 32 \\ \hline
+\path|/me| & 33 \\ \hline
 \path|/courses| & 18 \\ \hline
 \path|/dept| & 15 \\ \hline
 \path|/users| & 14 \\ \hline
@@ -34,7 +37,7 @@
 \path|/interview-configs| & 2 \\ \hline
 \path|/lesson-resources| & 1 \\ \hline
 health/root & 3 \\ \hline
-\textbf{Total} & \textbf{432} \\ \hline
+\textbf{Total} & \textbf{433} \\ \hline
 \end{tabular}
 \caption{REST operations by top-level path prefix.}
 \label{tab:api_surface_by_prefix}
