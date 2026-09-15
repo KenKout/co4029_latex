@@ -61,6 +61,8 @@ The platform offers a single sign-in path: Google SSO. Username/password, passwo
 
 \paragraph{Hot-path session cache.} On every authenticated request the backend must verify that the JWT's \path|sid| still references a live, non-revoked, MFA-cleared session. To keep this check off PostgreSQL the session state is cached in Redis under \path|session:{session_id}| with a 60-second TTL --- short enough that an admin-triggered revoke (which also invalidates the cache) takes effect within seconds even if pub/sub invalidation fails. A reverse-index Redis \path|SET| at \path|user_sessions:{user_id}| stores the active session IDs for a user, enabling \path{O(N)} cascade revocation when an administrator disables an account without an unsafe \path|SCAN MATCH session:*|. The cache is read-through with safe fallback: any \path|RedisError| or connection failure logs a warning and the request transparently falls through to the source database, so a Redis outage degrades latency rather than availability.
 
+\paragraph{Attempt ownership, and the one place Redis fails closed.} A live quiz attempt is bound to a single client through a second, deliberately short-lived Redis key, \path|quiz_attempt_session:{attempt_id}|, holding the owning authentication session for ninety seconds. Claim, heartbeat, takeover and release are compare-and-set Lua scripts, so two tabs resuming the same attempt simultaneously cannot both win; a learner who genuinely wants to move to a new device confirms an explicit takeover. This is the one hot path that inverts the fallback policy above: answer saves, integrity events and submission \textit{fail closed} when Redis is unavailable, because silently admitting two concurrent clients to a graded attempt is a worse failure than refusing the write. The design is deliberately not a durable assessment lease --- an abandoned client releases the attempt by falling silent rather than by being evicted --- and the authoritative attempt timer stays on the server throughout, so losing the key never pauses, extends, or forfeits the attempt.
+
 \paragraph{Login Flow.}
 \begin{enumerate}
     \item \path|GET /auth/google/login| returns \path|{authorization_url, state}|; the SPA stores \path|state| and redirects the browser to \path|authorization_url|.
@@ -165,6 +167,18 @@ Content-Type: application/json
 \paragraph{Idempotency.} Mutating endpoints that may be retried by the SPA (in particular \path|POST .../attempts| during quiz submission and the bulk \path|POST .../quizzes/{id}/generate|) accept an optional \path|Idempotency-Key| header; the backend deduplicates against this key for a 24-hour window. AI generation endpoints additionally return an \path|Operation-Location| header pointing to \path|.../generation-runs/{run_id}| for progress polling.
 
 % ────────────────────────────────────────────────────────────
+\subsection{Interactive Documentation}
+
+FastAPI auto-generates an OpenAPI 3.1 specification at \path|/openapi.json| and exposes a Swagger UI at \path|/docs| (and ReDoc at \path|/redoc|) for interactive exploration. Figure~\ref{fig:swagger_overview_main} shows the landing view of the live Swagger UI: the title bar, the \path|Authorize| button used to inject a bearer token before issuing requests, and the first audience-tagged section. The per-tag screenshot catalogue follows later in this appendix.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth,height=0.82\textheight,keepaspectratio]{graphics/swagger/00_overview.png}
+    \caption{Live Swagger UI at \texttt{/docs} (rendered from the FastAPI \texttt{/openapi.json}): title, authorise control, and the \texttt{auth} audience-tag section.}
+    \label{fig:swagger_overview_main}
+\end{figure}
+
+% ────────────────────────────────────────────────────
 \subsection{Endpoint Catalogue}
 % ────────────────────────────────────────────────────────────
 

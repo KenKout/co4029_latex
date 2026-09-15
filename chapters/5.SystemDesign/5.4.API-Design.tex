@@ -1,0 +1,21 @@
+% ============================================================
+%  \subsection{API Design}
+%  aBridgeAI — Capstone Report (main body summary)
+%  Full specification and endpoint catalogue: Appendix \ref{appendix:api-design}.
+% ============================================================
+
+\subsection{API Design}
+
+The backend is a Python FastAPI service exposing a versioned RESTful API at \path|/api/v1|, and it is the single data contract between the single-page application and the server. This section states the decisions that shape that contract; the full specification --- the authentication and MFA flows, the error model, pagination and idempotency, and the complete endpoint catalogue with its Swagger screenshots --- is given in Appendix~\ref{appendix:api-design}.
+
+\paragraph{Vertical slices, audience-scoped routers}
+Each feature owns a self-contained package with its own routers, services, queries and schemas, and routers translate HTTP to application calls without touching persistence directly --- a boundary enforced by an import-linter contract in continuous integration rather than by review. Within a feature, routers are split by \textit{audience} rather than by entity: a learner router under \path|/me/...|, an authoring router under \path|/teacher/...|, and where the domain needs them, administration, department-assignment and management routers under their own prefixes. The access context is therefore legible from the URL alone, which is what allows the permission guard on a route to be read against the route's own path rather than inferred from its handler.
+
+\paragraph{Asynchronous by default, with long work moved off the request}
+Every router function and database session is asynchronous, and work that cannot complete in a request --- material ingestion, quiz and interview generation, material reprocessing --- is dispatched to a worker pool over Redis rather than executed inline. The HTTP layer therefore returns within hundreds of milliseconds even for AI-driven mutations, and the client follows progress by polling the generation run the call returns. This is the decision that keeps an AI platform's API latency governed by its database rather than by its slowest model provider.
+
+\paragraph{Uniform contract mechanics}
+Three conventions are applied across every feature rather than chosen per endpoint. List endpoints use cursor pagination over a single indexed column, which avoids the cost of deep offsets and tolerates inserts between fetches without duplicating or skipping rows. Errors are returned in one structured envelope so the client has a single failure shape to handle. Mutating endpoints that a client may retry accept an idempotency key and deduplicate against it, which matters most where a retry would otherwise create a second quiz attempt or a second generation run.
+
+\paragraph{Session verification on the hot path}
+Because every authenticated request must confirm that its session is still live, non-revoked and MFA-cleared, session state is cached in Redis and read through to the database on a miss, so a cache outage costs latency rather than availability. A live quiz attempt carries a second, deliberately short-lived key binding it to one client; that path is the single deliberate exception to the fallback policy, failing closed rather than open, because admitting two concurrent clients to a graded attempt is worse than refusing the write. Both are described in full in Appendix~\ref{appendix:api-design}.
