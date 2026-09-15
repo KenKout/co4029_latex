@@ -1,0 +1,26 @@
+\subsection{Programme and Path Governance}
+\label{sec:impl_path_governance}
+
+The learning-programme subsystem governs the enrolment structure above individual courses: which career paths a student holds, how they are acquired, and how one is given up. It is implemented in \path{abridgeai/features/learning_programs/}.
+
+\paragraph{A held path is a row, not a column}
+The enrolment carries no \texttt{career\_path\_id}. \texttt{ProgramEnrollment} owns many \texttt{ProgramPathAttempt} rows, and the paths a student currently holds are the active ones. This is what lets a programme permit several paths at once, and it is what keeps a path that has ended readable: closing an attempt writes an \texttt{exit\_snapshot} of the progress it had earned rather than clearing a field. Each attempt also records a \texttt{selection\_source} --- \texttt{program\_default}, \texttt{student}, or \texttt{path\_change} --- so an audit can distinguish a path the system assigned from one the student chose.
+
+\paragraph{Automatic placement at enrolment}
+A published programme version must nominate exactly one of its paths as the default, enforced by a partial unique index on \texttt{learning\_program\_version\_paths} rather than in application code, so no concurrent edit can produce a second one. Enrolment resolves that default \emph{before} writing any row: if it has since been archived, the whole operation aborts. Resolving it afterwards would have admitted the student and then failed, leaving an enrolment with no path --- a state nothing else in the feature can produce or recover from. Both enrolment doors, the hand-picked list and the CSV import, go through the same helper for this reason.
+
+\paragraph{Adding is direct; leaving is reviewed}
+Taking on a further path is a direct write, bounded by a per-programme limit that may exceed neither the paths the programme bundles nor an organisation-configurable ceiling. Leaving one --- by switching to another path, or by dropping it outright --- creates a \texttt{PathChangeRequest} that a Faculty Dean must decide.
+
+Both kinds share one table, discriminated by a \texttt{kind} column, because they share everything that matters: the review queue, the partial unique index enforcing one open request per enrolment, the finite switch allowance an approval spends, and the rejection vocabulary. They differ only in whether a destination exists, so the target columns are nullable under a \texttt{CHECK} constraint that requires one for a change and forbids one for a drop. A separate table would have duplicated the queue and the allowance, and made the single-open-request rule unenforceable by any one constraint.
+
+\paragraph{Invariants are re-checked at the decision, not trusted from the request}
+Every precondition is verified twice: once when the student files, and again when the dean decides. The gap between the two is measured in days, and the enrolment can move within it. Approving a change re-confirms that the source attempt is still active and that the target has not since been archived, in which case the request is marked \texttt{invalidated} rather than failed. Approving a drop re-confirms that another path would remain in progress, because the student's other path may have been completed, switched out, or dropped by an earlier approval since filing.
+
+\paragraph{Entitlements follow the paths, not the request}
+Course access granted by a programme is released only when no remaining attempt still justifies it, resolved by counting the student's other active attempts on that path rather than assumed from the path being left. With several paths held at once, a course shared between two of them must survive one ending. Completions are held separately again, as \texttt{CourseCompletionAward} rows attached to the course, so a result already earned is never recomputed when the path beneath it changes.
+
+\paragraph{Programme completion}
+An enrolment completes only when no active attempt remains, so a student holding two paths completes the programme on finishing the second, not the first. Each attempt is judged against the path version it was pinned to, never the path's current head, so a revision published mid-enrolment cannot retroactively change what a student must finish.
+
+\diagramplaceholder{fig:impl_path_request_states}{Path request review lifecycle}{A state machine over \texttt{pending}, \texttt{in\_progress}, \texttt{approved}, \texttt{rejected}, \texttt{cancelled} and \texttt{invalidated}, shared by change and drop requests. Show the divergent approval effects --- a change opens a replacement attempt, a drop opens none --- and mark the invariants re-checked at the decision rather than trusted from filing.}

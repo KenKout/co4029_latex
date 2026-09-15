@@ -1,0 +1,26 @@
+\subsection{Mock Interview Sessions}
+\label{sec:impl_interviews}
+
+The mock interview is the largest subsystem in the codebase. Where a quiz establishes whether a learner can recall and apply material, the interview probes whether they can explain it, which makes the session a live dialogue rather than a form submission. The implementation is in \path{abridgeai/features/interviews/} and divides into three layers: an \path{orchestrator/} that decides what to ask next, a \path{realtime/} layer that carries the conversation over a voice or text channel, and an \path{ai/} stage pipeline that generates, validates, and evaluates.
+
+\paragraph{Onboarding before assessment}
+A session advances through \texttt{identity\_check}, \texttt{audio\_check}, \texttt{language\_check}, \texttt{preparation}, and \texttt{readiness} before it reaches \texttt{completed}, and no answer is recorded until onboarding finishes. The separation exists so that an equipment fault is never scored as a knowledge gap: a learner whose microphone was not working did not answer badly, and the record must not suggest they did.
+
+\paragraph{Perception, then decision}
+Each turn is processed in two halves. The perception pipeline (\path{orchestrator/pipeline.py}) classifies the learner's intent and, for genuine answers, produces a structured analysis; the decision layer then selects the next action and question. Perception is deliberately \emph{best-effort and never-raising} --- every model sub-call has its own fallback, so a classifier failure degrades to a safe default instead of breaking the turn. It is also idempotency-aware and optimistically locked: a replayed turn returns the existing state rather than re-running the models, and a lost race surfaces as a stale-state error for the caller to resolve rather than a silent overwrite.
+
+\paragraph{Adaptive questioning}
+\path{orchestrator/} carries separate modules for phase progression, difficulty bias, coverage of the declared learning outcomes, and answer sufficiency. Question selection is bounded on two axes the teacher sets --- follow-ups per question and hints per question --- so a session cannot expand without limit on one topic at the cost of outcomes it has not yet reached.
+
+\paragraph{Persona without assessment drift}
+An interviewer style (strict, neutral, supportive) and its individual dimensions --- warmth, directness, verbosity, formality --- shape tone only. Persona adherence is checked as its own stage, and assessment is computed independently of it, so a supportive interviewer and a strict one judge the same answer identically.
+
+\paragraph{Resisting manipulation}
+Because the learner speaks freely to a language model, the orchestrator carries explicit defences: intent classification separates answers from instructions addressed to the interviewer, and pattern modules screen for prompt injection, protected-asset probing, and semantic leakage of the expected answer. The teacher chooses the response --- record, warn, or end and flag --- and how many consecutive attempts are tolerated before it escalates.
+
+\paragraph{Evaluated exactly once}
+At the end of a session the conversation is assessed against each learning outcome in turn and aggregated into a gap report. Evaluation is reserved before it begins and only the reservation holder may record the result. This matters because evaluation takes minutes and a recovery path may start a second run while the first is still going: the assessment is made by a model rather than a fixed formula, so two runs over the same conversation can reach different conclusions, and without the reservation the recorded outcome would be whichever finished last. A learner's pass or fail must not depend on timing.
+
+\diagramplaceholder{fig:impl_interview_states}{Interview session lifecycle}{A state machine covering the onboarding stages \texttt{identity\_check} $\rightarrow$ \texttt{audio\_check} $\rightarrow$ \texttt{language\_check} $\rightarrow$ \texttt{preparation} $\rightarrow$ \texttt{readiness} $\rightarrow$ \texttt{completed}, over the session statuses \texttt{in\_progress}, \texttt{completed}, \texttt{timed\_out}, \texttt{abandoned} and \texttt{failed}. Mark the point after which answers begin to be recorded, and the single-evaluation reservation.}
+
+\diagramplaceholder{fig:impl_interview_turn}{Per-turn perception and decision pipeline}{A flow chart of one conversational turn: utterance $\rightarrow$ intent classification $\rightarrow$ (answer) structured analysis $\rightarrow$ persistence under optimistic locking $\rightarrow$ decision (follow up, hint, advance, or close). Show the fallback edge taken when a model sub-call fails, the idempotent replay path, and where the manipulation screen sits.}

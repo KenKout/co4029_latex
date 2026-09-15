@@ -33,3 +33,5 @@ When \path{settings.knowledge_graph_enabled} is true, the pipeline calls \path{b
 
 \paragraph{Worker and transaction discipline}
 The pipeline is invoked by an \texttt{arq} background worker (\path{features/materials/workers/ingest.py}). The pipeline itself only flushes to the database session; the worker owns the commit. On any exception, the material version's \texttt{processing\_status} is set to \texttt{failed} and the exception is re-raised so the worker can record the failure without silently swallowing errors.
+
+\diagramplaceholder{fig:impl_ingestion_pipeline}{Material ingestion pipeline and processing states}{Show one uploaded material version moving through extraction, chunking, embedding and indexing, with the processing status at each stage and the failure edge. Mark the point at which the object store holds the bytes and the database holds only the reference, and show that the previous version's chunks stay queryable until the new version completes.}

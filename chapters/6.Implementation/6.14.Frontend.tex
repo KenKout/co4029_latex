@@ -1,0 +1,24 @@
+\subsection{Frontend Implementation}
+\label{sec:impl_frontend}
+
+The client is a single-page application built with React~19 and TypeScript~5.9 on Vite~8, comprising roughly 1{,}600 TypeScript modules of which some 850 are route components. It is organised by route rather than by layer: each screen owns a directory holding its page component, a private \path{_components/} folder, and its tests, so the blast radius of a change is visible from the path.
+
+\paragraph{Routing and server state}
+Navigation uses TanStack Router, whose typed route definitions make a broken link a compile error rather than a runtime 404. Server state is held entirely in TanStack Query --- there is no parallel client-side cache of server data, and no global store mirroring it. Mutations invalidate query keys declared in one registry, so a write refreshes exactly the views that depend on it without each call site deciding for itself what to refetch.
+
+\paragraph{Types generated from the API, not written twice}
+Request and response types are generated from the backend's OpenAPI schema by \texttt{openapi-typescript} into a checked-in declaration file. A \texttt{codegen:check} script regenerates and fails on any difference, so a backend contract change that the client has not absorbed breaks the build rather than surfacing as a runtime shape mismatch. Hand-written types remain only for the few endpoints outside the generated schema, and are marked as such.
+
+\paragraph{Design system and theming}
+Styling is Tailwind~4 over a Material~3 token layer: components consume semantic tokens rather than raw palette values, which is what allows the light and dark themes to be defined once at the token level instead of per component. Dialogs, menus, and other overlay primitives come from a headless component library, so keyboard and focus behaviour is implemented once.
+
+\paragraph{Internationalisation}
+All user-facing copy resolves through i18next against English and Vietnamese catalogues. Text is never inlined in a component; a missing key is therefore visible as the key itself rather than silently rendering in the wrong language.
+
+\paragraph{Testing}
+Component and integration tests run under Vitest with Testing Library, against a Mock Service Worker layer that intercepts at the network boundary --- so tests exercise the same fetch path as production rather than a substituted client. Playwright covers end-to-end journeys. A bundle-size budget is checked against a recorded baseline on build, so a dependency that materially inflates the download fails the build rather than being discovered in production.
+
+\paragraph{A note on type checking}
+The repository root holds a solution-style \path{tsconfig.json} that lists project references and no files of its own. Running \texttt{tsc --noEmit} against it therefore type-checks \emph{nothing} while appearing to succeed --- the build script uses \texttt{tsc -b}, which walks the referenced projects, and that is the only invocation whose success is meaningful.
+
+\diagramplaceholder{fig:impl_frontend_data}{Client data flow and cache invalidation}{Show a route component reading server state through a TanStack Query hook, the generated API types sitting between client and backend contract, and a mutation invalidating declared query keys so dependent views refetch. Mark where the OpenAPI codegen check enforces contract agreement at build time, and where Mock Service Worker substitutes the network in tests.}

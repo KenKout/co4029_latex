@@ -1,0 +1,14 @@
+\subsection{Notifications and Discussions}
+\label{sec:impl_notifications}
+
+\paragraph{Notifications}
+Dispatch is implemented in \path{abridgeai/features/notifications/}. A notification carries a category drawn from a fixed vocabulary --- course updates and announcements, material processing, quiz and interview generation outcomes, path-change review, lesson discussion, and system messages --- and learners hold preferences per category rather than per event, so a single toggle governs a whole class of message instead of accumulating switches.
+
+Message text is built in \path{messages.py}, which holds one function per notification moment and renders English or Vietnamese from the recipient's own locale. Keeping the copy in typed builders rather than templates is what makes a new locale a compile-time obligation instead of a silent fallback to English.
+
+Delivery tracks \texttt{pending}, \texttt{sent}, \texttt{failed}, and \texttt{cancelled}, with e-mail dispatched by a background worker so the request that triggered it never waits. Crucially, a notification failure is swallowed and logged rather than propagated: the write that caused it --- a dean's approval, a completed import --- is an academic record change, and losing it because an inbox row could not be written would be far worse than a missing notification.
+
+\paragraph{Discussions}
+\path{abridgeai/features/discussions/} implements threaded discussion on lessons and courses: topics carry comments, comments carry direct replies, and both are soft-deleted so a removed post leaves the thread's shape intact rather than orphaning the replies beneath it. Authorship and edit windows are enforced in the service layer, and a new comment raises a \texttt{course\_discussion} notification through the same category machinery as everything else.
+
+\diagramplaceholder{fig:impl_notification_flow}{Notification dispatch and delivery states}{A flow chart from a domain event through category resolution, the recipient's per-category preference check, locale selection and message construction, to the \texttt{pending} $\rightarrow$ \texttt{sent} / \texttt{failed} / \texttt{cancelled} delivery states. Show the in-app write and the background e-mail worker as separate paths, and mark the boundary where a failure is swallowed so it cannot roll back the triggering transaction.}

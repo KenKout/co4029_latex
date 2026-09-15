@@ -1,0 +1,64 @@
+\section{Implementation Details}
+\label{appendix:implementation}
+
+This appendix carries the material that Chapter~\ref{sec:implementation} states only in summary: the full lifecycle vocabulary the system enforces, and the specifications for the diagrams that accompany each subsystem.
+
+\subsection{Entity lifecycle reference}
+
+Every lifecycle below is enforced by a database \texttt{CHECK} constraint rather than by application code alone, so a state outside the declared set cannot be written by any path --- including a migration or a manual correction. The table is the authoritative vocabulary; the transitions between the states are given by the diagrams that follow.
+
+\begin{longtable}{|>{\raggedright\arraybackslash}m{0.17\textwidth}|>{\raggedright\arraybackslash}m{0.22\textwidth}|>{\raggedright\arraybackslash}m{0.28\textwidth}|>{\raggedright\arraybackslash}m{0.25\textwidth}|}
+\caption{Entity lifecycle states enforced by database constraints.}
+\label{tab:impl_lifecycles} \\
+\hline
+\textbf{Lifecycle} & \textbf{Carried by} & \textbf{States} & \textbf{Note} \\ \hline
+\endfirsthead
+\multicolumn{4}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{Lifecycle} & \textbf{Carried by} & \textbf{States} & \textbf{Note} \\ \hline
+\endhead
+\hline \multicolumn{4}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+
+Publication (generic) & courses, modules, lessons, quizzes, interview configs, career paths, learning programmes, policy versions & \texttt{draft}, \texttt{published}, \texttt{archived} & Published is frozen; an edit opens a new draft. Archived is closed to new use but never deleted. \\ \hline
+Question review & quiz questions, interview questions & \texttt{pending}, \texttt{approved}, \texttt{edited}, \texttt{rejected} & AI-drafted items enter pending. Only approved items are delivered to a learner. \\ \hline
+Quiz attempt & \texttt{quiz\_attempts} & \texttt{in\_progress}, \texttt{submitted}, \texttt{graded}, \texttt{abandoned}, \texttt{expired} & Time limit and close date drive the automatic transitions; grading may pause on manual marking. \\ \hline
+Interview session & \texttt{interview\_sessions} & \texttt{in\_progress}, \texttt{completed}, \texttt{timed\_out}, \texttt{abandoned}, \texttt{failed} & Evaluated exactly once, under a reservation held for the duration of the run. \\ \hline
+Interview onboarding & \texttt{interview\_sessions} & \texttt{identity\_check}, \texttt{audio\_check}, \texttt{language\_check}, \texttt{preparation}, \texttt{readiness}, \texttt{completed} & No answer is recorded until onboarding completes, so equipment faults are not scored. \\ \hline
+Programme enrolment & \texttt{program\_enrollments} & \texttt{awaiting\_path}, \texttt{active}, \texttt{completed}, \texttt{withdrawn}, \texttt{cancelled} & Enrolment onto a version with a default path becomes active immediately, never awaiting\_path. \\ \hline
+Path attempt & \texttt{program\_path\_attempts} & \texttt{active}, \texttt{completed}, \texttt{switched\_out}, \texttt{cancelled} & One row per path held. switched\_out follows an approved change; cancelled, an approved drop or a withdrawal. \\ \hline
+Path request & \texttt{path\_change\_requests} & \texttt{pending}, \texttt{in\_progress}, \texttt{approved}, \texttt{rejected}, \texttt{cancelled}, \texttt{invalidated} & Shared by change and drop. invalidated is reached when the target disappears before the decision. \\ \hline
+Course enrolment & \texttt{course\_enrollments} & \texttt{active}, \texttt{completed}, \texttt{dropped}, \texttt{waitlisted} & Reached by operator enrolment, a programme or path entitlement, or an invitation code. \\ \hline
+Lesson progress & \texttt{lesson\_progress} & \texttt{not\_started}, \texttt{in\_progress}, \texttt{completed} & Feeds both the learner's progress display and the unlock evaluation. \\ \hline
+Career enrolment & \texttt{student\_career\_enrollments} & \texttt{active}, \texttt{completed}, \texttt{dropped} & The learner's standing on a career path, independent of any programme that granted it. \\ \hline
+Notification delivery & \texttt{notifications} & \texttt{pending}, \texttt{sent}, \texttt{failed}, \texttt{cancelled} & A failure is logged and swallowed; it can never roll back the event that raised it. \\ \hline
+Organisation membership & \texttt{organization\_memberships} & \texttt{active}, \texttt{invited}, \texttt{inactive}, \texttt{suspended}, \texttt{left} & Membership scope is what dean and manager authority is resolved against. \\ \hline
+User account & \texttt{users} & \texttt{active}, \texttt{invited}, \texttt{inactive}, \texttt{suspended} & Disabling an account revokes every live session. \\
+\end{longtable}
+
+
+\subsection{Cross-cutting implementation notes}
+
+\paragraph{Soft deletion and referential policy}
+Entities that carry academic meaning are soft-deleted rather than removed, and any parent carrying the soft-delete mixin declares \texttt{ON DELETE NO ACTION} on its children. Hard deletion therefore cannot happen by cascade; it happens only where a test or a maintenance job walks the live foreign-key graph explicitly. The effect is that a mistaken delete fails loudly against a constraint rather than silently removing a subtree of results.
+
+\paragraph{Feature independence}
+Cross-feature calls are confined to each feature's \path{api/public.py}, and the restriction is machine-checked by import-linter contracts in continuous integration rather than left to review. A feature that reaches into another's internals fails the build, which is what keeps the boundaries in the previous sections real rather than aspirational.
+
+\paragraph{Concurrency}
+Decisions that must not race --- a path request being approved, an interview being evaluated, a grade of record being recomputed --- take a row lock or a reservation before reading the state they will act on, and re-verify their preconditions inside it. Optimistic locking is used instead where a retry is cheap and a conflict is expected to be rare, notably on interview turn state, where a lost race surfaces as an explicit stale-state error rather than an overwrite.
+
+\subsection{Diagram specifications}
+
+The diagrams below are specified but not yet drawn. Each placeholder states what the finished artwork must show; replacing it with the drawn figure keeps the same label, so cross-references remain valid.
+
+\diagramplaceholder{fig:impl_learner_journey}{End-to-end learner journey across subsystems}{A single flow spanning the whole platform: programme enrolment and automatic placement on the default career path, the courses that path entitles, a lesson's materials and their ingestion, the quiz attempt and its grading, the review cards that attempt seeds, the unlock rule that gates the next lesson, and the mock interview that probes explanation. Mark the boundary of each feature package so the reader can see where one subsystem hands off to the next.}
+
+\diagramplaceholder{fig:impl_unlock_evaluation}{Lesson unlock evaluation}{A flow chart evaluating whether a lesson unlocks for one learner: prerequisite lesson completion, quiz grade against the pass mark, and the spaced-repetition standard --- ease factor above the configured minimum across a required coverage proportion of the lesson's cards. Show which inputs are per-lesson configuration and which are per-learner state, and show the outcome when a prerequisite has no data at all as distinct from failing it.}
+
+\diagramplaceholder{fig:impl_async_jobs}{Background job dispatch and outcome reporting}{Show the asynchronous work the platform performs outside the request path --- material ingestion, quiz and interview generation, notification e-mail, audit writes, retention sweeps --- dispatched through the job queue, with the per-job status surfaced back to the originating teacher as a notification. Mark which failures are retried, which are reported, and which are swallowed by design.}
+
+\diagramplaceholder{fig:impl_deployment}{Deployment and service topology}{A deployment view showing the SPA, the API service, the worker pool, PostgreSQL with pgvector, Redis, the object store, and the graph store, together with the external model providers. Mark the trust boundary crossed by learner-supplied content and the point at which presigned URLs let a client reach the object store without proxying bytes through the API.}

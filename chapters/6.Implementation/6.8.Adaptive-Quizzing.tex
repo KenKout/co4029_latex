@@ -1,0 +1,26 @@
+\subsection{Adaptive Quizzing}
+\label{sec:impl_quizzing}
+
+Section~\ref{sec:impl_ai_pipelines} covers how quiz questions are generated. This section covers what happens afterwards: review, publication, the attempt itself, grading, and release. The implementation is in \path{abridgeai/features/quizzes/}, whose service layer is deliberately one module per concern --- \path{publish_gate.py}, \path{grader.py}, \path{gradebook.py}, \path{regrade.py}, \path{overrides.py}, \path{integrity.py}, \path{review_visibility.py} --- because these rules change independently of one another.
+
+\paragraph{Human review before publication}
+Every question carries a \texttt{review\_status} of \texttt{pending}, \texttt{approved}, \texttt{edited}, or \texttt{rejected}. AI-drafted questions enter as \texttt{pending} and only approved questions are ever delivered in an attempt. \path{publish_gate.py} refuses publication while any question is unreviewed, and separately refuses it while any question lacks an expected answer time --- the latter because the spaced-repetition scheduler grades recall partly on elapsed time against expectation, so a question with no expectation cannot be scheduled and must not reach a learner.
+
+\paragraph{Per-student rule resolution}
+A quiz's dates, time limit, and retake rules can be adjusted for an individual or a group. \path{override_policy.py} resolves the effective rules for one learner in a fixed precedence: the quiz's own settings, then the most generous group adjustment that applies to them, then their personal adjustment. Group adjustments resolve to the most generous rather than the last-written, because an accommodation must never be narrowed by a second one the learner also qualifies for.
+
+\paragraph{The attempt}
+An attempt moves through \texttt{in\_progress} to one of \texttt{submitted}, \texttt{graded}, \texttt{abandoned}, or \texttt{expired}. Question and option order are shuffled per attempt by \path{shuffle.py} from a per-attempt seed, so the order is stable across a reload but differs between learners. An attempt still open when its time limit or the quiz's close date passes is resolved automatically --- submitted, granted a grace period, or closed ungraded --- as the teacher configured, so an attempt abandoned by a closed laptop does not wait on the learner's return.
+
+\paragraph{Grading and the grade of record}
+\path{grader.py} marks objectively-answerable questions on submission and sets aside anything it cannot mark with confidence for the queue in \path{manual_grading.py}. While any answer in an attempt remains unmarked the learner is shown no score, since a partial score presented as final would mislead. \path{gradebook.py} then reduces a learner's attempts to one grade of record by the quiz's declared method --- highest, first, last, or average --- and stores the method and the attempts counted alongside the figure, so a grade can be explained later rather than merely asserted.
+
+\paragraph{Regrading}
+\path{regrade.py} re-evaluates affected attempts as one auditable operation after an answer key is corrected, retaining both the run and its per-attempt outcomes. A preview mode computes the effect without applying it, so the size of a correction is known before it lands on a cohort.
+
+\paragraph{Integrity signals}
+\path{integrity.py} records window blur, tab switches, full-screen exits, and connection loss while an attempt is running. Recording never blocks or fails a submission, signals arriving after submission are discarded, and the weights and flag threshold are fixed at the moment the attempt starts --- so editing a quiz mid-cohort cannot change how an attempt already under way is judged. The records are evidence for a teacher to review, not a verdict, and learners never see them.
+
+\diagramplaceholder{fig:impl_quiz_attempt_states}{Quiz attempt lifecycle and grading path}{A state machine over \texttt{in\_progress}, \texttt{submitted}, \texttt{graded}, \texttt{abandoned} and \texttt{expired}, showing the automatic transitions driven by the time limit and close date (auto-submit, grace period, close-ungraded) and the branch into manual marking. Annotate where the grade of record is recomputed.}
+
+\diagramplaceholder{fig:impl_quiz_override}{Resolution of effective attempt rules for one learner}{A flow chart resolving quiz defaults $\rightarrow$ most generous applicable group adjustment $\rightarrow$ individual adjustment, showing which fields each layer may override and why group adjustments merge by generosity rather than by write order.}

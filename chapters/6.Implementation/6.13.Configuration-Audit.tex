@@ -1,0 +1,21 @@
+\subsection{Platform Configuration, Policies and Audit}
+\label{sec:impl_configuration}
+
+\paragraph{Runtime settings}
+Operational limits --- concurrent programme enrolments, career paths per programme, retention windows --- are runtime settings rather than deployment constants, resolved per organisation by \path{abridgeai/core/runtime_settings.py}. The effective value is the first of four levels that supplies one: a \texttt{system\_settings} row for this organisation, a row with a null organisation (the deployment default), the environment variable named by the setting's spec, and finally the code default declared in the settings registry.
+
+The last two levels are what make adding a setting safe. A deployment that has never heard of a new key still resolves it, so a release does not require a configuration change to land first. The resolution API returns every candidate value alongside the effective one and the level it came from, because an administrator asking ``why is this 3?'' needs to see which layer won rather than be told the answer.
+
+One row set per organisation is cached in process under a short TTL, since settings are read on many requests and written rarely.
+
+\paragraph{Policy documents}
+\path{abridgeai/features/policies/} holds terms, privacy notices, and academic regulations. Versioning is copy-on-write: a published version is immutable and correcting it opens a new draft, so the exact text a reader agreed to remains retrievable. Audience is a set of roles, and the empty set means public --- including signed-out visitors.
+
+\paragraph{Audit}
+Two audit trails run side by side. The typed authentication and access-control trail records sign-in, session, and role-assignment events; the HTTP audit log records mutating requests with actor, method, path, affected row, and a column-level diff, written asynchronously through an actor pool so the request path carries no additional latency.
+
+Both are append-only, and the guarantee is enforced in the database rather than in application code: a trigger rejects \texttt{UPDATE} and \texttt{DELETE} on the audit tables outright, with deletion permitted only inside a narrowly scoped maintenance session used by the retention job. This is the property that gives the trail its value --- a participant cannot remove evidence of what they did, and neither can an administrator.
+
+\diagramplaceholder{fig:impl_settings_resolution}{Runtime setting resolution order}{A flow chart resolving one setting key for one organisation through the four levels in order --- organisation row, deployment-default row, environment variable, code default --- returning at the first hit. Show the in-process cache and its TTL, and show that all candidates are reported alongside the winning value and its source.}
+
+\diagramplaceholder{fig:impl_audit_path}{Audit write path and append-only enforcement}{Show a mutating request producing an audit record dispatched asynchronously to the actor pool, so the response does not wait. Alongside it, show the database trigger rejecting \texttt{UPDATE} and \texttt{DELETE}, and the single scoped exception by which the retention job may delete after the configured window.}

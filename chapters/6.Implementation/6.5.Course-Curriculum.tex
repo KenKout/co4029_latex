@@ -1,0 +1,18 @@
+\subsection{Course and Curriculum}
+\label{sec:impl_course}
+
+Courses are the unit a learner enrols in and the container every other feature hangs from. The implementation lives in \path{abridgeai/features/courses/}, split by audience rather than by entity: \path{authoring.py} for the teacher's editing surface, \path{catalog.py} for the learner's browse and detail views, \path{assignment.py} for teacher--course bindings, and \path{administration.py} for the operator actions that cross both.
+
+\paragraph{The curriculum tree}
+A course owns ordered modules, and each module owns ordered items --- lessons, quizzes, and interview configurations addressed uniformly so the learner's next step is a single ordered walk rather than three parallel lists. Ordering is a dense \texttt{position} integer per parent under a unique constraint, so two items can never claim the same slot; reordering rewrites the affected range in one statement rather than issuing a move per row.
+
+\paragraph{Publication gating}
+A course, like every other authored artefact in the system, moves through \texttt{draft}, \texttt{published}, and \texttt{archived}. Draft content is invisible to learners at the query level rather than filtered in the presentation layer, so an unpublished lesson cannot leak through an endpoint that forgot to check.
+
+\paragraph{Syllabus import}
+\path{syllabus_import.py} accepts a structured syllabus and materialises an entire module tree in one operation. It follows the same per-row discipline as the programme roster import: a malformed entry is reported against its position and the remainder still imports, because a syllabus with one bad row is the normal case rather than the exception.
+
+\paragraph{Enrolment and entitlement}
+Learners reach a course three ways --- operator enrolment, a career path or programme that grants it, and self-enrolment by invitation code --- and all three converge on one enrolment row whose status is \texttt{active}, \texttt{completed}, \texttt{dropped}, or \texttt{waitlisted}. Keeping the grant paths separate from the enrolment record is what allows a programme path change to release an entitlement without disturbing an enrolment the learner obtained independently.
+
+\diagramplaceholder{fig:impl_course_tree}{Course curriculum structure and publication states}{Show the course $\rightarrow$ module $\rightarrow$ item tree with the uniform item abstraction over lessons, quizzes and interviews; alongside it, the \texttt{draft} $\rightarrow$ \texttt{published} $\rightarrow$ \texttt{archived} state machine and which transitions are reversible. Mark the point at which content becomes visible to learners.}

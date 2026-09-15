@@ -66,3 +66,5 @@ All LLM calls are routed through \texttt{LLMGateway} (\path{ai/llm/gateway.py}),
     \item Parses LLM responses robustly: it first attempts strict \texttt{json.loads}, then extracts from a fenced code block, then uses \texttt{raw\_decode} to tolerate trailing commentary from models that ignore the \texttt{json\_object} response format.
     \item Writes one \texttt{ai\_model\_calls} row per call recording the model name, prompt and completion token counts, computed cost (via a per-model pricing table), latency, and the \texttt{pipeline\_run\_id} grouping key.
 \end{itemize}
+
+\diagramplaceholder{fig:impl_hybrid_retrieval}{Hybrid retrieval and generation pipeline}{A flow chart of a generation request: parallel dense (pgvector) and sparse (BM25) retrieval, reciprocal-rank fusion, MMR diversification, and the role filter that removes chunks the requester may not access, feeding the LLM gateway. Show the human review gate that every generated item must pass before reaching a learner.}

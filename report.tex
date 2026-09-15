@@ -85,6 +85,34 @@
   {0.5em}  % Space before the title
   {0.5em}  % Space AFTER the title (positive value = new line)
 
+% ---------------------------------------------------------------------------
+% Placeholder for a diagram that is specified but not yet drawn.
+% Renders a visible, referenceable box so the gap is obvious in the PDF and
+% never silently ships as a missing figure. Replace the call with an ordinary
+% figure + \includegraphics once the artwork exists, keeping the same label.
+%   #1 = label   #2 = caption   #3 = what the diagram must show
+\newcommand{\diagramplaceholder}[3]{%
+  \begin{figure}[H]
+    \centering
+    \setlength{\fboxsep}{10pt}%
+    \fbox{%
+      \begin{minipage}{0.90\textwidth}
+        \centering
+        \textbf{[ DIAGRAM TO BE DRAWN ]}
+        \par\medskip
+        \textit{#2}
+        \par\medskip
+        \begin{minipage}{0.86\textwidth}
+          \small\raggedright #3
+        \end{minipage}
+      \end{minipage}%
+    }
+    \caption{#2}
+    \label{#1}
+  \end{figure}%
+}
+% ---------------------------------------------------------------------------
+
 \begin{document}
 \emergencystretch=3em
 \coverpage%
@@ -176,16 +204,25 @@
 \section{Implementation and Testing}
 \label{sec:implementation}
 
-This chapter describes the concrete implementation of the aBridgeAI backend, covering the development environment, project structure, and the realisation of each major subsystem. The implementation follows a feature-first architecture in which each domain (identity, courses, materials, quizzes, interviews, spaced repetition) is a self-contained package exposing its own models, queries, services, and API routers. Cross-cutting concerns — caching, audit logging, observability, and access control — are isolated in a shared \texttt{core} layer consumed by all features.
+This chapter describes the concrete implementation of aBridgeAI, covering the development environment, project structure, and the realisation of each major subsystem on both the server and the client. The backend follows a feature-first architecture in which each domain --- identity, access control, courses, materials, quizzes, interviews, spaced repetition, learning programmes, notifications and discussions, configuration and policies --- is a self-contained package exposing its own models, queries, services, and API routers, with cross-feature calls confined to a declared public surface. Cross-cutting concerns — caching, audit logging, observability, and access control — are isolated in a shared \texttt{core} layer consumed by all features.
+
+The sections that follow are ordered as the system is built up rather than as the packages happen to be named: platform foundations first, then the curriculum and the material that fills it, then the AI pipelines and the two assessment modes they feed, then the learning loop and the governance that sits above it, and finally the cross-cutting services, the client, and testing. Each subsystem states its design decision and the shape of its solution here; the full lifecycle vocabulary the system enforces, together with the specifications for the accompanying diagrams, is catalogued in Appendix~\ref{appendix:implementation}.
 
 \input{chapters/6.Implementation/6.1.Environment}
 \input{chapters/6.Implementation/6.2.Project-Structure}
-\input{chapters/6.Implementation/6.3.Authentication}
-\input{chapters/6.Implementation/6.4.Material-Ingestion}
-\input{chapters/6.Implementation/6.5.AI-Pipelines}
-\input{chapters/6.Implementation/6.6.Spaced-Repetition}
-\input{chapters/6.Implementation/6.7.Access-Control}
-\input{chapters/6.Implementation/6.8.Testing}
+\input{chapters/6.Implementation/6.3.Identity-Authentication}
+\input{chapters/6.Implementation/6.4.Access-Control}
+\input{chapters/6.Implementation/6.5.Course-Curriculum}
+\input{chapters/6.Implementation/6.6.Material-Ingestion}
+\input{chapters/6.Implementation/6.7.AI-Pipelines}
+\input{chapters/6.Implementation/6.8.Adaptive-Quizzing}
+\input{chapters/6.Implementation/6.9.Mock-Interviews}
+\input{chapters/6.Implementation/6.10.Spaced-Repetition}
+\input{chapters/6.Implementation/6.11.Path-Governance}
+\input{chapters/6.Implementation/6.12.Notifications-Discussions}
+\input{chapters/6.Implementation/6.13.Configuration-Audit}
+\input{chapters/6.Implementation/6.14.Frontend}
+\input{chapters/6.Implementation/6.15.Testing}
 
 \clearpage
 %%%%%%% Section 7: Evaluation %%%%%%% 

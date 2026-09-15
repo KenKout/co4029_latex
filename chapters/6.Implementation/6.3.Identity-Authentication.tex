@@ -23,3 +23,5 @@ TOTP-based MFA is implemented in \texttt{features/identity/services/mfa.py}. Enr
 
 \paragraph{Role-based access}
 Every authenticated request resolves the caller's roles and permissions through the access control subsystem (Section~\ref{sec:impl_access_control}). The identity layer attaches the resolved \texttt{UserContext} — containing user ID, organisation memberships, and permission set — to the request state so downstream route handlers can perform permission checks without additional database queries.
+
+\diagramplaceholder{fig:impl_auth_flow}{Authentication and session lifecycle}{A flow chart of both sign-in routes --- password and Google OAuth --- converging on session issue, with the MFA gate as a required second step before an access token is released. Show refresh-token rotation, and the revocation paths (explicit logout, account disable) that terminate every live session.}

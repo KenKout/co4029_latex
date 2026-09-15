@@ -39,3 +39,5 @@ The \path{features/spaced_repetition/routers/teacher.py} router exposes instruct
     \item \texttt{compliance\_rate.sql} — fraction of due reviews completed on time per student per lesson.
     \item \path{class_kr_distribution.sql} — histogram of KR scores across the class for a given lesson.
 \end{itemize}
+
+\diagramplaceholder{fig:impl_sm2_cycle}{SM-2 review scheduling cycle}{A flow chart from a graded answer to the next due date: quality derivation, ease-factor update, interval computation, and the jitter applied to prevent cohort pile-up. Show the lapse branch taken on an incorrect answer, and the unlock evaluation that reads the resulting card state.}

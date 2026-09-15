@@ -27,11 +27,14 @@ abridgeai/
 |   +-- admin/            # Admin dashboards, AI cost tracking, audit viewer
 |   +-- career_paths/     # Career path authoring and learner enrollment
 |   +-- courses/          # Course, module, lesson authoring and learner view
+|   +-- discussions/      # Lesson and course discussion topics and comments
 |   +-- enrollments/      # Enrollment lifecycle management
 |   +-- identity/         # Users, auth sessions, Google OAuth, MFA
 |   +-- interviews/       # AI interview generation, session taking, evaluation
+|   +-- learning_programs/# Programme authoring, enrollment, path governance
 |   +-- materials/        # Learning material upload, ingestion pipeline
 |   +-- notifications/    # In-app and email notification dispatch
+|   +-- policies/         # Versioned legal and academic policy documents
 |   +-- progress/         # Lesson progress tracking and analytics
 |   +-- quizzes/          # AI quiz generation, taking, grading
 |   +-- spaced_repetition/# SM-2 scheduler, card review, dashboards
@@ -45,4 +48,4 @@ abridgeai/
 Dependencies flow strictly downward: routers depend on services, services depend on queries and AI primitives, queries depend on models. No layer imports from a layer above it. Cross-feature communication is mediated through the \texttt{api/public} module of each feature, which exposes a stable internal API surface. This prevents circular imports and keeps feature boundaries explicit.
 
 \paragraph{Database migrations}
-Schema evolution is managed by 16 Alembic migration files numbered \texttt{0001} through \texttt{0016}. Migration \texttt{0001} establishes the full baseline schema ported from a hand-managed SQL file. Subsequent migrations add partial unique indexes, cascade rules, audit columns, pgvector half-precision embeddings (\texttt{halfvec(3072)}), and full-text search vectors. Every migration is reversible via a \texttt{downgrade()} function.
+Schema evolution is managed by 121 Alembic migration files running from \texttt{0001} to \texttt{0122}. Migration \texttt{0001} establishes the full baseline schema ported from a hand-managed SQL file. Subsequent migrations add partial unique indexes, cascade rules, audit columns, pgvector half-precision embeddings (\texttt{halfvec(3072)}), full-text search vectors, and the append-only trigger that protects the audit log. Every migration is reversible via a \texttt{downgrade()} function; where reversal would destroy records that cannot be reconstructed, the downgrade refuses rather than proceeding silently.

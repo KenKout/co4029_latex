@@ -26,3 +26,5 @@ Route handlers declare their required permissions via FastAPI dependencies. The 
 
 \paragraph{Audit logging}
 Every write operation that modifies a soft-deletable entity is recorded in the \texttt{http\_audit\_log} table by a SQLAlchemy event listener (\path{core/audit/listener.py}). The listener captures the actor's user ID, the HTTP method and path, the affected table and row ID, and a JSON diff of the changed columns. Audit writes are dispatched asynchronously via an actor pool (\path{core/audit/_worker_actor.py}) to avoid adding latency to the request path.
+
+\diagramplaceholder{fig:impl_permission_resolution}{Permission resolution for one request}{A flow chart resolving a caller's effective permissions: role assignments across organisation memberships $\rightarrow$ expansion of each role via the permission catalog $\rightarrow$ merge of direct grants $\rightarrow$ Redis cache $\rightarrow$ the guard's containment check. Show the recursive organisation-unit walk that determines which scopes contain the target resource.}
