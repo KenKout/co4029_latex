@@ -224,3 +224,46 @@ Signal — engagement drift detection \\
 \end{tabular}
 \label{tab:metrics_summary}
 \end{table}
+
+\subsubsection{Career Pathway Progress and Completion}
+\label{sec:pathway_completion}
+The metrics above govern movement \textit{within} a course. A career pathway is the structure above it: an ordered sequence of stages, each bundling required courses with a set of electives from which the stage asks for a stated number. Progress along a pathway, and the decision that a student has finished one, are therefore computed over stages rather than over cards.
+
+\paragraph{Stage Satisfaction and the Elective Quota}
+Let $\mathcal{S}$ denote the stages of the career-path version the student is pinned to. For a stage $s$, let $R_s$ be its required courses, $O_s$ its electives, and $m_s \in \mathbb{N}_0$ the number of electives the stage requires — its quota. A course $c$ is \textit{satisfied}, written $\sigma(c) = 1$, when the student holds a completion award for it; partial lesson progress does not satisfy a course.
+
+The work a stage credits and the work it demands are then
+
+\begin{equation}
+d_s = \left|\left\{ c \in R_s \mid \sigma(c) = 1 \right\}\right|
+     + \min\left(\left|\left\{ c \in O_s \mid \sigma(c) = 1 \right\}\right|,\; m_s\right),
+\qquad
+t_s = \left|R_s\right| + m_s.
+\end{equation}
+
+The $\min$ is the whole of the quota rule: electives satisfied beyond $m_s$ are credited at $m_s$ and no further, so a stage offering five electives and asking for one is finished by the first of them. This is a deliberate departure from treating every attached course as owed. An elective set exists to offer a choice, and a design under which choosing one obliges the student to the other four would make that choice meaningless. Because $d_s \leq t_s$ holds by construction, a stage can never be credited beyond what it demands.
+
+\paragraph{Pathway Progress}
+Pathway progress aggregates the stages, excluding those that demand nothing:
+
+\begin{equation}
+P = \frac{\sum_{s \in \mathcal{S},\; t_s > 0} d_s}{\sum_{s \in \mathcal{S},\; t_s > 0} t_s} \times 100.
+\end{equation}
+
+A stage with $t_s = 0$ — no required courses and no quota — has nothing outstanding and nothing to measure. Leaving it in the denominator would hold a finished pathway permanently below $100$, so it is excluded from both sums rather than counted as incomplete.
+
+\paragraph{Completion Is a Predicate, Not a Threshold}
+Whether a student has finished a pathway is decided from the stages directly,
+
+\begin{equation}
+\text{complete} \iff \mathcal{S} \neq \emptyset \;\wedge\; d_s = t_s \quad \forall s \in \mathcal{S},
+\end{equation}
+
+and not by testing $P \geq 100$. The distinction is not cosmetic. The platform retains an earlier progress formula — a flat mean of every attached course's completion percentage — selected by a deployment-wide setting, so that an installation may migrate on a dated cutover rather than have its reported figures move beneath it. Under that earlier formula a pathway whose required courses and elective quota are all satisfied still scores below $100$ while surplus electives sit untouched, and a completion gated on the percentage would never fire at all. Deriving completion from the stages makes it independent of whichever formula is presenting the number.
+
+Since $d_s \leq t_s$ for every stage, the predicate and the aggregate agree exactly wherever the stage-aware formula is the one in force: $P = 100$ if and only if every stage is complete. The two are one rule under two presentations, which is what prevents a pathway reading as finished on screen while the records built on completion remain open.
+
+An empty $\mathcal{S}$ is excluded deliberately. A pathway with no stages has not been shown to be finished; it has merely offered nothing to examine, and what completion writes is a durable academic record. Publication requires at least one stage per pathway and at least one course per stage, so the case does not arise for any pathway a student can be enrolled onto.
+
+\paragraph{Programme Completion}
+Completion propagates upward but never sideways. Finishing a pathway completes the attempt that held it, and the programme enrolment behind that attempt completes only once none of its attempts remain active — so a student holding two pathways completes the programme on the second, not the first. An attempt ended by an approved change or drop is closed rather than active, and therefore does not hold the enrolment open. Each attempt is judged against the pathway version pinned to it, so a revision published mid-enrolment cannot alter what an already-enrolled student must finish.
