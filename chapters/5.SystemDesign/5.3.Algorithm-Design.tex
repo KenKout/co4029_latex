@@ -267,6 +267,32 @@ completion remain open.
 
 An empty $\mathcal{S}$ is excluded deliberately. A pathway with no stages has not been shown to be finished; it has merely offered nothing to examine, and what completion writes is a durable academic record. Publication requires at least one stage per pathway and at least one course per stage, so the case does not arise for any pathway a student can be enrolled onto.
 
+\paragraph{Stage Unlocking}
+Completion says what a student has finished; unlocking says what they may open. The two are computed from the same evaluation but answer different questions, and a pathway needs both: a stage may be finished without ever having been reachable, and the design turns on recognising that as a coherent state rather than a contradiction.
+
+Each stage carries an unlock policy. Writing $U(s)$ for "stage $s$ is unlocked", $C(s)$ for "stage $s$ is complete" and $R(s)$ for "every required course of $s$ is satisfied", the rule for the stage at position $i$ is
+
+\begin{equation}
+U(s_i) =
+\begin{cases}
+\text{true} & i = 1 \text{ or policy} = \texttt{always},\\
+C(s_{i-1}) \wedge U(s_{i-1}) & \text{policy} = \texttt{after\_previous},\\
+R(s_{i-1}) \wedge U(s_{i-1}) & \text{policy} = \texttt{after\_previous\_required},\\
+\text{false} & \text{otherwise.}
+\end{cases}
+\end{equation}
+
+The first stage is unconditionally open whatever its stored policy says: a pathway whose opening stage were locked could not be started by anyone. An unrecognised policy resolves to false rather than true, so a malformed rule withholds content instead of releasing it. The distinction between the two gated policies is the elective quota: \texttt{after\_previous} waits for the previous stage to be complete, quota included, while \texttt{after\_previous\_required} releases the next stage once its required work is done and lets the electives run on.
+
+\paragraph{Why Unlocking Chains}
+The conjunction with $U(s_{i-1})$ is the part that is easy to omit and costly to omit. Satisfaction is a property of a student and a course, with no pathway in it, so a stage's courses can be satisfied by work done somewhere else entirely. Where a programme permits several pathways at once, a second pathway whose course set mirrors one stage of the first will complete that stage in the first the moment it is joined --- correctly, because the work was genuinely done, and it counts toward that pathway and is recorded as permanently earned.
+
+It must not, however, open what follows it. Without the conjunction, a stage the student had never been permitted to enter would serve as the prerequisite pass for the stage after it: a curriculum whose first stage is a hard requirement could be entered at its third stage without the first ever being touched, by taking a second pathway that mirrors the second stage. Requiring the previous stage to have been reachable as well as finished closes that route, and does so without weakening the credit: the mirrored stage remains complete, remains counted, and remains permanently recorded.
+
+What this admits is a stage that is complete and locked at the same time. That pair is not a contradiction but the precise description of the situation --- the work is done and will never have to be done again, while the pathway's own sequence has not yet reached it. An \texttt{always} stage is unaffected throughout, being unlocked by its own policy; it propagates the chain rather than interrupting it, so an unfinished stage of pure electives can never shut the pathway behind it.
+
+Unlocking governs presentation and access rather than eligibility to progress. A locked stage blocks a student from starting its courses only where its author marked the stage as hard-enforced; the softer settings record the lock, warn the student, and let them through, because an author who chose to advise rather than to block should not be silently overruled.
+
 \paragraph{One Evaluation, Every Surface}
 The same evaluation answers the question wherever it is asked: on the learner's own pathway view, on the manager's roster of every student following a pathway, and in the frozen snapshot written when a student leaves one. None of these recomputes progress for itself.
 

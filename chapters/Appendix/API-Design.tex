@@ -506,10 +506,10 @@ Quiz authoring follows a draft / generate / review / publish pipeline. \path|POS
 \end{longtable}
 
 % ── Career paths ────────────────────────────────────────────
-\subsubsection{Career Paths}
+\subsubsection{Career Paths --- Learner}
 
 \begin{longtable}{|p{0.1\textwidth}|p{0.424\textwidth}|p{0.15\textwidth}|p{0.206\textwidth}|}
-    \caption{Career-path endpoints.} \label{tab:api_career_paths} \\
+    \caption{Career-path endpoints --- learner catalogue and enrolment.} \label{tab:api_career_paths} \\
     \hline
     \textbf{Method} & \textbf{Path} & \textbf{Auth} & \textbf{Description} \\
     \hline
@@ -521,8 +521,56 @@ Quiz authoring follows a draft / generate / review / publish pipeline. \path|POS
     \endhead
     \hline
     \endfoot
-    GET    & \path|/career-paths|         & Bearer & List published career paths. \\ \hline
-    GET    & \path|/career-paths/{slug}|  & Bearer & Career-path detail with ordered course list. \\ \hline
+    GET    & \path|/career-paths|                                                    & Bearer & List published career paths, scoped to those the caller's programme offers. \\ \hline
+    GET    & \path|/career-paths/{slug}|                                             & Bearer & Career-path detail with its ordered course list. \\ \hline
+    GET    & \path|/career-paths/{slug}/detail|                                      & Bearer & The same path plus its stage roadmap. \\ \hline
+    GET    & \path|/me/career-enrollments|                                           & Bearer & The caller's pathway enrolments with derived progress. \\ \hline
+    GET    & \path|/me/career-enrollments/{career_path_id}/progress|                 & Bearer & Stage-aware progress against the pinned version (Section~\ref{sec:pathway_completion}). \\ \hline
+    GET    & \path|/me/career-enrollments/{career_path_id}/readiness-history|        & Bearer & Readiness snapshots, most recent first (FR-6.8). \\ \hline
+    POST   & \path|/me/career-enrollments/{career_path_id}/courses/{course_id}/start| & Bearer & Start one course of a pathway the caller already holds. \\ \hline
+\end{longtable}
+
+\subsubsection{Career Paths --- Authoring \& Roster}
+
+\begin{longtable}{|p{0.1\textwidth}|p{0.424\textwidth}|p{0.15\textwidth}|p{0.206\textwidth}|}
+    \caption{Career-path endpoints --- authoring, publication and roster.} \label{tab:api_career_paths_authoring} \\
+    \hline
+    \textbf{Method} & \textbf{Path} & \textbf{Auth} & \textbf{Description} \\
+    \hline
+    \endfirsthead
+    \multicolumn{4}{c}{\small\tablename~\thetable{} \textit{(continued)}} \\
+    \hline
+    \textbf{Method} & \textbf{Path} & \textbf{Auth} & \textbf{Description} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    POST   & \path|/management/career-paths|                                              & Bearer + manager & Create a pathway as a draft. \\ \hline
+    GET    & \path|/management/career-paths|                                              & Bearer + manager & List the organisation's pathways. \\ \hline
+    GET    & \path|/management/career-paths/{career_path_id}|                              & Bearer + manager & Pathway detail for authoring. \\ \hline
+    PATCH  & \path|/management/career-paths/{career_path_id}|                              & Bearer + manager & Edit pathway metadata. \\ \hline
+    PUT    & \path|/management/career-paths/{career_path_id}/thumbnail|                    & Bearer + manager & Upload a JPEG/PNG/WebP/GIF thumbnail, up to 5~MiB. \\ \hline
+    GET    & \path|/management/career-paths/{career_path_id}/impact|                       & Bearer + manager & Blast radius of an edit: who is enrolled and what would move. \\ \hline
+    GET    & \path|/management/career-paths/{career_path_id}/versions|                     & Bearer + manager & Version history, newest first; a published version is frozen. \\ \hline
+    POST   & \path|/management/career-paths/{career_path_id}/versions|                     & Bearer + manager & Fork the latest published version into a new draft. \\ \hline
+    GET    & \path|/management/career-paths/{career_path_id}/courses|                      & Bearer + manager & Courses attached to the working version. \\ \hline
+    POST   & \path|/management/career-paths/{career_path_id}/courses|                      & Bearer + manager & Attach a course to the pathway. \\ \hline
+    PATCH  & \path|/management/career-paths/{career_path_id}/courses/{course_id}|          & Bearer + manager & Edit an attached course's required / satisfied-by flags. \\ \hline
+    DELETE & \path|/management/career-paths/{career_path_id}/courses/{course_id}|          & Bearer + manager & Detach a course. \\ \hline
+    PUT    & \path|/management/career-paths/{career_path_id}/courses/reorder|              & Bearer + manager & Reorder courses within the pathway. \\ \hline
+    PUT    & \path|/management/career-paths/{career_path_id}/courses/{course_id}/stage|    & Bearer + manager & Move a course between stages, or reposition it within one. \\ \hline
+    GET    & \path|/management/career-paths/{career_path_id}/course-candidates|            & Bearer + manager & Organisation course catalogue for the attach picker, any status. \\ \hline
+    GET    & \path|/management/career-paths/{career_path_id}/stages|                       & Bearer + manager & Stages of the working version. \\ \hline
+    POST   & \path|/management/career-paths/{career_path_id}/stages|                       & Bearer + manager & Create a stage; an empty stage is valid. \\ \hline
+    PATCH  & \path|/management/career-paths/{career_path_id}/stages/{stage_id}|            & Bearer + manager & Edit a stage's title, unlock policy or elective quota. \\ \hline
+    DELETE & \path|/management/career-paths/{career_path_id}/stages/{stage_id}|            & Bearer + manager & Delete a stage; refused while it holds courses. \\ \hline
+    PUT    & \path|/management/career-paths/{career_path_id}/stages/reorder|               & Bearer + manager & Reorder stages; returns warnings rather than rewriting unlock policy. \\ \hline
+    POST   & \path|/management/career-paths/{career_path_id}/students|                     & Bearer + manager & Assign students to the pathway. \\ \hline
+    DELETE & \path|/management/career-paths/{career_path_id}/students/{student_id}|        & Bearer + manager & Withdraw a student from the pathway. \\ \hline
+    POST   & \path|/management/career-paths/{career_path_id}/publish|                      & Bearer + manager & Publish, freezing the version after the completeness gate. \\ \hline
+    POST   & \path|/management/career-paths/{career_path_id}/archive|                      & Bearer + manager & Archive; blocks new selections without interrupting current ones. \\ \hline
+    GET    & \path|/management/career-paths/{career_path_id}/readiness|                    & Bearer + manager & Readiness aggregate over actively-enrolled students (FR-6.8). \\ \hline
+    GET    & \path|/teacher/career-paths/{career_path_id}/students/progress|               & Bearer + teacher & Per-student roster progress, derived from the stage evaluation. \\ \hline
 \end{longtable}
 
 % ── Spaced repetition ───────────────────────────────────────
