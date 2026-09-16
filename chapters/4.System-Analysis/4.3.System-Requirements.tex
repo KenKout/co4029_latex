@@ -1,4 +1,4 @@
-\subsection{Requirements}
+﻿\subsection{Requirements}
 \subsubsection{User Requirements}
 User Requirements articulate the functional needs of the system from the perspective of the end-users.
 
@@ -38,85 +38,13 @@ User Requirements articulate the functional needs of the system from the perspec
 \end{itemize}
 \subsubsection{Functional Requirements}
 
-The functional requirements of aBridgeAI specify the concrete system behaviours, processes, and user interactions that the platform must support. They are organised into eight functional modules: (1)~Authentication and Access Control, (2)~Organisation and User Management, (3)~Course and Material Management, (4)~Learning Loop and Adaptive Quiz, (5)~Application Loop and Mock Interview, (6)~Analytics, Reporting, and Notifications, (7)~Learning Programs and Path Governance, and (8)~Platform Configuration and Policy Documents. Each requirement is traced to one or more User Requirements to ensure comprehensive coverage and end-to-end traceability. The complete Functional Requirements specification is provided in Appendix~\ref{appendix:fr}.
+The functional requirements of aBridgeAI specify the concrete system behaviours, processes, and user interactions that the platform must support. They are organised into eight functional modules: (1)~Authentication and Access Control, (2)~Organisation and User Management, (3)~Course and Material Management, (4)~Learning Loop and Adaptive Quiz, (5)~Application Loop and Mock Interview, (6)~Analytics, Reporting, and Notifications, (7)~Learning Programs and Path Governance, and (8)~Platform Configuration and Policy Documents. Each requirement is traced to one or more User Requirements to ensure comprehensive coverage and end-to-end traceability. The complete specification --- one hundred requirements, each with its actors, traced user requirement, feasibility and testability assessment, and priority --- is given in Appendix~\ref{appendix:fr}, and is not reproduced here.
 
+The modules divide along the lines the system itself is built on. Modules~1 and~2 establish who a user is and what they may do: federated sign-in, second-factor verification, and the dynamic role and permission model, then the tenant structure of organisations, faculties and memberships within which every later permission is resolved. Modules~3 to~5 carry the teaching loop in the order a learner meets it --- a course and its ingested materials, the quiz cycle and the spaced-repetition scheduling that governs progression, and the mock interview that tests explanation rather than recognition. Module~6 turns what those produce into reporting, notification and audit.
 
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|>{\centering\arraybackslash}m{0.05\textwidth}|m{0.29\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
-\caption{Core functional requirements by module.}
-\label{tab:fr_core} \\
-\hline
-\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
-\endfirsthead
- 
-\multicolumn{7}{c}%
-{{\bfseries Table \thetable\ -- Continued from previous page}} \\
-\hline
-\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.29\textwidth}|}{\centering \textbf{Requirement}} & \textbf{\hspace{0pt}Users} & \textbf{User Requirement} & \textbf{\hspace{0pt}Fea\-si\-ble} & \textbf{\hspace{0pt}Test\-able} & \textbf{\hspace{0pt}Pri\-or\-ity} \\ \hline
-\endhead
- 
-\hline \multicolumn{7}{|r|}{{Continued on next page}} \\ \hline
-\endfoot
- 
-\hline
-\endlastfoot
- 
-\multicolumn{7}{|l|}{\textit{Module 1 --- Authentication \& Access Control}} \\ \hline
- 
-FR-1.1 & The system shall allow users to authenticate using Google SSO and log out of the system. & All Users & UR-ITA-05 & Yes & Yes & High \\ \hline
- 
-FR-1.3 & The system shall support two-factor authentication using authenticator-app verification codes and one-time recovery codes for additional account protection. & All Users & UR-ITA-05 & Yes & Yes & High \\ \hline
+The final two modules are the ones most often mistaken for administration rather than pedagogy. Module~7 governs the enrolment structure above individual courses --- versioned learning programmes, the career pathways they bundle, and the dean-adjudicated workflow by which a student moves between pathways without losing earned progress. Module~8 covers the runtime configuration catalogue and the versioned policy documents, the two surfaces through which the platform itself is tuned and its terms published.
 
- 
-\multicolumn{7}{|l|}{\textit{Module 2 --- Organisation \& User Management}} \\ \hline
- 
-FR-2.1 & The system shall allow IT administrators to provision new tenant organisations and to assign the initial Educational Manager role to a user within each organisation. & IT Administrators & UR-ITA-01 & Yes & Yes & High \\ \hline
- 
-FR-2.3 & The system shall allow Educational Managers to bulk-enroll students into a course via CSV import, creating new student accounts for unseen email addresses and reporting per-row validation errors without aborting the batch. & Educational Managers & UR-MGR-01 & Yes & Yes & High \\ \hline
-
-\multicolumn{7}{|l|}{\textit{Module 3 --- Course \& Material Management}} \\ \hline
- 
-FR-3.1 & The system shall allow Teachers and Educational Managers to manage courses through draft, published, archived, and soft-deleted states, including administrative restoration of soft-deleted courses. & Teachers, Educational Managers & UR-TCH-01 & Yes & Yes & High \\ \hline
- 
-FR-3.3 & The system shall allow Teachers to upload learning materials in supported formats using standard or resumable upload flows, manage material metadata, link materials to lessons, and re-run processing when needed. & Teachers, Educational Managers & UR-TCH-01 & Yes & Yes & High \\ \hline
- 
-\multicolumn{7}{|l|}{\textit{Module 4 --- Learning Loop \& Adaptive Quiz}} \\ \hline
- 
-FR-4.1 & The system shall allow Teachers to create quiz questions manually or through AI drafting from ingested course content, review them through pending, approved, edited, or rejected states, reuse approved questions, and maintain source references and revision history. & Teachers, Educational Managers & UR-TCH-02 & Yes & Yes & High \\ \hline
- 
- 
-FR-4.5 & The system shall gate lesson access using prerequisite completion, the lesson coverage threshold $\tau$ over cards meeting the EF unlock threshold, and optional interview-pass requirements. & Students & UR-STU-01 & Yes & Yes & High \\ \hline
- 
-\multicolumn{7}{|l|}{\textit{Module 5 --- Application Loop \& Mock Interview}} \\ \hline
- 
-FR-5.1 & The system shall allow Teachers to define interview sections by specifying desired outcomes that students must demonstrate to pass, without requiring any expected or model answer. & Teachers, Educational Managers & UR-TCH-03 & Yes & Yes & High \\ \hline
- 
-FR-5.4 & The system shall allow Students to start mock interview sessions in text mode or voice mode as an adaptive turn-taking dialogue with an AI interviewer. & Students & UR-STU-02 & Yes & Yes & High \\ \hline
- 
-\multicolumn{7}{|l|}{\textit{Module 6 --- Analytics, Reporting \& Notifications}} \\ \hline
- 
- 
-FR-6.7 & The system shall maintain an immutable audit log for role assignments, sensitive data changes, and HTTP request events, queryable by administrators for security and compliance review. & IT Administrators & UR-ITA-03 & Yes & Yes & High \\ \hline
-
-\multicolumn{7}{|l|}{\textit{Module 7 --- Learning Programs \& Path Governance}} \\ \hline
-
-FR-7.3 & The system shall version a learning programme, creating a new draft version rather than modifying a published one, so that a Student remains on the version under which they enrolled. & Faculty Deans, Educational Managers & UR-MGR-02 & Yes & Yes & High \\ \hline
-
-FR-7.6 & The system shall place a Student onto the default career pathway of their programme version at the moment of enrolment, and shall allow further pathways to be added without approval up to a per-programme limit. & Students & UR-STU-01 & Yes & Yes & High \\ \hline
-
-FR-7.7 & The system shall allow a Student with an active enrolment to request a change of career pathway, or the dropping of one they hold, with a mandatory justification, for adjudication by the Faculty Dean. & Students & UR-STU-01 & Yes & Yes & Medium \\ \hline
-
-FR-7.10 & The system shall preserve a Student's earned course completions as immutable awards that survive a pathway change, so that progress shared between pathways is not repeated. & Students & UR-STU-01 & Yes & Yes & High \\ \hline
-
-\multicolumn{7}{|l|}{\textit{Module 8 --- Platform Configuration \& Policy Documents}} \\ \hline
-
-FR-8.2 & The system shall resolve the effective value of every setting by a fixed precedence of organisation override, deployment-wide override, environment configuration, and code default, and shall report all candidate values alongside the effective value and its source. & IT Administrators, Educational Managers & UR-ITA-03 & Yes & Yes & Medium \\ \hline
-
-FR-8.4 & The system shall require a written reason for every configuration change and shall record each application, clearance, and rollback for audit. & IT Administrators & UR-ITA-03 & Yes & Yes & Medium \\ \hline
-
-FR-8.7 & The system shall maintain policy documents, each classified as legal or academic, whose content is held in independently numbered versions. & IT Administrators & UR-ITA-05 & Yes & Yes & Low \\
-
-\end{longtable}
+Two properties hold across the set and are worth stating once rather than repeating in each requirement. Every artefact an AI pipeline generates enters a review state and requires a human decision before a learner can see it. And every rule that judges a learner --- the integrity policy on an attempt, the pathway version on an enrolment, the programme version on a student --- is frozen at the moment it starts applying to them, so that editing the curriculum never retroactively changes what somebody already under way is measured against.
 
 
 
@@ -133,32 +61,8 @@ Non-functional requirements define the quality attributes and operational constr
     \item Security and compliance mandates cover encryption at rest, RBAC, audit logging, session management, and the input and output guards that protect the AI interviewer against prompt injection and content leakage.
     \item Usability and accessibility requirements emphasise responsive UI and WCAG 2.1 AA alignment.
 \end{itemize}
-The complete Functional Requirements specification is provided in Appendix~\ref{appendix:nfr}.
-\renewcommand{\arraystretch}{1.4}
-\begin{longtable}{|>{\centering\arraybackslash}m{0.07\textwidth}|m{0.53\textwidth}|>{\centering\arraybackslash}m{0.14\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
-\caption{Representative non-functional requirements by domain.}
-\label{tab:nfr_core} \\
-\hline
-	\textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.53\textwidth}|}{\centering \textbf{Requirement}} & \textbf{Users} & \textbf{Pri\-or\-ity} \\ \hline
-\endfirsthead
 
-\multicolumn{4}{c}%
-{{\bfseries Table \thetable\ -- Continued from previous page}} \\
-\hline
-    \textbf{ID} & \multicolumn{1}{>{\centering\arraybackslash}m{0.53\textwidth}|}{\centering \textbf{Requirement}} & \textbf{Users} & \textbf{Pri\-or\-ity} \\ \hline
-\endhead
-
-\hline \multicolumn{4}{|r|}{{Continued on next page}} \\ \hline
-\endfoot
-
-\hline
-\endlastfoot
-
-NFR-2.1 & The system shall support on average 50 concurrent active users, 10 simultaneous video streams, and 5 concurrent AI interview sessions during peak hours without performance degradation. & Admin & Medium \\ \hline
-NFR-3.1 & All sensitive data must be encrypted at rest using AES-256, including PII, session and refresh tokens, multi-factor authentication secrets and recovery codes, API keys, and uploaded learning materials. The platform stores no user passwords: authentication is delegated to an external identity provider, so no password hash is retained. & All Users, Admin & High \\ \hline
-NFR-3.5 & The system must screen learner input to the AI interviewer for prompt-injection attempts and must screen model output for leakage of protected content before it reaches the learner, blocking or degrading the turn rather than failing the session when a guard trips. & Students, Admin & High \\ \hline
-NFR-4.2 & The system must comply with WCAG 2.1 AA accessibility standards, supporting full keyboard navigation, sufficient color contrast ratios, and alt text for all visual elements. & Users with Disabilities & Low \\ \hline
-\end{longtable}
+\noindent Two of these carry more weight than their priority suggests. The concurrency target is modest by design --- the deployment is institutional rather than public, and the measured headroom against it is reported in Section~\ref{sec:evaluation} --- but the accessibility requirement is the one most likely to be treated as optional and least likely to be recoverable late, since retrofitting keyboard navigation and contrast onto a finished component library costs far more than building to them. The nineteen requirements, with their actors and priorities, are enumerated in Appendix~\ref{appendix:nfr}.
 
 
 
