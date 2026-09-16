@@ -267,5 +267,14 @@ completion remain open.
 
 An empty $\mathcal{S}$ is excluded deliberately. A pathway with no stages has not been shown to be finished; it has merely offered nothing to examine, and what completion writes is a durable academic record. Publication requires at least one stage per pathway and at least one course per stage, so the case does not arise for any pathway a student can be enrolled onto.
 
+\paragraph{One Evaluation, Every Surface}
+The same evaluation answers the question wherever it is asked: on the learner's own pathway view, on the manager's roster of every student following a pathway, and in the frozen snapshot written when a student leaves one. None of these recomputes progress for itself.
+
+This is a stronger requirement than it appears, because the three surfaces have different shapes and invite different shortcuts. A roster reports many students at once and a single aggregate query is the obvious way to produce it; for a time the roster did exactly that, deriving each student's percentage — and the count of courses behind it — in SQL from the mean lesson completion of every attached course. Those numbers were individually reasonable and collectively wrong: a course counts as satisfied when the student has been awarded its completion, which is not the same condition as its lessons averaging $100$, so the roster could report a student at $100\%$ against a course count that said otherwise, in the same row.
+
+The correction is not a better query but one fewer. The roster's query now returns identity and avatar columns only; the percentage, the number of satisfied courses and the denominator are all read from the stage evaluation, which is the sole definition any of them has. A second derivation of a value that already has one authority does not add a check — it adds a disagreement that nothing is watching for.
+
+Evaluating per student is what this costs, since satisfaction is per student by nature. The stage structure, however, is a property of the pathway version and not of the reader, so it is resolved once for the whole roster rather than re-read for each row.
+
 \paragraph{Programme Completion}
 Completion propagates upward but never sideways. Finishing a pathway completes the attempt that held it, and the programme enrolment behind that attempt completes only once none of its attempts remain active — so a student holding two pathways completes the programme on the second, not the first. An attempt ended by an approved change or drop is closed rather than active, and therefore does not hold the enrolment open. Each attempt is judged against the pathway version pinned to it, so a revision published mid-enrolment cannot alter what an already-enrolled student must finish.
