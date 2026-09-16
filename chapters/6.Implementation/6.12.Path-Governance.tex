@@ -1,7 +1,7 @@
 \subsection{Programme and Path Governance}
 \label{sec:impl_path_governance}
 
-The learning-programme subsystem governs the enrolment structure above individual courses: which career paths a student holds, how they are acquired, and how one is given up. It is implemented in \path{abridgeai/features/learning_programs/}.
+Section~\ref{sec:impl_career_paths} covers the pathway itself --- its versions, stages and the evaluation that decides what a student has finished. This section covers the enrolment structure above it: which career paths a student holds, how they are acquired, and how one is given up. It is implemented in \path{abridgeai/features/learning_programs/}.
 
 \paragraph{A held path is a row, not a column}
 The enrolment carries no \texttt{career\_path\_id}. \texttt{ProgramEnrollment} owns many \texttt{ProgramPathAttempt} rows, and the paths a student currently holds are the active ones. This is what lets a programme permit several paths at once, and it is what keeps a path that has ended readable: closing an attempt writes an \texttt{exit\_snapshot} of the progress it had earned rather than clearing a field --- measured by the same stage evaluation the learner's own view and the manager's roster report (Section~\ref{sec:pathway_completion}), so the frozen figure means what the live one meant the moment before it froze. Each attempt also records a \texttt{selection\_source} --- \texttt{program\_default}, \texttt{student}, or \texttt{path\_change} --- so an audit can distinguish a path the system assigned from one the student chose.

@@ -1,0 +1,38 @@
+\subsection{Career Pathways}
+\label{sec:impl_career_paths}
+
+A career pathway is the route a student walks: an ordered sequence of stages, each holding required courses and a set of electives from which the stage asks for a stated number. The rules that decide what a student has finished and what they may open are specified in Section~\ref{sec:pathway_completion}; this section covers how the subsystem is built around them. It is implemented in \path{abridgeai/features/career_paths/}, split by audience into an authoring surface for managers and a learner surface for the student walking the path.
+
+\paragraph{A version is the unit of truth}
+A pathway is never edited in place once students are on it. Publishing freezes a version --- its stages, their ordering, their course membership, the required flags and the unlock policies --- and every enrolment pins the exact version it started on. A later revision is a copy-on-write fork into a new draft; it does not reach a student already walking the earlier one, and it does not reach a programme version that froze the earlier one either. Every read in the subsystem therefore takes a \texttt{version\_id} rather than a path identifier, and the progress a student sees is always measured against the route they were actually given. This is the premise the rest of the section depends on: without it, an author editing a pathway would silently change what enrolled students must finish.
+
+\paragraph{One module owns the rules}
+Satisfaction, stage completion, unlocking and progress are computed in exactly one place, \path{services/stages.py}. The learner's progress endpoint, the manager's roster, the readiness worker and the Start endpoint all call into it rather than deriving any part for themselves. The discipline is not stylistic: the subsystem has twice shipped a defect of exactly this shape --- a second implementation of ``finished'' that was individually reasonable and disagreed with the first at the margin, with nothing watching for the disagreement. A rule with one implementation cannot drift from itself.
+
+\paragraph{The stage latch is append-only}
+When a stage evaluates complete for an enrolment, a row is written to \texttt{student\_stage\_progress}, and that row is never updated or deleted. The table deliberately omits the soft-delete and audit mixins the rest of the schema carries, because a soft-deleted latch would be a way to un-complete a student --- the precise failure it exists to prevent.
+
+The need arises because stage completion is \emph{derived} rather than recorded, and derived answers can move backward. A learner can un-tick a lesson, demoting the course beneath them; an author can raise a stage's elective quota. Either would silently re-lock a stage the student had already passed. The asymmetry is deliberate and load-bearing: un-marking a lesson demotes the \emph{course}, so satisfaction stays honest, but it never un-latches the \emph{stage}. Work once finished is finished.
+
+\paragraph{Unlocking chains through the prefix}
+Unlock is evaluated in a single forward pass, each stage reading the one before it, because a gate may depend on a previous stage's completion and that completion may itself be latched. A gated stage requires the previous stage to have been \emph{reachable} as well as finished --- the reasoning is in Section~\ref{sec:pathway_completion}. An unrecognised unlock policy resolves to locked rather than open, so a malformed rule withholds content instead of releasing it.
+
+\paragraph{A lock is a setting, not a verdict}
+Whether a locked stage actually blocks a student from starting its courses is the author's choice: only \texttt{hard} enforcement refuses, while \texttt{soft} and \texttt{advisory} record the lock, warn the student and let them through. The distinction is routed through a single helper rather than tested at each call site, and that indirection is the fix for a real defect: the Start endpoint once tested the unlocked flag directly and blocked every enforcement level, so an author who had chosen ``show a warning, still allow'' got a hard block instead. The authoring interface offers these as three distinct choices; blocking all three would make the interface lie about what it does.
+
+\paragraph{Publication is gated; mutation is not}
+``Every pathway has at least one stage'' and ``every stage has at least one course'' are enforced when a pathway is published, not when it is edited. Enforcing them on the mutation path would make ordinary authoring impossible --- a stage must be creatable before it can be filled, and a pathway must exist before it has stages. The gate separates hard failures, which refuse the publish, from soft findings, which are returned so the interface can surface them without blocking an author who means it.
+
+\paragraph{Editing a live pathway is classified, not forbidden}
+A published pathway with students on it can still be revised, and the subsystem's job is to make the consequence visible rather than to refuse. Every mutation is classified against the number of students actually walking the path and how far they have reached: an edit is \emph{breaking} when an in-flight student ends up worse off --- work added to a stage they have not finished, the goal moved by a raised quota or a lengthened path, or a stage they could previously enter now locked --- and safe otherwise. With no active enrolments nothing can be breaking, so authoring a draft is unconstrained.
+
+A separate impact read reports the blast radius before the author commits: how many students are enrolled and how many sit in each stage. Reordering stages is the subtlest case and is handled by reporting rather than repair --- moving a stage away from the first position changes what its stored unlock policy means, so the operation returns warnings and leaves the policy as the author wrote it. Silently rewriting it would discard the author's intent at the moment the position that expressed it moved.
+
+\paragraph{Archive, never delete}
+A published pathway is archived rather than removed. Archiving blocks new selections and invalidates pending change requests that targeted it, while students already walking it continue under their pinned version, with their progress, completion awards and history untouched. Outright deletion is reserved for drafts, where by definition no student can be enrolled.
+
+\paragraph{Readiness is sampled, not recomputed}
+A nightly worker writes one append-only readiness snapshot per active enrolment, each stamped with the pathway version that produced the score. Readiness is therefore a record of what was true on a given night rather than a figure re-derived from today's rules --- an author who revises a pathway, or a student whose course is demoted, changes future points and never past ones. The alternative, recomputing history on read, would silently rewrite a chart every time the underlying pathway moved.
+
+\paragraph{The compatibility projection}
+Learner-facing pathway endpoints still authorise through \texttt{student\_career\_enrollments}, a per-student row maintained alongside the programme path attempts that are the real source of truth. Starting an attempt ensures the projection exists; ending the last attempt on a pathway releases it. It is named here as what it is --- a staged-cutover artefact, kept so the learner surface continued to work while enrolment moved up into the programme layer, not a second authority on who is on which pathway.
