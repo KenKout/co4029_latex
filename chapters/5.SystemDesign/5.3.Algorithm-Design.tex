@@ -252,16 +252,18 @@ P = \frac{\sum_{s \in \mathcal{S},\; t_s > 0} d_s}{\sum_{s \in \mathcal{S},\; t_
 
 A stage with $t_s = 0$ — no required courses and no quota — has nothing outstanding and nothing to measure. Leaving it in the denominator would hold a finished pathway permanently below $100$, so it is excluded from both sums rather than counted as incomplete.
 
-\paragraph{Completion Is a Predicate, Not a Threshold}
+\paragraph{Completion Is a Predicate}
 Whether a student has finished a pathway is decided from the stages directly,
 
 \begin{equation}
 \text{complete} \iff \mathcal{S} \neq \emptyset \;\wedge\; d_s = t_s \quad \forall s \in \mathcal{S},
 \end{equation}
 
-and not by testing $P \geq 100$. The distinction is not cosmetic. The platform retains an earlier progress formula — a flat mean of every attached course's completion percentage — selected by a deployment-wide setting, so that an installation may migrate on a dated cutover rather than have its reported figures move beneath it. Under that earlier formula a pathway whose required courses and elective quota are all satisfied still scores below $100$ while surplus electives sit untouched, and a completion gated on the percentage would never fire at all. Deriving completion from the stages makes it independent of whichever formula is presenting the number.
-
-Since $d_s \leq t_s$ for every stage, the predicate and the aggregate agree exactly wherever the stage-aware formula is the one in force: $P = 100$ if and only if every stage is complete. The two are one rule under two presentations, which is what prevents a pathway reading as finished on screen while the records built on completion remain open.
+rather than from a presentation metric. Since $d_s \leq t_s$ for every stage,
+the predicate and the aggregate agree exactly: $P = 100$ if and only if every
+stage is complete. The two are one rule under two presentations, which is what
+prevents a pathway reading as finished on screen while the records built on
+completion remain open.
 
 An empty $\mathcal{S}$ is excluded deliberately. A pathway with no stages has not been shown to be finished; it has merely offered nothing to examine, and what completion writes is a durable academic record. Publication requires at least one stage per pathway and at least one course per stage, so the case does not arise for any pathway a student can be enrolled onto.
 

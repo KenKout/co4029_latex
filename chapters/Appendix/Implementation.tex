@@ -42,8 +42,6 @@ User account & \texttt{users} & \texttt{active}, \texttt{invited}, \texttt{inact
 \paragraph{Where completion is written}
 Three of the lifecycles above complete as one cascade rather than independently, and the table cannot show that because the transition crosses all three. The evaluation described in Section~\ref{sec:pathway_completion} is performed once, against the career-path version in question; where it holds, the learner's career enrolment is marked \texttt{completed}, every programme path attempt on that path whose \emph{own} pinned version also evaluates complete is closed as \texttt{completed}, and a programme enrolment left with no attempt still \texttt{active} is marked \texttt{completed} with the date recorded. The middle step is qualified deliberately: two programmes may pin different versions of the same path, and a result earned against one version must not close an attempt that promised another.
 
-The cascade is not driven by the reported progress percentage. That figure is produced by whichever formula the deployment-wide setting selects, and under the legacy formula a pathway satisfying every required course and its full elective quota still reports below $100$. Gating these writes on it would leave all three lifecycles open indefinitely; they are gated on the stage evaluation itself, as Section~\ref{sec:impl_path_governance} sets out.
-
 
 \subsection{Cross-cutting implementation notes}
 
