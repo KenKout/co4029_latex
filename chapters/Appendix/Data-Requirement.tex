@@ -473,6 +473,23 @@ passing interview for that module. Lesson \textit{completion} is
 recorded independently, as an explicit completion state on the
 student's lesson progress record.
 
+A lesson may be discharged in either of two ways. The student may mark
+it complete themselves, which is an assertion the system accepts and
+which they may withdraw again. Failing that, it completes from
+measured engagement: the system must record active time against each
+material and the furthest reading position reached, and take the
+greater of the two as the lesson's progress — active time measured
+against the duration the teacher estimated for it, reading position as
+a proportion of the material.
+
+Automatic completion requires that measure to reach the estimate in
+full. The estimate is the teacher's judgement of how long the material
+takes, so any fraction of it would be an arbitrary bar, and a lesson
+reported as finished short of one would credit the student with work
+neither they nor the teacher accounted for. Engagement beyond the
+estimate is recorded but the reported figure is capped, since progress
+past complete conveys nothing.
+
 At the \textit{course level}, progress must be computed over
 \textit{curriculum units} rather than over lessons alone. Each
 published curriculum item — lesson, quiz, or interview — contributes
