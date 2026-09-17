@@ -304,8 +304,8 @@ The following tables enumerate every endpoint exposed by the backend, grouped by
     \endhead
     \hline
     \endfoot
-    POST   & \path|/teacher/courses|                                            & Bearer + teacher & Create a course. \\ \hline
-    GET    & \path|/teacher/courses/check-slug|                                 & Bearer + teacher & Probe slug availability. \\ \hline
+    POST   & \path|/teacher/courses|                                            & Bearer + manager & Create a course. Requires \path|course.create|, which a teacher does not hold. \\ \hline
+    GET    & \path|/teacher/courses/check-slug|                                 & Bearer + manager & Probe slug availability; pre-flight for the create form, so same permission. \\ \hline
     GET    & \path|/teacher/courses|                                            & Bearer + teacher & List courses owned or co-taught by the caller. \\ \hline
     GET    & \path|/teacher/courses/{course_id}|                                & Bearer + teacher & Get a course (authoring view). \\ \hline
     GET    & \path|/teacher/courses/{course_id}/content|                        & Bearer + teacher & Get the full module/lesson/quiz tree. \\ \hline
