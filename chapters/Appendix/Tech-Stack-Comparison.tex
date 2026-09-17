@@ -1,0 +1,120 @@
+\section{Technology Selection Comparisons}
+\label{appendix:techstack}
+
+Section~\ref{sec:tech_stack} states each technology decision and the constraint that drove it. The comparison matrices behind those decisions are collected here: one per component, scoring the option chosen against the alternatives that were seriously considered. They are reference material for a reader checking the reasoning rather than following it, which is why they sit apart from the argument they support.
+
+\subsection{Backend Framework}
+
+\begin{table}[H]
+    \caption{Backend Framework Comparison}
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|}
+        \hline
+        \textbf{Feature} & \textbf{FastAPI} & \textbf{Django REST} & \textbf{Express.js} \\
+        \hline
+        \textbf{Language} & Python & Python & JavaScript / Node.js \\
+        \textbf{AI/ML Integration} & Native (LangChain, scikit-learn, NumPy) & Native but synchronous ORM bottleneck & Requires Python sidecar microservices \\
+        \textbf{Concurrency Model} & Async I/O (\texttt{asyncio}) & Sync-first (WSGI); async support limited & Single-threaded event loop \\
+        \textbf{Performance} & High ($\sim$180MB cold start, async-native) & Moderate ($\sim$250MB, sync overhead) & Moderate ($\sim$120MB, CPU-bound limits) \\
+        \textbf{Auto Schema / Docs} & Built-in (OpenAPI, Swagger UI) & Requires \texttt{drf-spectacular} add-on & Requires manual setup \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Frontend Framework}
+
+\begin{table}[H]
+    \caption{Frontend Framework Comparison}
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|}
+        \hline
+        \textbf{Feature} & \textbf{Vite + React + TanStack Query} & \textbf{Next.js (App Router)} & \textbf{Angular} \\
+        \hline
+        \textbf{Bundle Size} & $\sim$42KB (minimal runtime) \cite{techsy2026vite} & $\sim$92KB (RSC runtime overhead) \cite{techsy2026vite} & Large (full framework) \\
+        \textbf{HMR Speed} & $<$50ms (native ESM) \cite{hygraph2024vite} & Slower (Turbopack improving) \cite{hygraph2024vite} & Moderate \\
+        \textbf{Complexity} & Low (standard React patterns) & High (RSC boundaries, App Router, Flight payload) \cite{northflank2024nextjs} & High (Zone.js, decorators) \\
+        \textbf{Data Fetching} & Fine-grained (TanStack Query: cache, invalidation, optimistic updates) \cite{tanstack2024comparison} & Coarse (fetch caching, requires manual React Query integration) \cite{tanstack2024comparison} & RxJS (steep learning curve) \\
+        \textbf{LiveKit SDK} & Official React SDK \cite{livekit2024sdk} & Official React SDK \cite{livekit2024sdk} & No official SDK \\
+        \textbf{SSR / SEO} & Not needed (authenticated SPA) & Built-in (unnecessary overhead for this use case) & Angular Universal (complex) \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Real-Time Communication}
+
+\begin{table}[H]
+    \caption{Real-Time Communication Comparison}
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|}
+        \hline
+        \textbf{Feature} & \textbf{LiveKit} & \textbf{Twilio} & \textbf{Socket.io} \\
+        \hline
+        \textbf{Protocol} & WebRTC (UDP) & SIP / WebRTC & WebSockets (TCP) \\
+        \textbf{Voice Latency} & Ultra-low ($<$200ms) \cite{versatik2025webrtc} & Moderate (cloud routing overhead) & High (TCP head-of-line blocking) \\
+        \textbf{AI Agent SDK} & Built-in (Agents SDK, VAD, STT) & Requires manual pipeline & No native support \\
+        \textbf{STT Integration} & Integrated (Whisper, Deepgram) & Separate service required & Separate service required \\
+        \textbf{Self-Hostable} & Yes (open-source) & No (vendor lock-in) & Yes \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Primary Database and Vector Search}
+
+\begin{table}[H]
+    \caption{Primary Database \& Vector Search Comparison}
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|}
+        \hline
+        \textbf{Feature} & \textbf{PostgreSQL + pgvector} & \textbf{Qdrant} & \textbf{Pinecone} \\
+        \hline
+        \textbf{Vector Throughput (99\% Recall)} & 471.57 QPS \cite{tigerdata2025pgvector} & 41.47 QPS \cite{tigerdata2025pgvector} & N/A (managed, opaque) \\
+        \textbf{ACID Transactions} & Full \cite{postgresql2024acid} & None & None \\
+        \textbf{SQL + Vector in one query} & Yes (JOIN + \texttt{<->} operator) & No & No \\
+        \textbf{Operational Overhead} & Low (single service) & Moderate (separate cluster) & Low (managed SaaS) \\
+        \textbf{Self-Hostable} & Yes & Yes & No (vendor lock-in) \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Graph Database}
+
+\begin{table}[H]
+    \caption{Graph Database Comparison}
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|p{0.28\textwidth}|p{0.30\textwidth}|p{0.30\textwidth}|}
+        \hline
+        \textbf{Feature} & \textbf{Neo4j} & \textbf{ArangoDB} \\
+        \hline
+        \textbf{Graph Traversal} & Native (Cypher, index-free adjacency) & Native (AQL, multi-model) \\
+        \textbf{Query Language} & Cypher (declarative, readable) & AQL (verbose, general-purpose) \\
+        \textbf{Plugin Ecosystem} & APOC (graph algorithms, ML, path expansion) & Foxx microservices (custom JS) \\
+        \textbf{Python Driver} & Official (\texttt{neo4j} package) & Official (\texttt{python-arango}) \\
+        \textbf{Community \& Docs} & Large, mature & Moderate \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Caching and Task Queue}
+
+\begin{table}[H]
+    \caption{Caching \& Task Queue Comparison}
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|p{0.22\textwidth}|}
+        \hline
+        \textbf{Feature} & \textbf{Redis} & \textbf{Memcached} & \textbf{RabbitMQ} \\
+        \hline
+        \textbf{Throughput} & $>$100K ops/sec \cite{redis2024benchmark} & $>$100K ops/sec & Moderate (AMQP overhead) \\
+        \textbf{Latency} & $<$1ms \cite{redis2024benchmark} & $<$1ms & Higher (protocol overhead) \\
+        \textbf{Data Structures} & Rich (lists, sets, sorted sets, streams) & Key-value only & Queue-only \\
+        \textbf{Task Queue Support} & Yes (via \texttt{arq}, \texttt{Celery}) & No & Yes (native) \\
+        \textbf{Persistence} & Optional (RDB / AOF) & None & Yes \\
+        \hline
+    \end{tabular}
+\end{table}
+
