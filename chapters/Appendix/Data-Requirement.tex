@@ -482,14 +482,21 @@ satisfied. The per-kind rules are deliberately asymmetric:
 \begin{itemize}
     \item a \textbf{lesson} is satisfied when its progress record is
     marked complete;
-    \item a \textbf{quiz} is satisfied when it becomes terminal —
-    either the student has passed the teacher's milestone, or they
-    have failed with every permitted attempt consumed and none still
-    in flight;
+    \item a \textbf{quiz} is satisfied when nothing in it still
+    awaits a marker, and it has become terminal — either the student
+    has passed the teacher's milestone, or they have failed with every
+    permitted attempt consumed and none still in flight;
     \item an \textbf{interview} is satisfied only on a pass: at least
     one attempt must carry a passing verdict, since a merely finished
     interview is not a discharged one.
 \end{itemize}
+
+The marking clause is a precondition of the terminal test rather than
+a refinement of it. A submitted attempt still carrying an answer that
+needs a person is neither in progress nor finished, so counting it as
+a consumed attempt would let a student who spent their last permitted
+attempt on a question requiring judgement complete the course — and
+unlock the stage behind it — before anyone had read what they wrote.
 
 Counting lessons alone would leave a course carrying quizzes
 completable without a single answered question, and would in turn
