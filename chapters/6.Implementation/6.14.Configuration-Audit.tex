@@ -2,7 +2,7 @@
 \label{sec:impl_configuration}
 
 \paragraph{Runtime settings}
-Operational limits --- concurrent programme enrolments, career paths per programme, retention windows --- are runtime settings rather than deployment constants, resolved per organisation by \path{abridgeai/core/runtime_settings.py}. The effective value is the first of four levels that supplies one: a \texttt{system\_settings} row for this organisation, a row with a null organisation (the deployment default), the environment variable named by the setting's spec, and finally the code default declared in the settings registry.
+Operational limits --- concurrent programme enrolments, concurrent career paths per student, retention windows --- are runtime settings rather than deployment constants, resolved per organisation by \path{abridgeai/core/runtime_settings.py}. The effective value is the first of four levels that supplies one: a \texttt{system\_settings} row for this organisation, a row with a null organisation (the deployment default), the environment variable named by the setting's spec, and finally the code default declared in the settings registry.
 
 The last two levels are what make adding a setting safe. A deployment that has never heard of a new key still resolves it, so a release does not require a configuration change to land first. The resolution API returns every candidate value alongside the effective one and the level it came from, because an administrator asking ``why is this 3?'' needs to see which layer won rather than be told the answer.
 
