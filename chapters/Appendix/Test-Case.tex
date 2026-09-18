@@ -275,10 +275,10 @@ TC-3.15.1 & FR-3.15 & System & Course manager opens a discussion topic on a less
 
 % --- FR-4.1: Quiz Question Authoring and Review ---
 TC-4.1.1 & FR-4.1 & Integ-ration & Teacher drafts quiz questions from ingested course content & Questions are generated from source content, retain source references, and enter review state & Questions without valid source references are flagged for review \\ \hline
-TC-4.1.2 & FR-4.1 & System & Teacher edits, approves, rejects, or reuses quiz questions & Question state and revision history are updated correctly & Students cannot access unapproved questions \\ \hline
+TC-4.1.2 & FR-4.1 & System & Teacher edits, approves, rejects, or reuses quiz questions & Question state and revision history are updated correctly & Students cannot access unapproved questions, no question can be authored, imported, or generated unless the quiz is a draft, and a generation run that would replace existing questions is refused once a learner attempt or spaced-repetition card state exists \\ \hline
 
 % --- FR-4.2: Quiz and SR Configuration ---
-TC-4.2.1 & FR-4.2 & System & Teacher configures quiz settings and sets $T_{\text{exp}}$ for every live question & Quiz can be published and settings are applied to student attempts & Publication is blocked if any live question has no $T_{\text{exp}}$ \\ \hline
+TC-4.2.1 & FR-4.2 & System & Teacher configures quiz settings and sets $T_{\text{exp}}$ for every live question & Quiz can be published and settings are applied to student attempts & Publication is blocked if any live question has no $T_{\text{exp}}$; on a published quiz only the title, description, schedule, and reminders remain editable, and an archived quiz refuses every edit \\ \hline
 
 % --- FR-4.3: Student Quiz Session ---
 TC-4.3.1 & FR-4.3 & System & Student submits a quiz answer with response time and optional hint usage & System records correctness, response time, and hint usage for the answer & Attempts are blocked when retake policy or cooldown rules are violated \\ \hline

@@ -23,7 +23,7 @@ Every lifecycle below is enforced by a database \texttt{CHECK} constraint rather
 \hline
 \endlastfoot
 
-Publication (generic) & courses, modules, lessons, quizzes, interview configs, career paths, learning programmes, policy versions & \texttt{draft}, \texttt{published}, \texttt{archived} & Published is frozen; an edit opens a new draft. Archived is closed to new use but never deleted. \\ \hline
+Publication (generic) & courses, modules, lessons, quizzes, interview configs, career paths, learning programmes, policy versions & \texttt{draft}, \texttt{published}, \texttt{archived} & Published is frozen against edits that would disturb work already done. Where the lifecycle is version-based an edit opens a new draft; where it is not, publication is one-way and a published course or quiz never returns to draft. Archived is closed to new use and never deleted, and for quizzes and learning programmes it is additionally immutable. \\ \hline
 Question review & quiz questions, interview questions & \texttt{pending}, \texttt{approved}, \texttt{edited}, \texttt{rejected} & AI-drafted items enter pending. Only approved items are delivered to a learner. \\ \hline
 Quiz attempt & \texttt{quiz\_attempts} & \texttt{in\_progress}, \texttt{submitted}, \texttt{graded}, \texttt{abandoned}, \texttt{expired} & Time limit and close date drive the automatic transitions; grading may pause on manual marking. \\ \hline
 Interview session & \texttt{interview\_sessions} & \texttt{in\_progress}, \texttt{completed}, \texttt{timed\_out}, \texttt{abandoned}, \texttt{failed} & Evaluated exactly once, under a reservation held for the duration of the run. \\ \hline
