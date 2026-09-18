@@ -73,6 +73,8 @@ Second, interval growth is governed solely by $EF$, which encodes only the histo
 
 Third, SM-2 does not model the passage of time between reviews beyond the binary distinction of whether the review occurred before or after the scheduled date. A student who reviews every card one day late receives identical scheduling to one who reviews on time, and a student who never reviews an overdue card suffers no algorithmic consequence — their $EF$ remains frozen at its last recorded value indefinitely \cite{wozniak1998sm2}.
 
+Fourth, the interval recurrence has no upper bound. Each successful review multiplies the previous interval by $EF$, so an item answered correctly several times in succession recedes geometrically: at the $EF$ ceiling of $2.5$ the eighth interval already exceeds four years. In solo study that is the intended behaviour and costs nothing, because the learner's engagement with the material is open-ended. Within a course of fixed duration it means an item can fall due after the enrolment that introduced it has ended. SM-2 offers no concept of an item ceasing to require review, and neither do the widely deployed implementations of it: Anki's \textit{Maximum Interval} bounds how long a card may wait but never stops scheduling it, and its only automatic removal --- leech suspension --- is triggered by repeated failure rather than by mastery.
+
 These limitations motivate the design adaptations described in Section~\ref{sec:system_sm2}, where aBridgeAI's hybrid scheduling model is specified.
 
 \subsubsection{Memory Models: Stability and Retrievability}

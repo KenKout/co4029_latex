@@ -101,6 +101,21 @@ I_{\text{final}} = I(n) \cdot (1 + \varepsilon).
 
 The magnitude of $\varepsilon$ is small enough to have negligible effect on retention outcomes while distributing scheduled reviews across a window of approximately $\pm 10\%$ of the nominal interval, preventing the concentration of review obligations on single calendar dates.
 
+\paragraph{Interval Ceiling and Card Retirement}
+As established in Section~\ref{sec:sm2_limitation}, the SM-2 recurrence is unbounded above. aBridgeAI bounds it with an organisation-configurable ceiling $I_{\max}$ applied after jitter, so that the ceiling is a true upper bound rather than one the jitter may exceed:
+
+\begin{equation}
+I_{\text{scheduled}} = \min\left(I(n) \cdot (1 + \varepsilon),\ I_{\max}\right).
+\end{equation}
+
+The default $I_{\max} = 36500$ days is adopted from Anki, where the equivalent setting carries the same default, and at that value the ceiling does not bind: the longest interval reachable through eight consecutive maximal-$EF$ reviews is approximately $1465$ days. The direction of the control is worth stating explicitly, because it is counter-intuitive. Lowering $I_{\max}$ does not reduce review load; it guarantees that no item drifts out of sight for longer than the configured period, and therefore \textit{increases} the number of reviews a student is asked to perform. It is a retention floor, not a workload ceiling.
+
+A second, independent parameter converts that bound into a terminal state. When card retirement is enabled and a review earns an interval exceeding $I_{\max}$, the card ceases to be scheduled: it retains its $EF$, its interval, its repetition count and its full review history, but holds no next due date and is therefore absent from every due-card read. Retirement requires the computed interval to exceed $I_{\max}$ strictly, so an installation may set the ceiling to the cadence at which it wishes items to settle without that cadence itself triggering retirement.
+
+Retirement is terminal in both directions. A subsequent encounter with the item --- in a later quiz, for instance --- is graded and recorded as a review, because the retrieval did occur, but does not return the card to the queue; and a failed review neither retires a card nor revives a retired one, since the reset to a one-day interval addresses an item still being consolidated rather than one already released.
+
+This parameter is disabled by default, and the reason is theoretical rather than operational. Under the Two-Component Model described in Section~\ref{sec:sm2_limitation}, retrievability decays continuously between reviews for every item regardless of its stability; no state exists in which an item is no longer subject to forgetting. A retirement point therefore cannot be justified as a claim about memory. It is justified instead as a bounded-scope decision: where the material belongs to a course of finite duration, an institution may reasonably decide that review obligations should not outlive the enrolment that created them. The distinction matters for interpretation of the resulting data --- a retired card records that scheduling stopped, not that the item was permanently learned.
+
 \paragraph{Calibration Weight}
 SM-2 initialises $EF$ at $2.5$ for all items, implicitly assuming average retention ability from the first review. In an institutional context where EF influences lesson unlock eligibility, an overestimated early EF produces intervals that grow too quickly before the algorithm has accumulated sufficient evidence of the student's retention capacity for that item. To address this, aBridgeAI applies a calibration weight $\alpha$ to positive EF increments during the first three repetitions of any card:
 
@@ -143,6 +158,8 @@ A student satisfies the unlock condition for lesson $\ell$ — becoming eligible
 \end{equation}
 
 The numerator counts the cards in the lesson for which the student's $EF$ has reached the required floor; the denominator is the total number of active cards in the lesson; and $\tau \in (0, 1]$ is the minimum proportion required before the unlock condition is satisfied. Setting $\tau = 1.0$ requires every card to meet the $EF$ floor before progression, enforcing zero tolerance for weak knowledge components. Lower values of $\tau$ permit advancement when a large majority of cards are consolidated, accommodating instructors who wish to allow progression despite isolated difficult items. Both $EF_{\min}^{\text{unlock}}$ and $\tau$ are configured per lesson by the teacher, allowing unlock stringency to vary across lessons according to the criticality of the material.
+
+The card set $\mathcal{C}_{\ell}$ is determined by which quizzes contribute cards at all. A quiz may be designated as an assessment rather than as practice, in which case answering its questions opens no new cards, and its questions consequently form no part of the denominator above. This prevents a summative assessment from governing progression through the same mechanism that measures formative retrieval practice: without it, an examination administered under time pressure would generate cards whose depressed $EF$ values determine whether the student may proceed. Questions the student already holds cards for are still graded normally when they appear in such a quiz, since the retrieval occurred and the evidence is admissible; what the designation withholds is the creation of new scheduling obligations, not the recording of performance.
 
 Where a teacher additionally configures an interview section for the lesson, the unlock condition above is necessary but not sufficient: the student must also satisfy the interview pass condition before progression is granted. The combined gate ensures that both retention of factual knowledge — measured by the quiz EF distribution — and demonstrated application of that knowledge — measured by the interview outcome assessment — are required for lesson completion.
 
