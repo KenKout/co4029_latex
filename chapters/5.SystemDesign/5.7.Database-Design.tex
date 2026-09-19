@@ -3,13 +3,34 @@
 This section presents the database design of aBridgeAI through three views: the Entity-Relationship Diagram, the logical design, and the physical design. Together, these views describe how system data is structured, related, and implemented.
 \subsubsection{Entity-Relationship Diagram}
 
-The ERD provides a high-level view of the main entities in the system and the relationships between them.
+The database schema is presented first as an overall map, then through focused diagrams for the quiz, interview, and remaining cross-domain entities. Splitting the ERD makes the primary keys, foreign keys, and domain-specific relationships readable without losing the overall context.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{graphics/db-diagrams/ERD.png}
-    \caption{Entity-Relationship Diagram}
-    \label{fig:erd}
+    \includegraphics[width=\textwidth]{graphics/db-diagrams/ERD-Overall.png}
+    \caption{Overall Entity-Relationship Diagram}
+    \label{fig:erd-overall}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/db-diagrams/ERD-Quiz.png}
+    \caption{Entity-Relationship Diagram: Quiz, Attempts, Grading, and Spaced Repetition}
+    \label{fig:erd-quiz}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/db-diagrams/ERD-Interview.png}
+    \caption{Entity-Relationship Diagram: Interview Configuration, Sessions, Evaluation, Integrity, and Recording}
+    \label{fig:erd-interview}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/db-diagrams/ERD-Others.png}
+    \caption{Entity-Relationship Diagram: Remaining Cross-Domain Entities}
+    \label{fig:erd-others}
 \end{figure}
 
 \subsubsection{Logical Database Design}
