@@ -1,14 +1,16 @@
 \section{Site Map Specification}
 \label{appendix:sitemap}
 
-This appendix provides the complete site map of the aBridgeAI frontend application, organised by user role. Each entry specifies the URL path, page title, and primary purpose. Routes marked with parameters (e.g.\ \texttt{\$slug}) are dynamic segments resolved at runtime.
+This appendix provides the complete site map of the aBridgeAI frontend application, organised by user role. Each entry specifies the URL path, page title, and primary purpose. Routes carrying a parameter (for example \texttt{\$slug}) are dynamic segments resolved at runtime. The tables below list every route that renders a destination; the redirect-only aliases are listed separately in Section~\ref{sec:sitemap_redirects}.
+
+Three prefixes are privileged, and each maps to one permission set: \path|/admin| requires \texttt{system.administer}, \path|/teacher| requires a course-authoring permission, and \path|/management| requires an organisation management permission. Two further prefixes are unprivileged but load-bearing: \path|/me| is everything scoped to the signed-in user, and \path|/catalog| is the organisation-wide browsable inventory. Neither the shared routes nor the student routes below carry a role guard: both are reachable by every authenticated user. They are listed apart because the shared ones are offered to every role by the top bar, whereas the student ones are only ever linked from the student sidebar.
 
 % ────────────────────────────────────────────────────────────
 \subsection{Public Routes (Unauthenticated)}
 
 \renewcommand{\arraystretch}{1.25}
 \small
-\begin{longtable}{|>{\raggedright\arraybackslash}m{0.32\textwidth}|>{\raggedright\arraybackslash}m{0.20\textwidth}|>{\raggedright\arraybackslash}m{0.38\textwidth}|}
+\begin{longtable}{|>{\raggedright\arraybackslash}m{0.32\textwidth}|>{\raggedright\arraybackslash}m{0.2\textwidth}|>{\raggedright\arraybackslash}m{0.38\textwidth}|}
 \caption{Public (unauthenticated) routes.}
 \label{tab:sitemap_public} \\
 \hline
@@ -20,10 +22,42 @@ This appendix provides the complete site map of the aBridgeAI frontend applicati
 \hline
 \endfoot
 
-\path|/| & Landing Page & Marketing page with platform overview and CTA. \\ \hline
+\path|/| & Landing & Marketing page with the platform overview and sign-in call to action. \\ \hline
 \path|/login| & Login & Google SSO authentication entry point. \\ \hline
-\path|/login/mfa| & MFA Verification & TOTP or recovery code verification after initial login. \\ \hline
-\path|/auth/google/callback| & OAuth Callback & Handles Google OAuth redirect and token exchange. \\ \hline
+\path|/login/mfa| & MFA Verification & TOTP or recovery-code verification after the initial login. \\ \hline
+\path|/auth/google/callback| & OAuth Callback & Handles the Google OAuth redirect and token exchange. \\ \hline
+\path|/help| & Help & Public help and frequently asked questions. \\ \hline
+\path|/policies| & Policy Catalogue & Searchable index of every policy document the reader is a party to. \\ \hline
+\path|/policy/$slug| & Policy Document & Published text of one policy, with its effective version. \\ \hline
+
+\end{longtable}
+\normalsize
+
+% ────────────────────────────────────────────────────────────
+\subsection{Routes for Any Signed-In User}
+
+The routes below hang off the application shell --- the notification bell and the user menu in the top bar --- which is rendered for every authenticated role. They belong to no one persona, so they are listed once here rather than repeated under each role.
+
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{longtable}{|>{\raggedright\arraybackslash}m{0.32\textwidth}|>{\raggedright\arraybackslash}m{0.2\textwidth}|>{\raggedright\arraybackslash}m{0.38\textwidth}|}
+\caption{Routes available to every authenticated user.}
+\label{tab:sitemap_shared} \\
+\hline
+\textbf{Path} & \textbf{Page} & \textbf{Purpose} \\ \hline
+\endfirsthead
+\multicolumn{3}{c}{{\bfseries Table \thetable\ -- Continued}} \\ \hline
+\textbf{Path} & \textbf{Page} & \textbf{Purpose} \\ \hline
+\endhead
+\hline
+\endfoot
+
+\path|/notifications| & Notifications & In-app notification inbox, opened from the bell in the top bar. \\ \hline
+\path|/me/profile| & Profile & The reader's own public profile. \\ \hline
+\path|/settings| & Settings Hub & Navigation hub for account settings. \\ \hline
+\path|/settings/profile| & Profile Settings & Edit display name, avatar, biography, and links. \\ \hline
+\path|/settings/security| & Security Settings & MFA enrolment, recovery codes, and session management. \\ \hline
+\path|/settings/notifications| & Notification Preferences & Configure notification delivery by category. \\ \hline
 
 \end{longtable}
 \normalsize
@@ -33,7 +67,7 @@ This appendix provides the complete site map of the aBridgeAI frontend applicati
 
 \renewcommand{\arraystretch}{1.25}
 \small
-\begin{longtable}{|>{\raggedright\arraybackslash}m{0.40\textwidth}|>{\raggedright\arraybackslash}m{0.18\textwidth}|>{\raggedright\arraybackslash}m{0.32\textwidth}|}
+\begin{longtable}{|>{\raggedright\arraybackslash}m{0.4\textwidth}|>{\raggedright\arraybackslash}m{0.18\textwidth}|>{\raggedright\arraybackslash}m{0.32\textwidth}|}
 \caption{Student-facing routes.}
 \label{tab:sitemap_student} \\
 \hline
@@ -45,25 +79,24 @@ This appendix provides the complete site map of the aBridgeAI frontend applicati
 \hline
 \endfoot
 
-\path|/dashboard| & Dashboard & Overview of enrolled courses, due reviews, and progress summary. \\ \hline
-\path|/dashboard/sr| & SR Dashboard & Spaced repetition metrics: due cards, retention, streaks. \\ \hline
-\path|/study/cards-due| & Study Cards & Review due flashcards from spaced repetition queue. \\ \hline
-\path|/courses| & Course Catalog & Browse and search available courses. \\ \hline
-\path|/courses/$slug| & Course Detail & View course structure, modules, and lessons. \\ \hline
-\path|/courses/$slug/learn| & Course Learn & Read lesson content, stream materials, view resources. \\ \hline
+\path|/dashboard| & Dashboard & Enrolled courses, due reviews, and a progress summary. \\ \hline
+\path|/courses| & Course Catalogue & Browse and search the courses available to the reader. \\ \hline
+\path|/courses/$slug| & Course Detail & Course structure, modules, and lessons before enrolling. \\ \hline
+\path|/courses/$slug/learn| & Course Learn & The learning workspace: lesson content, materials, and resources. \\ \hline
+\path|/courses/$slug/learn/$itemSlug| & Curriculum Item & Deep link to one lesson, quiz, or interview item inside the workspace. \\ \hline
 \path|/courses/$slug/quiz/$quizId| & Quiz Session & Take a quiz attempt with timed questions. \\ \hline
-\path|/courses/$slug/quiz/$quizId/attempts/$attemptId| & Quiz Review & Review past attempt with correct answers and explanations. \\ \hline
-\path|/courses/$slug/interview/$moduleId| & Interview Session & Conduct AI mock interview for a module. \\ \hline
-\path|/progress| & Progress & Overall learning progress and completion tracking. \\ \hline
-\path|/career-paths| & Career Paths & Browse available career pathways. \\ \hline
-\path|/career-paths/$slug| & Career Path Detail & View courses in a pathway and progression status. \\ \hline
-\path|/me/career-paths| & My Career Paths & View enrolled career pathways and progress. \\ \hline
-\path|/notifications| & Notifications & In-app notification inbox. \\ \hline
-\path|/profile| & Profile & View own public profile. \\ \hline
-\path|/settings| & Settings Hub & Navigation hub for account settings. \\ \hline
-\path|/settings/profile| & Profile Settings & Edit display name, avatar, bio, and links. \\ \hline
-\path|/settings/security| & Security Settings & MFA setup, recovery codes, session management. \\ \hline
-\path|/settings/notifications| & Notification Prefs & Configure notification preferences by category. \\ \hline
+\path|/courses/$slug/quiz/$quizId/attempts/$attemptId| & Quiz Review & Review a past attempt against the revision that graded it. \\ \hline
+\path|/courses/$slug/interview/$moduleId| & Interview Session & Conduct the AI mock interview for a module. \\ \hline
+\path|/catalog/career-paths| & Career Path Catalogue & Browse the career pathways the organisation publishes. \\ \hline
+\path|/catalog/career-paths/$slug| & Career Path Detail & Courses in a pathway, and the option to add it to a programme. \\ \hline
+\path|/me/career-paths| & My Career Paths & Pathways the reader has started, and their progression. \\ \hline
+\path|/me/learning-programs| & My Learning Programs & Choose and complete career paths in each enrolled programme. \\ \hline
+\path|/me/progress| & Progress & Overall learning progress and completion tracking. \\ \hline
+\path|/me/study| & Review Dashboard & Spaced-repetition metrics: due cards, retention, and streaks. \\ \hline
+\path|/me/study/cards-due| & Due Cards & The cards the scheduler has released for review today. \\ \hline
+\path|/me/study/review| & Review Session & Work through the due queue one card at a time. \\ \hline
+\path|/me/interviews| & My Interviews & Past mock-interview attempts and their results. \\ \hline
+\path|/me/interviews/$sessionId| & Interview Result & Transcript and competency evaluation for one session. \\ \hline
 
 \end{longtable}
 \normalsize
@@ -71,9 +104,11 @@ This appendix provides the complete site map of the aBridgeAI frontend applicati
 % ────────────────────────────────────────────────────────────
 \subsection{Teacher / Instructor Routes}
 
+The course workspace at \path|/teacher/courses/$courseId| is a layout route with an index child, so the shell and the curriculum tab share one URL. The tabs beneath it --- roster, progress, assessments, question bank, discussion, and the retention views --- are separate URLs, so a teacher can send a colleague straight to the tab in question.
+
 \renewcommand{\arraystretch}{1.25}
 \small
-\begin{longtable}{|>{\raggedright\arraybackslash}m{0.46\textwidth}|>{\raggedright\arraybackslash}m{0.18\textwidth}|>{\raggedright\arraybackslash}m{0.26\textwidth}|}
+\begin{longtable}{|>{\raggedright\arraybackslash}m{0.46\textwidth}|>{\raggedright\arraybackslash}m{0.16\textwidth}|>{\raggedright\arraybackslash}m{0.28\textwidth}|}
 \caption{Teacher and instructor routes.}
 \label{tab:sitemap_teacher} \\
 \hline
@@ -85,25 +120,27 @@ This appendix provides the complete site map of the aBridgeAI frontend applicati
 \hline
 \endfoot
 
-\path|/teacher| & Overview & Teacher dashboard with course summary. \\ \hline
-\path|/teacher/courses| & My Courses & List of courses the teacher manages. \\ \hline
-\path|/teacher/courses/new| & Create Course & Form to create a new course. \\ \hline
-\path|/teacher/courses/$courseId| & Course Manage & Course authoring: modules, settings, publishing. \\ \hline
-\path|/teacher/courses/$courseId/modules/$moduleId| & Module Manage & Edit module: ordering, items, prerequisites. \\ \hline
-\path|/teacher/courses/$courseId/lessons/$lessonId| & Lesson Manage & Edit lesson content, notes, and settings. \\ \hline
-\path|/teacher/courses/$courseId/lessons/$lessonId/materials| & Lesson Materials & Upload, manage, and re-process materials. \\ \hline
-\path|/teacher/courses/$courseId/quizzes/$quizId| & Quiz Editor & Manage questions, review AI drafts, configure settings. \\ \hline
-\path|/teacher/courses/$courseId/interview-configs/new| & New Interview Config & Create interview section with desired outcomes. \\ \hline
-\path|/teacher/courses/$courseId/interview-configs/$configId| & Interview Config & Edit interview configuration and rules. \\ \hline
-\path|/teacher/interview-sessions/$sessionId/gap-report| & Gap Report & Review student interview transcript and evaluation. \\ \hline
-\path|/teacher/courses/$courseId/students| & Student Roster & View enrolled students and progress. \\ \hline
-\path|/teacher/courses/$courseId/students/$studentId| & Student Detail & Individual student progress and activity. \\ \hline
-\path|/teacher/courses/$courseId/students/$studentId/sr| & Student SR Detail & Student's spaced repetition card-level data. \\ \hline
+\path|/teacher| & Workspace & Teacher home: the work queue across every course they own. \\ \hline
+\path|/teacher/course-health| & Course Health & All of the teacher's courses ranked by what needs attention. \\ \hline
+\path|/teacher/courses| & My Courses & Courses the teacher manages. \\ \hline
+\path|/teacher/courses/$courseId| & Course Workspace & Authoring shell for one course; its index tab is the curriculum. \\ \hline
+\path|/teacher/courses/$courseId/students| & Student Roster & Enrolled students and their progress. \\ \hline
+\path|/teacher/courses/$courseId/students/$studentId| & Student Detail & One student's progress and activity in the course. \\ \hline
+\path|/teacher/courses/$courseId/students/$studentId/sr| & Student SR Detail & That student's spaced-repetition data, card by card. \\ \hline
+\path|/teacher/courses/$courseId/progress| & Course Progress & Aggregate completion analytics for the course. \\ \hline
+\path|/teacher/courses/$courseId/assessments| & Assessments & Quizzes and interview configurations for the course. \\ \hline
+\path|/teacher/courses/$courseId/question-bank| & Question Bank & Approved and draft questions available for reuse. \\ \hline
+\path|/teacher/courses/$courseId/discussion| & Discussion & Course discussion threads and teacher replies. \\ \hline
 \path|/teacher/courses/$courseId/sr-cohort| & SR Cohort & Cohort-level retention distribution and analytics. \\ \hline
-\path|/teacher/courses/$courseId/at-risk| & At-Risk Students & Students flagged for low retention or engagement. \\ \hline
-\path|/teacher/courses/$courseId/progress| & Course Progress & Aggregate course completion analytics. \\ \hline
-\path|/dept| & Department Courses & View all courses in the department. \\ \hline
-\path|/dept/courses/$courseId| & Dept Course Detail & Read-only view of a department course. \\ \hline
+\path|/teacher/courses/$courseId/at-risk| & At-Risk Students & Students flagged by the inactivity and low-completion thresholds. \\ \hline
+\path|/teacher/courses/$courseId/modules/$moduleId| & Module Manage & Edit a module: ordering, items, and prerequisites. \\ \hline
+\path|/teacher/courses/$courseId/lessons/$lessonId| & Lesson Manage & Edit lesson content, materials, notes, and settings. \\ \hline
+\path|/teacher/courses/$courseId/quizzes/$quizId| & Quiz Editor & Manage questions, review AI drafts, and configure settings. \\ \hline
+\path|/teacher/courses/$courseId/quizzes/$quizId/generate| & Quiz Generation & Configure and run an AI generation pass over a draft quiz. \\ \hline
+\path|/teacher/courses/$courseId/quizzes/$quizId/results| & Quiz Results & Attempt distribution, per-question statistics, and outliers. \\ \hline
+\path|/teacher/courses/$courseId/quiz-attempts/$attemptId| & Attempt Detail & Inspect and manually grade one submitted attempt. \\ \hline
+\path|/teacher/courses/$courseId/interview-configs/$configId| & Interview Config & Edit an interview section's desired outcomes and rules. \\ \hline
+\path|/teacher/interview-sessions/$sessionId/gap-report| & Gap Report & Review a student's interview transcript and evaluation. \\ \hline
 
 \end{longtable}
 \normalsize
@@ -113,7 +150,7 @@ This appendix provides the complete site map of the aBridgeAI frontend applicati
 
 \renewcommand{\arraystretch}{1.25}
 \small
-\begin{longtable}{|>{\raggedright\arraybackslash}m{0.42\textwidth}|>{\raggedright\arraybackslash}m{0.18\textwidth}|>{\raggedright\arraybackslash}m{0.30\textwidth}|}
+\begin{longtable}{|>{\raggedright\arraybackslash}m{0.42\textwidth}|>{\raggedright\arraybackslash}m{0.18\textwidth}|>{\raggedright\arraybackslash}m{0.3\textwidth}|}
 \caption{Educational Manager routes.}
 \label{tab:sitemap_manager} \\
 \hline
@@ -125,9 +162,19 @@ This appendix provides the complete site map of the aBridgeAI frontend applicati
 \hline
 \endfoot
 
-\path|/management/courses/$courseId/enrollments| & Course Enrollments & Bulk enroll students via CSV, manage roster. \\ \hline
-\path|/management/career-paths| & Career Paths Mgmt & Create and manage career pathways. \\ \hline
-\path|/management/career-paths/$id| & Career Path Edit & Edit pathway details and course ordering. \\ \hline
+\path|/management| & Management Overview & Organisation-wide summary of courses, programmes, and people. \\ \hline
+\path|/management/courses| & Courses & Every course in the organisation, filterable by faculty. \\ \hline
+\path|/management/courses/new| & Create Course & Create a course and assign its teachers. \\ \hline
+\path|/management/courses/$courseId| & Course Detail & Course lifecycle, teacher assignment, and enrolment entry point. \\ \hline
+\path|/management/courses/$courseId/enrollments| & Course Enrollments & Bulk-enrol students from CSV and manage the roster. \\ \hline
+\path|/management/learning-programs| & Learning Programs & Create, publish, and archive versioned learning programmes. \\ \hline
+\path|/management/learning-programs/new| & Create Learning Program & Draft a new programme and its initial version. \\ \hline
+\path|/management/learning-programs/$id| & Learning Program Detail & General settings, roster, path-change requests, and version history. \\ \hline
+\path|/management/career-paths| & Career Paths & Create and manage the organisation's career pathways. \\ \hline
+\path|/management/career-paths/$id| & Career Path Edit & Edit a pathway's details and course ordering. \\ \hline
+\path|/management/org-units| & Faculties & The organisation's top-level faculties and their staff affiliations. \\ \hline
+\path|/management/users| & Users & Accounts in the organisation; invite, disable, and re-enable. \\ \hline
+\path|/management/users/$userId| & User Detail & One account's roles, affiliations, and enrolment history. \\ \hline
 
 \end{longtable}
 \normalsize
@@ -137,7 +184,7 @@ This appendix provides the complete site map of the aBridgeAI frontend applicati
 
 \renewcommand{\arraystretch}{1.25}
 \small
-\begin{longtable}{|>{\raggedright\arraybackslash}m{0.38\textwidth}|>{\raggedright\arraybackslash}m{0.20\textwidth}|>{\raggedright\arraybackslash}m{0.32\textwidth}|}
+\begin{longtable}{|>{\raggedright\arraybackslash}m{0.38\textwidth}|>{\raggedright\arraybackslash}m{0.18\textwidth}|>{\raggedright\arraybackslash}m{0.34\textwidth}|}
 \caption{IT Administrator routes.}
 \label{tab:sitemap_admin} \\
 \hline
@@ -149,20 +196,20 @@ This appendix provides the complete site map of the aBridgeAI frontend applicati
 \hline
 \endfoot
 
-\path|/admin/stats| & Admin Dashboard & Platform-level statistics overview. \\ \hline
-\path|/admin/stats/active| & Active Users & Real-time active user metrics. \\ \hline
-\path|/admin/stats/content| & Content Stats & Content volume and growth metrics. \\ \hline
-\path|/admin/stats/health| & System Health & Infrastructure health indicators. \\ \hline
+\path|/admin/stats| & Admin Dashboard & Platform-level usage, capacity, and content statistics. \\ \hline
 \path|/admin/users| & Users & Manage all user accounts across tenants. \\ \hline
-\path|/admin/users/$userId| & User Detail & View/edit individual user, disable account. \\ \hline
+\path|/admin/users/$userId| & User Detail & View or edit an individual user and disable the account. \\ \hline
 \path|/admin/organizations| & Organizations & Manage tenant organisations. \\ \hline
-\path|/admin/organizations/$orgId| & Org Detail & Edit org settings, domains, lifecycle. \\ \hline
-\path|/admin/courses| & Courses & Cross-org course overview and restoration. \\ \hline
-\path|/admin/courses/$courseId| & Course Detail & Inspect course processing history and stats. \\ \hline
-\path|/admin/processing| & Processing Jobs & View ingestion and AI pipeline job queue. \\ \hline
-\path|/admin/processing/$jobId| & Job Detail & Inspect individual job logs and retry. \\ \hline
-\path|/admin/ai-costs| & AI Costs & AI usage telemetry by user and pipeline. \\ \hline
-\path|/admin/health| & Health Check & Backend service health and connectivity. \\ \hline
+\path|/admin/organizations/$orgId| & Organization Detail & Edit organisation settings, domains, and lifecycle. \\ \hline
+\path|/admin/courses| & Resource Inventory & Cross-tenant course accounting and restoration. \\ \hline
+\path|/admin/courses/$courseId| & Course Detail & Inspect a course's processing history and statistics. \\ \hline
+\path|/admin/operations| & Operations & Dependency health, the job queue, and everything that failed. \\ \hline
+\path|/admin/operations/jobs/$jobId| & Job Detail & Inspect one job's logs and retry it. \\ \hline
+\path|/admin/ai-costs| & AI Costs & AI usage telemetry by user, organisation, and pipeline. \\ \hline
+\path|/admin/audit-logs| & Audit Logs & Immutable record of role changes, data changes, and HTTP requests. \\ \hline
+\path|/admin/policies| & Policies & Author, version, and publish the platform's policy documents. \\ \hline
+\path|/admin/policies/$policyId| & Policy Detail & Edit one policy, open a new draft, and review its versions. \\ \hline
+\path|/admin/settings| & Runtime Settings & Ingestion, retrieval, and behavioural settings changeable without a deploy. \\ \hline
 
 \end{longtable}
 \normalsize
@@ -177,25 +224,24 @@ This appendix provides the complete site map of the aBridgeAI frontend applicati
 \begin{tabular}{|l|c|}
 \hline
 \textbf{Role / Section} & \textbf{Routes} \\ \hline
-Public (unauthenticated) & 4 \\ \hline
-Student & 19 \\ \hline
-Teacher / Instructor & 19 \\ \hline
-Educational Manager & 3 \\ \hline
+Public (unauthenticated) & 7 \\ \hline
+Any signed-in user & 6 \\ \hline
+Student & 18 \\ \hline
+Teacher / Instructor & 21 \\ \hline
+Educational Manager & 13 \\ \hline
 IT Administrator & 14 \\ \hline
-\textbf{Total unique routes} & \textbf{59} \\ \hline
+\textbf{Total distinct destination URLs} & \textbf{79} \\ \hline
+Redirect-only aliases & 16 \\ \hline
 \end{tabular}
 \end{table}
+
+The router declares 97 routes: one pathless authenticated layout that mounts the session and MFA gate, 80 that render a destination, and the 16 aliases below. The 80 destinations occupy the 79 distinct URLs counted above; the difference is the instructor course workspace, which declares a layout route and an index child at the same path.
 
 % ────────────────────────────────────────────────────────────
 \subsection{Redirect-Only Routes}
 \label{sec:sitemap_redirects}
 
-The router declares 96 paths. The 80 documented in the preceding subsections render a
-destination page; the 16 below render nothing and immediately redirect. They exist because the
-paths were published in an earlier release --- in bookmarks, in notification deep links, in
-course announcements --- and removing them would break those references. They are listed
-separately so that the counts in Section~\ref{fig:sitemap} reconcile: destinations plus
-redirects equals declared paths.
+The routes below render nothing and redirect immediately. They exist because the paths were published in an earlier release --- in bookmarks, in notification deep links, in course announcements --- and removing them would break those references. Eleven are the trail left by two renames: the learner surfaces moving under \path|/me| and \path|/catalog|, and the manager surfaces at \path|/dept| folding into \path|/management|. The remaining five come from the administrator console consolidating its health, processing, and statistics pages into \path|/admin/operations| and \path|/admin/stats|; each of those carries the reader to the correct tab or anchor rather than the top of the page, so a deep link that used to name a page still names a place.
 
 \renewcommand{\arraystretch}{1.25}
 \small
@@ -211,12 +257,7 @@ redirects equals declared paths.
 \hline
 \endfoot
 
-\path|/admin/health| & \path|/admin/operations| \\ \hline
-\path|/admin/stats/health| & \path|/admin/operations| \\ \hline
-\path|/admin/stats/active| & \path|/admin/stats| \\ \hline
-\path|/admin/stats/content| & \path|/admin/stats| \\ \hline
-\path|/admin/processing| & \path|/admin/operations| \\ \hline
-\path|/management/enrolment| & \path|/management/courses| \\ \hline
+\path|/profile| & \path|/me/profile| \\ \hline
 \path|/progress| & \path|/me/progress| \\ \hline
 \path|/dashboard/sr| & \path|/me/study| \\ \hline
 \path|/study/cards-due| & \path|/me/study/cards-due| \\ \hline
@@ -226,7 +267,12 @@ redirects equals declared paths.
 \path|/career-paths/$slug| & \path|/catalog/career-paths/$slug| \\ \hline
 \path|/dept| & \path|/management/courses| \\ \hline
 \path|/dept/courses/$courseId| & \path|/management/courses/$courseId| \\ \hline
-\path|/profile| & \path|/me/profile| \\ \hline
+\path|/management/enrolment| & \path|/management/courses| \\ \hline
+\path|/admin/health| & \path|/admin/operations| \textit{(services tab)} \\ \hline
+\path|/admin/stats/health| & \path|/admin/operations| \textit{(services tab)} \\ \hline
+\path|/admin/processing| & \path|/admin/operations| \textit{(jobs or failures tab)} \\ \hline
+\path|/admin/stats/active| & \path|/admin/stats| \textit{(usage and capacity)} \\ \hline
+\path|/admin/stats/content| & \path|/admin/stats| \textit{(usage and capacity)} \\ \hline
 
 \end{longtable}
 \normalsize

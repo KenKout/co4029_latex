@@ -1,0 +1,141 @@
+%% aBridgeAI application sitemap.
+%% Source of truth: src/frontend/src/router.tsx (97 createRoute declarations =
+%% 1 pathless authenticated layout + 80 page routes + 16 redirect-only aliases).
+%% The 16 aliases are documented in the appendix, not drawn here.
+%% Bands are personas, not permissions: only /admin, /teacher and /management
+%% are permission-gated. The "Any signed-in user" band holds the routes the
+%% top bar offers to every role; the student band holds routes that are
+%% equally ungated but that only the student sidebar links to.
+%% Regenerate the PNG with: npx -y @mermaid-js/mermaid-cli -i sitemap_diagram.mmd
+%%   -o ../screenshots/sitemap_diagram.png -b white -s 4
+graph LR
+  ROOT["aBridgeAI"]
+
+  %% ───────────────────────────── Public ─────────────────────────────
+  ROOT --> PUB["Public"]
+  PUB --> P1["/"]
+  PUB --> P2["/login"]
+  P2 --> P3["/mfa"]
+  PUB --> P4["/auth/google/callback"]
+  PUB --> P5["/help"]
+  PUB --> P6["/policies"]
+  PUB --> P7["/policy/<b>$slug</b>"]
+
+  %% ──────────────────── Any signed-in user ──────────────────────────
+  %% Reached from the top bar, which AppShell renders for every role.
+  ROOT --> ANY["Any signed-in<br/>user"]
+  ANY --> C1["/notifications"]
+  ANY --> C2["/me/profile"]
+  ANY --> C3["/settings"]
+  C3 --> C4["/profile"]
+  C3 --> C5["/security"]
+  C3 --> C6["/notifications"]
+
+  %% ───────────────────────────── Student ────────────────────────────
+  %% No role guard either, but only the student sidebar offers them.
+  ROOT --> STU["Student"]
+  STU --> S1["/dashboard"]
+  STU --> S2["/courses"]
+  S2 --> S3["<b>$slug</b>"]
+  S3 --> S4["/learn"]
+  S4 --> S5["/<b>$itemSlug</b>"]
+  S3 --> S6["/quiz/<b>$quizId</b>"]
+  S6 --> S7["/attempts/<b>$attemptId</b>"]
+  S3 --> S8["/interview/<b>$moduleId</b>"]
+  STU --> S9["/catalog/career-paths"]
+  S9 --> S10["<b>$slug</b>"]
+  STU --> S11["/me/career-paths"]
+  STU --> S12["/me/learning-programs"]
+  STU --> S13["/me/progress"]
+  STU --> S14["/me/study"]
+  S14 --> S15["/cards-due"]
+  S14 --> S16["/review"]
+  STU --> S17["/me/interviews"]
+  S17 --> S18["/<b>$sessionId</b>"]
+
+  %% ──────────────────────────── Instructor ──────────────────────────
+  ROOT --> INS["Instructor"]
+  INS --> T1["/teacher"]
+  T1 --> T2["/course-health"]
+  T1 --> T3["/courses"]
+  T3 --> T4["<b>$courseId</b>"]
+  T4 --> T5["curriculum<br/><i>index</i>"]
+  T4 --> T6["/students"]
+  T6 --> T7["<b>$studentId</b>"]
+  T7 --> T8["/sr"]
+  T4 --> T9["/progress"]
+  T4 --> T10["/assessments"]
+  T4 --> T11["/question-bank"]
+  T4 --> T12["/discussion"]
+  T4 --> T13["/sr-cohort"]
+  T4 --> T14["/at-risk"]
+  T4 --> T15["/modules/<b>$moduleId</b>"]
+  T4 --> T16["/lessons/<b>$lessonId</b>"]
+  T4 --> T17["/quizzes/<b>$quizId</b>"]
+  T17 --> T18["/generate"]
+  T17 --> T19["/results"]
+  T4 --> T20["/interview-configs/<b>$configId</b>"]
+  T4 --> T21["/quiz-attempts/<b>$attemptId</b>"]
+  INS --> T22["/teacher/interview-sessions/<b>$sessionId</b>/gap-report"]
+
+  %% ───────────────────────────── Manager ────────────────────────────
+  ROOT --> MGR["Manager"]
+  MGR --> M1["/management"]
+  M1 --> M2["/courses"]
+  M2 --> M3["/new"]
+  M2 --> M4["<b>$courseId</b>"]
+  M4 --> M5["/enrollments"]
+  M1 --> M6["/learning-programs"]
+  M6 --> M7["/new"]
+  M6 --> M8["<b>$id</b>"]
+  M1 --> M9["/career-paths"]
+  M9 --> M10["<b>$id</b>"]
+  M1 --> M11["/org-units"]
+  M1 --> M12["/users"]
+  M12 --> M13["<b>$userId</b>"]
+
+  %% ────────────────────────────── Admin ─────────────────────────────
+  ROOT --> ADM["Admin"]
+  ADM --> A1["/admin/stats"]
+  ADM --> A2["/admin/users"]
+  A2 --> A3["<b>$userId</b>"]
+  ADM --> A4["/admin/organizations"]
+  A4 --> A5["<b>$orgId</b>"]
+  ADM --> A6["/admin/courses"]
+  A6 --> A7["<b>$courseId</b>"]
+  ADM --> A8["/admin/operations"]
+  A8 --> A9["/jobs/<b>$jobId</b>"]
+  ADM --> A10["/admin/ai-costs"]
+  ADM --> A11["/admin/audit-logs"]
+  ADM --> A12["/admin/policies"]
+  A12 --> A13["<b>$policyId</b>"]
+  ADM --> A14["/admin/settings"]
+
+  %% ───────────────────────────── Styling ────────────────────────────
+  classDef root fill:#1c2430,stroke:#1c2430,color:#ffffff,font-weight:bold;
+  classDef hpub fill:#3d4b5c,stroke:#3d4b5c,color:#ffffff,font-weight:bold;
+  classDef hany fill:#57534e,stroke:#57534e,color:#ffffff,font-weight:bold;
+  classDef hstu fill:#1a3fa0,stroke:#1a3fa0,color:#ffffff,font-weight:bold;
+  classDef hins fill:#12655a,stroke:#12655a,color:#ffffff,font-weight:bold;
+  classDef hmgr fill:#7b2fd4,stroke:#7b2fd4,color:#ffffff,font-weight:bold;
+  classDef hadm fill:#a8480c,stroke:#a8480c,color:#ffffff,font-weight:bold;
+  classDef pub fill:#eef1f5,stroke:#c3ccd8,color:#26303c;
+  classDef any fill:#eceae8,stroke:#c2bab3,color:#3f3a35;
+  classDef stu fill:#dbe9fd,stroke:#9dbdf0,color:#12306f;
+  classDef ins fill:#ccf5e7,stroke:#7bd7bf,color:#0d4f45;
+  classDef mgr fill:#efe4fb,stroke:#c9a6ef,color:#4f1b8c;
+  classDef adm fill:#fdeec4,stroke:#eccb79,color:#7a3408;
+
+  class ROOT root;
+  class PUB hpub;
+  class ANY hany;
+  class STU hstu;
+  class INS hins;
+  class MGR hmgr;
+  class ADM hadm;
+  class P1,P2,P3,P4,P5,P6,P7 pub;
+  class C1,C2,C3,C4,C5,C6 any;
+  class S1,S2,S3,S4,S5,S6,S7,S8,S9,S10,S11,S12,S13,S14,S15,S16,S17,S18 stu;
+  class T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22 ins;
+  class M1,M2,M3,M4,M5,M6,M7,M8,M9,M10,M11,M12,M13 mgr;
+  class A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14 adm;
