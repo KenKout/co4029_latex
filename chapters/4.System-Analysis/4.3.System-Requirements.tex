@@ -5,8 +5,8 @@ User Requirements articulate the functional needs of the system from the perspec
 \paragraph{Student Requirements}
 \begin{itemize}
     \item \textbf{UR-STU-01:} As a Student, I want to consume multimedia course materials and complete spaced-repetition quiz reviews scheduled by the system so that I can build durable retention of lesson content.
-    \item \textbf{UR-STU-02:} As a Student, I want to participate in context-aware mock interviews via voice or text so that I can practise articulating my understanding under realistic conditions.
-    \item \textbf{UR-STU-03:} As a Student, I want to receive the binary pass/fail outcome of each interview session --- without per-outcome scoring or rubric exposure --- so that I am evaluated on overall demonstrated competence rather than on isolated answers.
+    \item \textbf{UR-STU-02:} As a Student, I want to participate in context-aware mock interviews through a unified hybrid experience supporting typed and spoken turns so that I can practise articulating my understanding under realistic conditions.
+    \item \textbf{UR-STU-03:} As a Student, I want to receive the binary pass/fail outcome and qualitative remediation guidance for each interview session --- without numeric rubric scores, per-outcome verdicts, or model reasoning --- so that I can understand how to improve while being evaluated on overall demonstrated competence rather than on isolated answers.
     \item \textbf{UR-STU-04:} As a Student, I want to track my own progress through learner-facing metrics --- per-lesson Knowledge Retention Estimate, Progression Readiness, and Review Compliance Rate --- so that I can self-regulate my study pace without depending on instructor intervention.
 \end{itemize}
 
@@ -27,12 +27,17 @@ User Requirements articulate the functional needs of the system from the perspec
     \item \textbf{UR-MGR-04:} As an Educational Manager, I want all my actions to be strictly scoped to my single tenant organisation so that I cannot accidentally or intentionally access data belonging to other institutions on the platform.
 \end{itemize}
 
+\paragraph{Faculty Dean Requirements}
+\begin{itemize}
+    \item \textbf{UR-DN-01:} As a Faculty Dean, I want to review, acknowledge, approve, or reject eligible student pathway-change and pathway-drop requests within programmes owned by my faculty, with a recorded reason and no self-approval, so that pathway governance is accountable and scoped to the appropriate academic authority.
+\end{itemize}
+
 \paragraph{IT Administrator Requirements}
 \begin{itemize}
     \item \textbf{UR-ITA-01:} As an IT Administrator, I want to provision new tenant organisations and invite their initial Educational Manager so that institutions can be onboarded onto the platform without my involvement in their internal user management.
     \item \textbf{UR-ITA-02:} As an IT Administrator, I want to tune the platform's operational parameters at runtime --- enrolment ceilings, retention windows, AI timeout and rate-limit behaviour, ingestion and retrieval thresholds, and the toggles that enable or disable optional processing stages --- with an organisation-level override where a tenant needs to differ, so that the deployment can be adjusted to institutional demand without a code change.
-    \item \textbf{UR-ITA-03:} As an IT Administrator, I want to monitor cross-tenant system health, infrastructure metrics, and an immutable audit log so that I can ensure platform stability and respond to security or compliance incidents.
-    \item \textbf{UR-ITA-04:} As an IT Administrator, I want every action I take inside a tenant --- restoring deleted content, disabling an account, amending an organisation's configuration --- to be recorded in the immutable audit trail, so that platform authority broad enough to recover a tenant from an operational failure remains accountable, and pedagogical decisions stay in practice with the Educational Manager and Teachers even where the permission model does not forbid me from making them.
+    \item \textbf{UR-ITA-03:} As an IT Administrator, I want to monitor cross-tenant system health, infrastructure metrics, and retained append-only audit records so that I can ensure platform stability and respond to security or compliance incidents.
+    \item \textbf{UR-ITA-04:} As an IT Administrator, I want every action I take inside a tenant --- restoring deleted content, disabling an account, amending an organisation's configuration --- to be recorded in retained append-only audit records, so that platform authority broad enough to recover a tenant from an operational failure remains accountable, and pedagogical decisions stay in practice with the Educational Manager and Teachers even where the permission model does not forbid me from making them.
     \item \textbf{UR-ITA-05:} As an IT Administrator, I want the platform to enforce centralised authentication and identity controls --- including Google SSO, two-factor authentication, session management, and role-based access control --- so that user access is uniformly secured across all tenant organisations.
 
 \end{itemize}
@@ -44,7 +49,7 @@ The modules divide along the lines the system itself is built on. Modules~1 and~
 
 The final two modules are the ones most often mistaken for administration rather than pedagogy. Module~7 governs the enrolment structure above individual courses --- versioned learning programmes, the career pathways they bundle, and the dean-adjudicated workflow by which a student moves between pathways without losing earned progress. Module~8 covers the runtime configuration catalogue and the versioned policy documents, the two surfaces through which the platform itself is tuned and its terms published.
 
-Two properties hold across the set and are worth stating once rather than repeating in each requirement. Every artefact an AI pipeline generates enters a review state and requires a human decision before a learner can see it. And every rule that judges a learner --- the integrity policy on an attempt, the pathway version on an enrolment, the programme version on a student --- is frozen at the moment it starts applying to them, so that editing the curriculum never retroactively changes what somebody already under way is measured against.
+Two properties hold across the assessment requirements and are worth stating once rather than repeating in each requirement. AI-drafted quiz and interview questions enter a review state and require a human decision before publication; automatically derived ingestion units instead support retrieval and generation. Rules that judge a learner --- such as the integrity policy on an attempt, the pathway version on an enrolment, and the programme version on a student --- are frozen when they start applying, so that editing the curriculum does not retroactively change what somebody already under way is measured against.
 
 
 
@@ -79,12 +84,12 @@ content creation, assessment, learner modeling, and progress reporting
 demands are as follows.
 
 \begin{itemize}
-    \item \textbf{Audit and traceability.} Every record in every
-    domain carries its creation and last-modification timestamps and
-    the identity of the actor responsible; soft-deleted records
-    additionally carry the deletion timestamp and actor. This uniform
-    base is what makes compliance reporting and dispute resolution
-    possible.
+    \item \textbf{Audit and traceability.} Mutable, auditable domain
+    records capture the timestamps and responsible actors needed for
+    compliance reporting and dispute resolution; soft-deletable records
+    additionally record deletion metadata. Append-only event and history
+    records may retain only their creation timestamp and actor context
+    appropriate to that event.
 
     \item \textbf{Identity and access.} One account belongs to at most
     one organisation at a time. Permissions are not hardcoded to roles
@@ -94,16 +99,16 @@ demands are as follows.
     different contexts.
 
     \item \textbf{Curriculum structure.} Organisations contain
-    faculties; faculties own versioned, staged career pathways and the
-    learning programmes that bundle them; courses divide into modules,
-    and each module holds lessons, quizzes, and interviews as sibling
-    curriculum items.
+    faculties and organisation-owned career pathways. Faculty-scoped
+    learning programmes bundle pinned pathway versions; courses divide
+    into modules, and each module holds lessons, quizzes, and interviews
+    as sibling curriculum items.
 
-    \item \textbf{Content provenance.} Materials are immutable
-    versions rather than mutable files, and every AI-derived artefact
-    --- knowledge unit, quiz card, interview question --- records
-    whether it was machine-generated or teacher-edited, so that
-    generated assessment remains attributable to its source.
+    \item \textbf{Content provenance.} Uploaded file content is retained
+    through material versions while material metadata remains editable.
+    Quiz and interview questions record their generation provenance and
+    review state; automatically derived ingestion units support retrieval
+    but are not individually teacher-review artefacts.
 
     \item \textbf{Assessment records.} Spaced-repetition state is held
     per student-card pair in isolation from every peer, while quizzes
@@ -121,8 +126,8 @@ demands are as follows.
     the current implementation checks only that an active video track
     is present and keeps the stream local to the learner's browser.
 
-    \item \textbf{Operational telemetry.} Every external AI call is
-    logged with its tokens, latency, outcome, and a cost frozen at the
-    time of the call, so that spend can be attributed and a later
-    price change cannot rewrite history.
+    \item \textbf{Operational telemetry.} External AI calls record
+    available token usage, latency, and outcome. When token usage and a
+    model-price entry are configured, an estimated cost is persisted at
+    call time so that later price changes cannot rewrite that estimate.
 \end{itemize}

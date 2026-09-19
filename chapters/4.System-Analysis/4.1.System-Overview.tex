@@ -10,20 +10,15 @@ It is essential to distinguish between stakeholders (those impacted by or invest
 \paragraph{Stakeholders}
 \begin{itemize}
     \item \textbf{Higher Education Institutions and Coding Bootcamps:}
-    The host organisations that adopt aBridgeAI to improve student
-    employability rates, reduce manual assessment overhead, and
-    surface auditable evidence of progression.
- 
-    \item \textbf{Accreditation Bodies and Industry Partners:}
-    External entities that consume institution-level reporting on progression and outcomes. These parties
-    do not interact with the system directly but rely on the
-    aggregated metrics it produces to evaluate programme quality.
- 
-    \item \textbf{Hiring Companies:}
-    The eventual consumers of the graduate pipeline, who benefit
-    from candidates whose technical and communication competencies
-    have been verified against outcome checklists rather than
-    self-reported coursework.
+    The intended institutional adopters of aBridgeAI, which can use
+    the platform to reduce assessment overhead and inspect progression
+    evidence within their authorised scope.
+
+    \item \textbf{Accreditation Bodies, Industry Partners, and Hiring Companies:}
+    External stakeholders that may benefit indirectly from institutional
+    progression evidence and improved graduate preparation. They are not
+    direct system users, and the current platform specifies no direct
+    reporting, data-sharing, or candidate-verification workflow for them.
  
     \item \textbf{Academic Supervisor and Project Review Committee:}
     The faculty advisors and reviewers responsible for evaluating
@@ -36,35 +31,36 @@ It is essential to distinguish between stakeholders (those impacted by or invest
     \item \textbf{Student:} The primary end-user. Consumes
     multimedia lessons, participates in AI-driven quiz and spaced-repetition quiz
     review cycles whose intervals are governed by the hybrid SM-2
-    scheduler, takes AI-conducted mock interviews in voice or text
-    mode, and tracks personal progression via the Knowledge
-    Retention Estimate, Progression Readiness, and Review Compliance
-    Rate metrics. The student receives a binary pass/fail outcome
-    per interview session.
+    scheduler, takes AI-conducted mock interviews in a unified hybrid
+    room supporting typed and spoken interaction, and tracks personal
+    progression via the Knowledge Retention Estimate, Progression
+    Readiness, and Review Compliance Rate metrics. The student receives
+    a binary pass/fail outcome together with qualitative remediation and
+    a study plan; numeric rubric scores, per-outcome verdicts, and model
+    reasoning remain hidden.
  
     \item \textbf{Teacher:} Designs lessons, uploads
     raw materials for AI ingestion, and is
-    responsible for the human-in-the-loop review of all AI-generated
-    artefacts before publication --- including editing quiz cards,
-    confirming the per-card expected response time $T_{\text{exp}}$
-    that anchors $Q$ derivation, defining target outcomes for the
-    mock interview, and reviewing the AI-generated interview
-    question bank. Teachers additionally configure the SM-2 unlock
+    responsible for reviewing AI-drafted quiz and interview questions
+    before publication --- including editing quiz cards, confirming the
+    per-card expected response time $T_{\text{exp}}$ that anchors $Q$
+    derivation, defining target outcomes for the mock interview, and
+    reviewing the AI-generated interview question bank. Material
+    ingestion and derived retrieval units are processed automatically
+    rather than individually teacher-approved. Teachers additionally
+    configure the SM-2 unlock
     parameters ($EF_{\min}^{\text{unlock}}$, coverage threshold
     $\tau$, prerequisite criteria) per lesson and monitor cohort
     retention and compliance metrics via the teacher dashboard.
  
-    \item \textbf{Educational Manager:} The administrative authority
-    within a single organisation (e.g.\ a programme lead). Defines
-    \textit{career paths}---the staged, versioned pathways of courses
-    representing a target professional competency---and assigns
-    teachers to courses within those pathways. Onboards teachers and
-    students into the organisation by invitation, and enrols student
-    cohorts onto a course or learning programme in bulk from a CSV
-    roster, and consumes organisation-scoped reports including Career
-    Readiness progression at both the individual and cohort level. The
-    Educational Manager's authority is bounded by the organisation
-    they administer; they have no cross-tenant visibility.
+    \item \textbf{Educational Manager:} An academic operations role
+    acting within the organisation or faculty scope granted by its
+    permissions (e.g.\ a programme lead). May manage pathways,
+    teaching assignments, programmes, and enrolments only within that
+    resolved scope; bulk enrolment and organisation-scoped reporting
+    remain subject to the same boundary. Faculty Deans retain the
+    distinct authority to adjudicate pathway-change requests. An
+    Educational Manager has no cross-tenant visibility.
 
     \item \textbf{Faculty Dean:} The academic authority over a single
     faculty or department within an organisation (e.g.\ a Dean or Vice
@@ -92,6 +88,6 @@ It is essential to distinguish between stakeholders (those impacted by or invest
     requires it; in normal operation, however, course content and
     assessment configuration remain the responsibility of the
     Educational Manager and the Teachers of each tenant, and every
-    administrative action taken inside a tenant is recorded in the
-    immutable audit trail.
+    administrative action taken inside a tenant is recorded in an
+    append-only audit trail during its configured retention period.
 \end{itemize}

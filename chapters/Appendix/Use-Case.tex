@@ -720,8 +720,8 @@ $\bullet$ Prior participants and, for a Student comment, the course managers are
 \textbf{Actors} & Teacher, Educational Manager \\ \hline
 \textbf{Related Requirements} & FR-4.1 \\ \hline
 \textbf{Description} & Allows Teachers to create quiz questions manually or through AI drafting from ingested course content, review drafted questions, reuse approved questions, and maintain source references and revision history. \\ \hline
-\textbf{Pre-conditions} & The relevant course materials have been ingested, and the actor has quiz-authoring permission. \\ \hline
-\textbf{Post-conditions} & Quiz questions are created, reviewed, and stored with source references and revision history. \\ \hline
+\textbf{Pre-conditions} & The actor has quiz-authoring permission; ingested materials are required only when AI drafting is requested. \\ \hline
+\textbf{Post-conditions} & Quiz questions are created and stored with source references and revision history; AI-drafted questions remain subject to teacher review before publication. \\ \hline
 \textbf{Main Flow} &
 1. The Teacher opens the Quiz Authoring page for a lesson or module. \newline
 2. The Teacher chooses to create questions manually or generate them from ingested content. \newline
@@ -968,8 +968,8 @@ $\bullet$ A timed attempt is finalised even when the Student never submits it. \
 1. The Teacher opens the Mock Interview configuration page. \newline
 2. The Teacher defines interview sections and desired outcomes that students must demonstrate to pass. \newline
 3. The system does not require the Teacher to provide expected or model answers. \newline
-4. The Teacher drafts interview questions from ingested course content. \newline
-5. The system associates each question with one or more desired outcomes. \newline
+4. The Teacher drafts interview questions from ingested course content or creates them manually. \newline
+5. The system may associate each question with one desired outcome and reports unlinked questions as readiness warnings. \newline
 6. The Teacher reviews, edits, approves, or rejects drafted questions. \newline
 7. The Teacher configures session rules, including maximum attempts, cooldown periods, and whether related quiz progression remains locked until the interview is passed. \newline
 8. The system saves the interview configuration for publication. \\ \hline
@@ -1005,28 +1005,28 @@ $\bullet$ A timed attempt is finalised even when the Student never submits it. \
 \textbf{Use Case Name} & \textbf{Take Mock Interview} \\ \hline
 \textbf{Actors} & Student \\ \hline
 \textbf{Related Requirements} & FR-5.4, FR-5.5, FR-5.6, FR-5.8 \\ \hline
-\textbf{Description} & Allows Students to participate in text-mode or voice-mode mock interview sessions with an adaptive AI interviewer, while the system records transcript, metadata, and session activity signals. \\ \hline
+\textbf{Description} & Allows Students to participate in unified hybrid mock interview sessions supporting typed and spoken turns, while the system records transcript, metadata, and session activity signals. Adaptive sequencing and follow-ups apply only when the relevant rollout flags are enabled; otherwise the session uses the established legacy progression path. \\ \hline
 \textbf{Pre-conditions} & The Student is authenticated, enrolled, and eligible to access the interview. \\ \hline
 \textbf{Post-conditions} & The interview transcript, session metadata, and activity signals are persisted for evaluation and review. \\ \hline
 \textbf{Main Flow} &
 1. The Student selects an available mock interview. \newline
-2. The Student chooses text mode or voice mode. \newline
-3. The system starts an adaptive turn-taking dialogue with the AI interviewer. \newline
+2. The system starts a hybrid room that supports typed turns and optional microphone interaction. \newline
+3. The system applies adaptive sequencing and follow-ups only when the relevant rollout flags are enabled; otherwise it uses the legacy progression path. \newline
 4. The AI interviewer presents a question. \newline
 5. The Student responds by typing or speaking. \newline
-6. In voice mode, the system streams audio, transcribes speech, and generates text-to-speech responses. \newline
-7. The system processes raw audio transiently without persistent archival. \newline
+6. When spoken interaction is available, the runtime streams audio, transcribes speech, and generates text-to-speech responses. \newline
+7. Voice-answer media may be linked to stored audio; optional whole-session recording requires current-policy consent and deployment enablement, and a recording failure does not interrupt the interview. \newline
 8. The interview continues until the session is completed. \newline
 9. The system persists the interview transcript and session metadata. \newline
-10. The system records session activity signals such as browser focus changes, tab switching, full-screen status, and session events. \\ \hline
+10. The system records browser activity signals such as focus changes, tab switching, full-screen status, and session events for review. \\ \hline
 \textbf{Alternative Flows} &
 \textbf{1a. Student is not eligible:} \newline
 \hspace*{1em}1. The system denies access to the interview. \newline
 \hspace*{1em}2. The Student is shown the unmet requirement. \newline
 \textbf{2a. Microphone permission denied:} \newline
-\hspace*{1em}1. The system shows guidance or allows fallback to text mode. \newline
+\hspace*{1em}1. The system shows guidance; typed interaction remains available in the hybrid session. \newline
 \textbf{10a. Integrity signal detected:} \newline
-\hspace*{1em}1. The system records the event for post-session review. \\
+\hspace*{1em}1. The system records the event for post-session human review; it does not by itself prove misconduct or terminate the interview. \\
 \end{longtable}
 
 % =========================================================
@@ -1051,20 +1051,22 @@ $\bullet$ A timed attempt is finalised even when the Student never submits it. \
 \textbf{Use Case Name} & \textbf{Review Interview Result} \\ \hline
 \textbf{Actors} & Student, Teacher \\ \hline
 \textbf{Related Requirements} & FR-5.6, FR-5.7 \\ \hline
-\textbf{Description} & Evaluates the Student's interview responses against teacher-defined desired outcomes and controls result visibility for Students and Teachers. \\ \hline
-\textbf{Pre-conditions} & The interview session has been completed and the transcript has been persisted. \\ \hline
-\textbf{Post-conditions} & A binary pass-or-fail verdict is produced, shown to the Student, and the transcript with outcome-level assessment is available to Teachers for remediation review. \\ \hline
+\textbf{Description} & Evaluates recorded Student interview evidence against teacher-defined desired outcomes asynchronously and controls result visibility for Students and Teachers. \\ \hline
+\textbf{Pre-conditions} & The interview session has reached a gradeable terminal state and its transcript has been persisted. \\ \hline
+\textbf{Post-conditions} & After successful evaluation, a binary pass-or-fail verdict and qualitative remediation are available to the Student; the transcript with outcome-level assessment is available to authorised Teachers for remediation review. \\ \hline
 \textbf{Main Flow} &
 1. The Student completes the interview session. \newline
-2. The system evaluates the transcript against teacher-defined desired outcomes. \newline
-3. The system produces a single binary pass-or-fail verdict. \newline
+2. The system dispatches asynchronous evaluation of recorded answer evidence against teacher-defined desired outcomes. \newline
+3. The evaluation worker produces a binary pass-or-fail verdict and qualitative remediation. \newline
 4. The Student opens the interview result page. \newline
-5. The system displays only the binary verdict to the Student. \newline
+5. The system displays the verdict and qualitative remediation while hiding numeric and per-outcome rubric details. \newline
 6. The Teacher opens the completed interview session. \newline
 7. The system displays the transcript and outcome-level assessment to the Teacher for remediation purposes. \\ \hline
 \textbf{Alternative Flows} &
-\textbf{1a. Interview incomplete:} \newline
+\textbf{1a. Interview incomplete or abandoned before assessment:} \newline
 \hspace*{1em}1. The system does not produce a final verdict. \newline
+\textbf{3a. Evaluation is pending, recovering, or terminally failed:} \newline
+\hspace*{1em}1. The system presents the applicable processing or unavailable state without inventing a verdict. \newline
 \textbf{5a. Student attempts to access outcome-level details:} \newline
 \hspace*{1em}1. The system hides per-outcome rubric details. \newline
 \textbf{6a. Teacher does not manage the course:} \newline
@@ -1143,9 +1145,9 @@ $\bullet$ Near-duplicate questions are reported before they enter the bank. \\ \
 \textbf{Use Case Name} & \textbf{Review the Interview Gap Report} \\ \hline
 \textbf{Actors} & Student as the recipient of the remediation plan; Teacher for the full assessment and notes \\ \hline
 \textbf{Related Requirements} & FR-5.10, FR-5.7 \\ \hline
-\textbf{Description} & Allows a Student to receive a qualitative gap report with an actionable study plan after an interview, while the Teacher additionally reviews criterion-level assessment and attaches remediation notes. \\ \hline
+\textbf{Description} & Allows a Student to receive a qualitative gap report with an actionable study plan after successful interview evaluation, while the Teacher additionally reviews criterion-level assessment and attaches remediation notes. \\ \hline
 \textbf{Pre-conditions} &
-$\bullet$ The interview session has been completed and evaluated. \newline
+$\bullet$ The interview session has completed evaluation successfully. \newline
 $\bullet$ The Student owns the session; the Teacher holds authoring rights on the course. \\ \hline
 \textbf{Post-conditions} &
 $\bullet$ The Student sees the discrepancy summary and a study plan of topics with lesson links and suggested resources. \newline
@@ -1275,7 +1277,7 @@ $\bullet$ Teacher notes are recorded against the report. \\ \hline
 \textbf{Use Case Name} & \textbf{Monitor Platform Operations} \\ \hline
 \textbf{Actors} & IT Administrator, Educational Manager \\ \hline
 \textbf{Related Requirements} & FR-6.4, FR-6.5, FR-6.6, FR-6.7 \\ \hline
-\textbf{Description} & Allows authorised administrators to view platform and organisation-level statistics, inspect AI cost telemetry, inspect processing jobs, retry failed jobs, and query immutable audit logs. \\ \hline
+\textbf{Description} & Allows authorised administrators to view platform and organisation-level statistics, inspect AI cost telemetry, inspect processing jobs, retry failed jobs, and query append-only audit records retained under the configured retention policy. \\ \hline
 \textbf{Pre-conditions} & The actor is authenticated and has administrative reporting or audit permissions. \\ \hline
 \textbf{Post-conditions} & The actor obtains operational visibility into platform health, AI usage, processing jobs, or audit records. \\ \hline
 \textbf{Main Flow} &
@@ -1287,7 +1289,7 @@ $\bullet$ Teacher notes are recorded against the report. \\ \hline
 6. The system displays job status and failed job details. \newline
 7. The administrator retries a failed processing job when appropriate. \newline
 8. The administrator opens the audit log. \newline
-9. The system displays immutable audit records for role assignments, sensitive data changes, and HTTP request events. \\ \hline
+9. The system displays retained append-only audit records for role assignments, sensitive data changes, and HTTP request events according to the actor's audit permission and scope. \\ \hline
 \textbf{Alternative Flows} &
 \textbf{2a. Actor has organisation-only scope:} \newline
 \hspace*{1em}1. The system filters statistics to the actor's organisation. \newline
@@ -1388,7 +1390,7 @@ $\bullet$ Students already enrolled remain attached to the programme version the
 $\bullet$ The operator is authenticated and holds learning-programme enrolment rights for the programme's organisation. \newline
 $\bullet$ The programme is published and has a published version. \\ \hline
 \textbf{Post-conditions} &
-$\bullet$ Each accepted Student holds an enrolment awaiting initial pathway selection, pinned to the current published version. \newline
+$\bullet$ Each accepted Student holds an enrolment pinned to the current published version. When the default pathway is eligible and concurrent-path constraints permit, the system activates a system-originated attempt; otherwise the enrolment remains awaiting initial pathway selection. \newline
 $\bullet$ Rejected rows are reported individually and do not prevent the remaining rows from being enrolled. \newline
 $\bullet$ A withdrawn Student's enrolment records the withdrawal reason and any open pathway-change request is cancelled. \\ \hline
 \textbf{Main Flow} &
@@ -1396,7 +1398,7 @@ $\bullet$ A withdrawn Student's enrolment records the withdrawal reason and any 
 2. The operator either selects Students individually or uploads a comma-separated file of e-mail addresses with optional names. \newline
 3. The system validates each entry against the Student role, the programme's organisation, and the concurrent-enrolment ceiling. \newline
 4. For an unknown e-mail address in a file import, the system creates a Student account in the programme's organisation. \newline
-5. The system creates one enrolment per accepted Student awaiting initial pathway selection. \newline
+5. The system creates one enrolment per accepted Student and attempts to activate the programme's eligible default pathway; when activation is not possible, the enrolment remains awaiting initial pathway selection. \newline
 6. The system reports the outcome as the number enrolled, the accounts created, those already enrolled, and the per-row failures. \newline
 7. To remove a Student, the operator selects ``Withdraw'' and supplies a reason. \newline
 8. The system records the withdrawal, snapshots and cancels the active pathway attempt, and releases the access it granted. \\ \hline
@@ -1437,21 +1439,21 @@ $\bullet$ A withdrawn Student's enrolment records the withdrawal reason and any 
 \textbf{Use Case Name} & \textbf{Hold, Change, and Drop Career Pathways} \\ \hline
 \textbf{Actors} & Student for selection and request; Faculty Dean for the decision \\ \hline
 \textbf{Related Requirements} & FR-7.6, FR-7.7, FR-7.8, FR-7.9, FR-7.10, FR-7.12, FR-7.13, FR-7.14, FR-7.15, FR-7.16 \\ \hline
-\textbf{Description} & Describes the life of a Student's career pathways within an enrolled learning programme: the default pathway they receive on enrolment, the further pathways they may add without approval, and the two reviewed requests --- to change a pathway or to drop one --- which an owning Faculty Dean acknowledges and then approves or rejects. \\ \hline
+\textbf{Description} & Describes the life of a Student's career pathways within an enrolled learning programme: a default pathway that the system attempts to activate when eligible, further pathways the Student may add without approval, and the two reviewed requests --- to change a pathway or to drop one --- which an owning Faculty Dean acknowledges and then approves or rejects. \\ \hline
 \textbf{Pre-conditions} &
 $\bullet$ The Student holds an enrolment on a published learning programme. \newline
 $\bullet$ For a change or a drop request, the enrolment is active, no other request is open, and the Student has not exhausted the permitted number of switches. \newline
 $\bullet$ For a drop request, the Student holds at least two pathways in progress. \newline
 $\bullet$ For a decision, the reviewer is a Faculty Dean owning the programme and is not the subject of the request. \\ \hline
 \textbf{Post-conditions} &
-$\bullet$ Upon enrolment the enrolment is active with an open attempt pinned to the version of the programme's default pathway. \newline
+$\bullet$ Upon enrolment, when the programme's default pathway is eligible and concurrent-path constraints permit, the enrolment is active with a system-originated open attempt pinned to that pathway version; otherwise it remains awaiting selection. \newline
 $\bullet$ Upon adding a pathway a further open attempt exists, no review having taken place. \newline
 $\bullet$ Upon approval of a change the outgoing attempt is closed with a progress snapshot, a new attempt is opened on the target pathway version, and the switch is counted against the allowance. \newline
 $\bullet$ Upon approval of a drop the dropped attempt is closed with a progress snapshot and no replacement is opened, at least one pathway remains in progress, and the decision is counted against the allowance and never restored. \newline
 $\bullet$ Course completions already earned remain valid and continue to count towards the new pathway. \newline
 $\bullet$ Upon rejection the enrolment and the current pathway are unchanged and the recorded reason is visible to the Student. \\ \hline
 \textbf{Main Flow} &
-1. On enrolment the system activates the enrolment, opens an attempt pinned to the version of the programme's default pathway, records the assignment as system-originated, and grants access to that pathway's courses. \newline
+1. On enrolment the system attempts to activate an eligible default pathway. On success, it opens a system-originated attempt pinned to that pathway version and grants access to its courses; otherwise the enrolment remains awaiting pathway selection. \newline
 2. The Student opens their programme enrolment and reviews the pathways offered by their programme version. \newline
 3. While the programme's pathway limit permits, the Student may add a further pathway; the system opens an additional attempt and grants access without any review. \newline
 4. To change pathway later, the Student names the pathway to leave, selects a different pathway, and submits a written justification; to drop a pathway instead, the Student names the pathway to end and submits a written justification without naming a destination. \newline
@@ -1529,7 +1531,7 @@ $\bullet$ The change, clearance, or rollback is recorded with its reason and the
 $\bullet$ The new value takes effect on the next operation that reads the setting. \\ \hline
 \textbf{Main Flow} &
 1. The administrator opens the Settings console at either deployment-wide or organisation scope. \newline
-2. The system lists the catalogue, showing for each setting its type, permitted range, the value held at each precedence layer, and the effective value together with its source. \newline
+2. The system lists the catalogue, showing for each setting its type, permitted range, the value held at each precedence layer, and the effective value together with its source. The precedence is organisation override, deployment-wide stored value, environment configuration, then code default. \newline
 3. The administrator selects a setting and enters a proposed value. \newline
 4. The administrator selects ``Preview''. \newline
 5. The system validates the proposed value against the setting's type and range and reports the current value, the proposed value, and the scope affected. \newline

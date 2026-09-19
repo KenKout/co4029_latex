@@ -23,49 +23,61 @@ traceable phases.
     then admit students, individually or by bulk import, subject to an
     organisation-configurable ceiling on concurrent enrolments. Each
     programme version nominates one of its pathways as the default,
-    and admission places the student on it at once; a student may
-    afterwards take on further pathways of their own accord, up to a
-    limit the programme sets. Enrolment is what grants access to the
-    courses that Stages~2 through~4 operate upon; without it a student
-    has no curriculum and the loop cannot begin.
+    and admission attempts to activate it when it is eligible and the
+    concurrent-path constraints permit. Otherwise the enrolment remains
+    awaiting pathway selection. A student may afterwards take on further
+    pathways of their own accord, up to a limit the programme sets.
+    Enrolment is what grants access to the courses that Stages~2
+    through~4 operate upon; without it a student has no curriculum and
+    the loop cannot begin.
 
     \item \textbf{Content Ingestion (Preparation).}
     Teachers upload raw learning materials in supported formats 
     including PDF documents, MP4 video recordings, and presentation 
-    files. The ingestion pipeline parses each source, extracts typed 
-    knowledge units — summaries, concepts, examples, and indexes 
-    them in a dense vector store to support semantic retrieval. The 
-    resulting structured knowledge base serves as the sole authoritative 
-    source for all subsequent AI generation tasks, ensuring that 
-    generated assessments are grounded exclusively in 
-    teacher-uploaded content.
+    files. The ingestion pipeline parses each source, extracts typed
+    knowledge units — summaries, concepts, examples, and indexes
+    them in a dense vector store to support semantic retrieval. The
+    resulting knowledge base supports retrieval-grounded AI drafting
+    where source material is available. Teachers may additionally
+    author assessment questions manually and supply learning outcomes
+    or supplementary instructions that guide assessment generation and
+    evaluation.
 
     \item \textbf{The Learning Loop (Knowledge Validation).}
-    Students consume published learning materials and undertake 
-    AI-generated quizzes to validate baseline knowledge retention. 
-    Each quiz card carries a teacher-confirmed expected response time 
-    $T_{\text{exp}}$. The system derives the quality response value 
-    $Q$ algorithmically from response correctness, hint usage, and 
-    the time ratio $\rho = T_{\text{actual}} / T_{\text{exp}}$, 
-    updating the student's per-card Easiness Factor $EF$ via the 
-    hybrid SM-2 scheduling model. Students remain in the learning 
-    loop — receiving SR reminders at algorithmically 
-    determined intervals — until their $EF$ distribution across the 
-    lesson's cards satisfies the teacher-configured unlock condition.
+    Students consume published learning materials and undertake quizzes
+    whose questions may be teacher-authored, AI-drafted, or imported
+    from curated banks to validate baseline knowledge retention. Each
+    quiz card carries a teacher-confirmed expected response time
+    $T_{\text{exp}}$. The system derives the quality response value
+    $Q$ algorithmically from response correctness, hint usage, and
+    the time ratio $\rho = T_{\text{actual}} / T_{\text{exp}}$,
+    updating the student's per-card Easiness Factor $EF$ via the
+    hybrid SM-2 scheduling model. Due reviews may generate in-app
+    reminders when enabled; students remain in the learning loop until
+    their $EF$ distribution across the lesson's cards satisfies the
+    teacher-configured unlock condition.
 
     \item \textbf{The Application Loop (Practical Assessment).}
-    Upon satisfying the quiz unlock condition, students gain access 
-    to the lesson's interview section. Interview questions are drawn 
-    from a pre-generated, teacher-reviewed question bank aligned to 
-    teacher-defined outcome requirements. Students engage with the 
-    interview in text or voice mode, with each session conducted 
-    independently under a dedicated model instance. Upon session 
-    completion, the full transcript is submitted to the AI assessment 
-    model in a single batch call, which evaluates whether each defined 
-    outcome was satisfied. The student receives a binary pass or fail 
-    verdict; no rubric, per-outcome breakdown, or model reasoning is 
-    exposed. A lesson is considered complete only when both the quiz 
-    unlock condition and the interview pass condition are satisfied.
+    Upon satisfying the relevant learning and access conditions, students gain
+    access to a mock interview. Interview questions are selected from a
+    pre-generated, teacher-reviewed question bank. Questions may be linked
+    to one outcome; the system reports incomplete outcome coverage as a
+    readiness warning rather than universally blocking publication. Each
+    session uses a unified hybrid interaction space that supports both typed
+    and spoken turns.
+
+    When a session is completed or times out after assessment has begun, an
+    asynchronous evaluation worker assesses recorded answer evidence against
+    the configured outcomes, produces diagnostic rubric information, and
+    generates a gap report and study plan. After successful evaluation, the
+    student receives a binary pass/fail verdict together with qualitative
+    remediation guidance. Pending, recovery, or terminal evaluation-failure
+    states do not invent a verdict. Numeric rubric scores, per-outcome
+    verdicts, and model reasoning remain hidden from the student, while
+    authorised teachers may review the transcript and outcome-level
+    assessment. A curriculum unit is considered complete only when its
+    configured completion conditions, including any required interview pass
+    verdict, are satisfied.
 
     \item \textbf{Evaluation and Reporting (Feedback).}
     The system continuously aggregates per-card SM-2 state into three 
@@ -76,11 +88,11 @@ traceable phases.
     teachers. At the career level, course completion percentages are 
     aggregated into a Career Readiness score reported to the student,
     the Educational Manager, and the Faculty Dean who owns the
-    programme. Teachers are additionally notified
-    of cohort-level patterns — including systematic retention gaps and
-    declining compliance rates — enabling intervention at the content
-    or configuration level rather than purely at the individual
-    student level.
+    programme. Teachers can inspect cohort-level patterns — including
+    systematic retention gaps and declining compliance rates — through
+    learning-loop dashboard views, enabling intervention at the content
+    or configuration level rather than purely at the individual student
+    level.
 
     Reporting also feeds a slower, governance-level response. A
     student whose progression shows that they are on the wrong pathway

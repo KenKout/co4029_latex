@@ -49,7 +49,7 @@ The full set of use case specifications for this module is provided in Appendix~
 
 This module supports multi-tenant organisation management, user onboarding, organisation memberships, user profiles, domain-based auto-provisioning, and tenant-scoped access control.
 
-IT Administrators are responsible for provisioning and managing tenant organisations, organisation domains, and account status. Educational Managers manage organisation-level learning operations such as bulk student enrollment, teacher-course assignment, and career pathway definition. The module also ensures that Educational Manager actions and queries remain scoped to their own tenant organisation.
+IT Administrators are responsible for provisioning and managing tenant organisations, organisation domains, and account status. Educational Managers manage learning operations such as bulk student enrolment, teacher-course assignment, and pathway administration within the organisation or faculty scope resolved from their permissions. The module ensures that Educational Manager actions and queries remain tenant-scoped.
 
 \begin{figure}[H]
     \centering
@@ -100,11 +100,11 @@ Teachers create or review quiz questions, configure expected response time $T_{\
 % ===================5 Application Loop and Mock Interview Module=======================
 \paragraph{Application Loop and Mock Interview Module}
 
-This module focuses on transforming learned knowledge into applied interview performance. Teachers define desired outcomes that students must demonstrate, while the system drafts interview questions from ingested course content and associates them with those outcomes.
+This module focuses on transforming learned knowledge into applied interview performance. Teachers define desired outcomes that students must demonstrate, while the system can draft questions from ingested course content or accept manually authored questions. Each question may be linked to one desired outcome; unlinked questions and incomplete outcome coverage produce readiness warnings rather than universally preventing publication.
 
-Students participate in mock interviews through text mode or voice mode. The system persists the interview transcript and session metadata, evaluates the student's responses against teacher-defined desired outcomes, and produces a binary pass-or-fail verdict. Students only see the final verdict, while Teachers can review the transcript and outcome-level assessment for remediation purposes. The module also records interview session activity signals to support post-session integrity review.
+Students participate in mock interviews through a unified hybrid session supporting typed and spoken turns. The system persists the interview transcript and session metadata, then evaluates recorded answer evidence against teacher-defined desired outcomes asynchronously. After successful evaluation, students receive a binary pass-or-fail verdict together with a qualitative gap report and study plan; numeric rubric scores, per-outcome verdicts, and model reasoning remain hidden. Pending, recovery, and terminal evaluation-failure states do not invent a verdict. Teachers can review the transcript and outcome-level assessment for remediation purposes. The module also records browser activity signals to support post-session integrity review; these signals support human review but do not constitute conclusive evidence of misconduct or automatically terminate an interview.
 
-Because the assessment is conducted through a conversational model, the module additionally guards the exchange in both directions: learner input is screened for prompt-injection attempts, and model output is screened for leakage of protected content before it reaches the learner. A tripped guard degrades or blocks the individual turn rather than failing the session, and each decision is written to a redacted audit trail that administrators may review without the record itself becoming a catalogue of working attacks.
+Because the assessment is conducted through a conversational model, the module additionally guards the exchange in both directions: learner input is screened for prompt-injection attempts, and model output is screened for leakage of protected content before it reaches the learner. The guard defaults to shadow mode, which assesses and records security signals without changing learner-facing flow. Explicit enforcement configuration may refuse, redirect, or end the relevant turn rather than failing the whole session. Redacted security events are persisted, and authorised review is scope- and permission-controlled without exposing raw attack content. Adaptive progression is feature-flagged, with voice adaptive behaviour separately disabled by default; if an adaptive turn fails, the system preserves the recorded answer and continues through the legacy progression path.
 
 \begin{figure}[H]
     \centering
@@ -123,7 +123,7 @@ The full set of use case specifications for this module is provided in Appendix~
 \paragraph{Analytics, Reporting and Notifications Module}
 This module consolidates progress tracking, notification delivery, administrative analytics, audit-log querying, AI cost telemetry, processing-job inspection, and Career Readiness reporting.
 
-Students can view completion progress and receive notifications, while Teachers can monitor roster progress and identify at-risk learners. Educational Managers can view organisation-scoped Career Readiness snapshots and drill down into individual learner progress. IT Administrators can inspect platform statistics, AI usage, processing jobs, and immutable audit logs for security and compliance review.
+Students can view completion progress and receive notifications, while Teachers can monitor roster progress and identify at-risk learners. Educational Managers can view organisation-scoped Career Readiness snapshots and drill down into individual learner progress. IT Administrators can inspect platform statistics, AI usage, processing jobs, and append-only audit records retained under the configured retention policy for security and compliance review.
 
 \begin{figure}[H]
     \centering
@@ -140,17 +140,9 @@ This module governs the enrolment structure that sits above individual courses. 
 
 Faculty Deans and Educational Managers author programmes within their own faculty and move them through draft, published, and archived states. Authoring is version-based: an edit opens a new draft rather than mutating a published version, so a student who enrolled under version~2 continues to see version~2 for the life of their enrolment. Authorised operators enrol students individually or by bulk import, subject to an organisation-configurable ceiling on concurrent programme enrolments.
 
-On the student-facing side a programme version nominates one of its pathways as the default, and enrolment places the student on it immediately rather than leaving them to choose; the assignment is recorded as system-originated so that it is never mistaken for the student's own. A student may then take on further pathways without approval, up to a limit the programme sets, which may exceed neither the pathways it bundles nor an organisation-configurable ceiling. Relinquishing a pathway is governed rather than free: a student may request either a change of pathway or, holding more than one, that a pathway be dropped, in each case with a mandatory written justification. Both kinds share a single open request per enrolment and a single finite switch allowance, which an approval spends and nothing restores. A request is adjudicated by a Faculty Dean who owns the programme and who may not be the subject of it. Approval closes the outgoing attempt with a progress snapshot, opening a replacement attempt for a change and none for a drop; no approval may leave a student with no pathway in progress, that being a withdrawal rather than a pathway decision. Course completions already earned are preserved as immutable awards, so work shared between pathways is never repeated, and the enrolment completes only once every pathway the student holds is itself complete.
+On the student-facing side a programme version nominates one of its pathways as the default, and enrolment attempts to activate a system-originated attempt on it when the path is eligible and the concurrent-path constraints permit. Otherwise the enrolment remains awaiting selection. A student may then take on further pathways without approval, up to a limit the programme sets, which may exceed neither the pathways it bundles nor an organisation-configurable ceiling. Relinquishing a pathway is governed rather than free: a student may request either a change of pathway or, holding more than one, that a pathway be dropped, in each case with a mandatory written justification. Both kinds share a single open request per enrolment and a single finite switch allowance, which an approval spends and nothing restores. A request is adjudicated by a Faculty Dean who owns the programme and who may not be the subject of it. Approval closes the outgoing attempt with a progress snapshot, opening a replacement attempt for a change and none for a drop; no approval may leave a student with no pathway in progress, that being a withdrawal rather than a pathway decision. Course completions already earned are preserved as immutable awards, so work shared between pathways is never repeated, and the enrolment completes only once every pathway the student holds is itself complete.
 
-% TODO: draw graphics/usecase-diagrams/learning_programs_usecase.png, then uncomment.
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=0.70\textwidth]{graphics/usecase-diagrams/learning_programs_usecase.png}
-%     \caption{Detailed Use Case Diagram: Learning Programs and Path Governance Module}
-%     \label{fig:learning_programs_usecase}
-% \end{figure}
-
-\noindent The use case specifications for this module --- including pathway selection and the dean-adjudicated change-request workflow --- are given in Appendix~\ref{appendix:usecase-specifications}.
+\noindent A dedicated rendered use case diagram for this module is not yet included; the programme authoring, conditional default-path activation, pathway selection, and dean-adjudicated change-request workflows are specified textually in Appendix~\ref{appendix:usecase-specifications}.
 
 
 % ====================8 Platform Configuration and Policy Documents Module======================
@@ -158,19 +150,11 @@ On the student-facing side a programme version nominates one of its pathways as 
 
 This module covers the operational surfaces through which the platform itself is tuned and through which its governing documents are published. It comprises two related concerns: a catalogue of runtime-tunable settings, and a versioned store of policy documents.
 
-Every setting declares its key, grouping, data type, default value, and description. The effective value of a setting is resolved by a fixed precedence of organisation override, deployment-wide value, and code default, so that an IT Administrator tunes the deployment while an Educational Manager tunes only their own organisation. Because a mis-set value can affect every tenant, a change may first be previewed as a validated dry run that reports what it would alter; every applied change carries a mandatory written reason and is recorded so that it can later be cleared or rolled back to the value it replaced. Should a stored setting become unreachable or unreadable, the system continues to operate on environment configuration and code defaults rather than failing.
+Every setting declares its key, grouping, data type, default value, and description. The effective value of a setting is resolved by a fixed precedence of organisation override, deployment-wide stored value, environment configuration, and code default, so that an IT Administrator tunes the deployment while an Educational Manager tunes only their own organisation. Because a mis-set value can affect every tenant, a change may first be previewed as a validated dry run that reports what it would alter; every applied change carries a mandatory written reason and is recorded so that it can later be cleared or rolled back to the value it replaced. Should a stored setting become unreachable, unreadable, or invalid, the system falls through to the next precedence layer rather than failing.
 
 Policy documents — each classified as legal or academic — hold their content in independently numbered versions, so that the text in force on a given date remains recoverable. The index of published policies and the current text of any published policy are served without requiring authentication, since a prospective user must be able to read the terms before holding an account.
 
-% TODO: draw graphics/usecase-diagrams/platform_config_usecase.png, then uncomment.
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=0.70\textwidth]{graphics/usecase-diagrams/platform_config_usecase.png}
-%     \caption{Detailed Use Case Diagram: Platform Configuration and Policy Documents Module}
-%     \label{fig:platform_config_usecase}
-% \end{figure}
-
-The full set of use case specifications for this module is provided in Appendix~\ref{appendix:usecase-specifications}.
+\noindent A dedicated rendered use case diagram for this module is not yet included; runtime-setting precedence, preview, rollback, and policy-document workflows are specified textually in Appendix~\ref{appendix:usecase-specifications}.
 
 
 
