@@ -347,10 +347,10 @@ student's work.
 Teachers define interview sections by specifying a set of 
 \textit{desired outcomes} — descriptions of the competencies or 
 demonstrations the student must satisfy to pass the interview. The 
-system must record each outcome, its association with a specific 
-lesson, and its ordering within the outcome set. Outcomes are the 
-authoritative reference against which both question generation and 
-post-session assessment are performed.
+system must record each outcome against its interview configuration,
+which belongs to a course module, together with its ordering within the
+outcome set. Outcomes are the authoritative reference against which
+post-session assessment is performed.
 
 From these outcomes, the AI generation model produces a bank of sample 
 questions. The system must record each generated question, its 
@@ -366,35 +366,35 @@ question may carry sibling variants that probe the same outcome from
 different angles, with semantic duplicate detection over the bank.
 
 The system must capture teacher-defined interview configuration 
-parameters including the maximum number of attempts permitted per 
-student, the minimum number of outcomes that must be satisfied for a 
-pass verdict, whether EF progression in the associated quiz is locked 
-until the interview is passed, and any supplementary instructions 
-provided to the AI assessment model.
+parameters including the maximum number of attempts permitted per
+student, the minimum number of outcomes that must be satisfied for a
+pass verdict, cooldown and time-limit rules, and any supplementary
+instructions provided to the AI assessment model.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \subsection{Student Interview Sessions}
-Each student interview session is an independent interaction between 
-the student and a dedicated model instance. The system must record the 
-session's association with a specific interview configuration, the 
-student's identity, the attempt number, the input mode used (voice, 
-text, or both), and the session's start and end timestamps.
+Each student interview session is an independent interaction between
+the student and the interview runtime. The system records the session's
+association with a specific interview configuration, the student's
+identity, the attempt number, hybrid input mode, onboarding and terminal
+state, and start and end timestamps.
 
-The system must store the full session transcript — either as 
-structured text or as a reference to a stored audio file in the case 
-of voice input — to support post-session AI assessment and to provide 
-an auditable record of the interaction. The transcript must be linked 
-to the specific questions drawn from the question bank during that 
-session, along with the student's response to each.
+The system stores the full session transcript as structured turns and
+links it to the specific questions drawn from the question bank during
+that session, along with the student's response to each. Voice-answer
+media may be represented by stored object references; optional
+whole-session audio recording is separately consented, feature-gated,
+and retained under its own lifecycle.
 
 At the conclusion of each session, the AI assessment model evaluates 
 the transcript against the defined outcome checklist. The system must 
 store the per-outcome verdict — met or not met — along with the 
 model's internal reasoning for each verdict. The internal reasoning 
-is retained for audit and quality assurance purposes but is never 
-exposed to the student. The student-facing result is limited to a 
-binary pass or fail at the session level, with no rubric, no
-per-outcome breakdown, and no score.
+is retained for audit and quality assurance purposes but is never
+exposed to the student. After successful evaluation, the student-facing
+result provides a binary pass or fail together with qualitative
+remediation and a study plan, while withholding numeric rubric scores,
+per-outcome verdicts, and internal reasoning.
 
 The system must additionally maintain the \textit{runtime state} of an
 in-progress adaptive interview as a durable record rather than in
@@ -419,17 +419,14 @@ by severity. These signals are evidence for post-session review by a
 teacher and must not by themselves invalidate a session: the system
 records what happened and leaves the academic judgement to a human.
 
-The integrity policy under which an attempt is judged must be
-\textit{frozen onto the attempt} when it begins — the signal weights,
-the flag threshold, and whether a camera was required. A quiz edited
-or retuned mid-cohort must never re-judge an attempt that started
-under the earlier rules. Where a camera is required, the current
-implementation satisfies the requirement by the presence of an active
-local video track and nothing more, so the integrity record holds the
-policy and the resulting signals rather than any media. Retaining or
-examining the video itself would introduce data demands of its own ---
-storage, retention, and consent --- and is out of scope for this
-release.
+The server-scored browser-integrity policy under which an attempt is
+judged is \textit{frozen onto the attempt} when it begins: the signal
+weights and flag threshold cannot be changed by a later configuration
+edit. Interview delivery also uses a mandatory frontend-only local
+camera gate. It checks for an active video track and blocks the
+workspace when absent, but neither the interview configuration nor the
+session policy snapshot stores a camera requirement, and no camera
+media is uploaded or retained.
 
 The second is \textit{adversarial use of the model itself}. Learner
 input to the AI interviewer must be screened for prompt-injection

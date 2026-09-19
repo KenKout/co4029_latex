@@ -243,23 +243,35 @@ FR-4.20 & The system shall allow Teachers to require a camera for a quiz, in whi
 
 FR-5.1 & The system shall allow Teachers to define interview sections by specifying desired outcomes that students must demonstrate to pass, without requiring any expected or model answer. & Teachers, Educational Managers & UR-TCH-03 & Yes & Yes & High \\ \hline
 
-FR-5.2 & The system shall draft interview questions from ingested course content, associate each question with one or more desired outcomes, and allow Teachers to review, edit, approve, or reject them before publication. & Teachers, Educational Managers & UR-TCH-02 & Yes & Yes & High \\ \hline
+FR-5.2 & The system shall draft interview questions from ingested course content, may associate each question with at most one desired outcome, and shall allow Teachers to review, edit, approve, or reject generated questions before publication. & Teachers, Educational Managers & UR-TCH-02 & Yes & Yes & High \\ \hline
 
 FR-5.3 & The system shall allow Teachers to configure interview session rules, including maximum attempts, cooldown periods. & Teachers, Educational Managers & UR-TCH-03 & Yes & Yes & High \\ \hline
 
-FR-5.4 & The system shall allow Students to start mock interview sessions in text mode or voice mode as an adaptive turn-taking dialogue with an AI interviewer. & Students & UR-STU-02 & Yes & Yes & High \\ \hline
+FR-5.4 & The system shall allow Students to start mock interview sessions in a hybrid real-time room supporting typed and spoken turns; adaptive orchestration shall be enabled only by the applicable deployment and rollout controls. & Students & UR-STU-02 & Yes & Yes & High \\ \hline
 
-FR-5.5 & The system shall support voice-mode interview sessions through real-time audio streaming, speech-to-text transcription, and text-to-speech responses, while processing raw audio transiently without persistent archival. & Students & UR-STU-02 & Yes & Yes & High \\ \hline
+FR-5.5 & The system shall support spoken interview turns through real-time audio streaming, speech-to-text transcription, and text-to-speech responses. Audio recording shall be optional, require deployment enablement and affirmative consent, and follow configured retention and tombstone rules without being required to conduct the interview. & Students & UR-STU-02 & Yes & Yes & High \\ \hline
 
 FR-5.6 & The system shall persist the interview transcript and session metadata, and evaluate the student's responses against teacher-defined desired outcomes to produce a binary pass-or-fail verdict. & Students, Teachers & UR-STU-03, UR-TCH-03 & Yes & Yes & High \\ \hline
 
-FR-5.7 & The system shall expose only the binary pass-or-fail verdict to Students --- without per-outcome rubric scores --- while allowing Teachers to review the transcript and outcome-level assessment for remediation purposes. & Students, Teachers & UR-STU-03, UR-TCH-03 & Yes & Yes & High \\ \hline
+FR-5.7 & After successful evaluation, the system shall expose the binary pass-or-fail verdict together with qualitative remediation and a study plan to Students, while withholding numeric rubric scores, per-outcome verdicts, and internal reasoning; authorised Teachers may review the transcript and outcome-level assessment for remediation purposes. & Students, Teachers & UR-STU-03, UR-TCH-03 & Yes & Yes & High \\ \hline
 
 FR-5.8 & The system shall record interview session activity signals, such as browser focus changes, tab switching, full-screen status, and session events, to support post-session integrity review. & Students, Teachers & UR-STU-02, UR-TCH-03 & Yes & Yes & Medium \\ \hline
 
-FR-5.9 & The system shall maintain a course-scoped interview question bank in which one logical question carries sibling variants covering complementary interview angles, shall detect near-duplicate questions before they are added, and shall require Teacher approval of generated variants before they may be used in a published interview. & Teachers, Educational Managers & UR-TCH-02 & Yes & Yes & Medium \\ \hline
+FR-5.9 & The system shall maintain a course-scoped interview question bank in which one logical question may carry sibling variants covering complementary interview angles, shall provide advisory semantic duplicate checks for configuration questions and reject exact normalised duplicates within the relevant bank group or import scope, and shall require Teacher approval of generated variants before they may be used in a published interview. & Teachers, Educational Managers & UR-TCH-02 & Yes & Yes & Medium \\ \hline
 
-FR-5.10 & The system shall generate a gap report for a completed interview session summarising the observed discrepancies together with an actionable study plan of topics linked to the relevant lessons and suggested resources, shall withhold criterion-level scores and internal assessment rationale from the Student, and shall allow the Teacher to attach remediation notes. & Students, Teachers & UR-STU-03, UR-TCH-03 & Yes & Yes & Medium \\
+FR-5.10 & After successful asynchronous evaluation, the system shall generate a gap report for an interview session summarising observed discrepancies together with an actionable study plan of topics linked to relevant lessons and suggested resources, shall withhold criterion-level scores and internal assessment rationale from the Student, and shall allow the Teacher to attach remediation notes. Pending, recovery, or terminal evaluation failure shall expose no invented report or verdict. & Students, Teachers & UR-STU-03, UR-TCH-03 & Yes & Yes & Medium \\ \hline
+
+FR-5.11 & The system shall require a Student to complete resumable identity, audio, language, preparation, and readiness onboarding before assessed questioning, and shall start the assessment timer only after readiness confirmation. & Students & UR-STU-02 & Yes & Yes & High \\ \hline
+
+FR-5.12 & The system shall maintain at most one active interview session for a Student and interview configuration, shall resume that session after reload, resolve retried starts idempotently, and reject a response bound to a stale session question. & Students & UR-STU-02 & Yes & Yes & High \\ \hline
+
+FR-5.13 & The system shall allow Teachers to configure an optional interview time limit and shall enforce that limit server-side by terminalising an expired session and rejecting late responses. & Students, Teachers & UR-STU-02, UR-TCH-03 & Yes & Yes & High \\ \hline
+
+FR-5.14 & The system shall allow Teachers to configure the minimum satisfied outcomes for a pass, follow-up and hint limits, interviewer persona, and supported TTS voice settings; conduct and grading settings shall be frozen after publication. & Teachers & UR-TCH-03 & Yes & Yes & High \\ \hline
+
+FR-5.15 & The system shall capture recording consent before voice-room entry, continue the interview unrecorded when consent is declined, permit authorised Teachers to play available recordings through short-lived URLs, and delete expired recordings while retaining a retention tombstone. & Students, Teachers & UR-STU-02, UR-TCH-03 & Yes & Yes & Medium \\ \hline
+
+FR-5.16 & The client shall block the interview workspace while fullscreen is absent or the mandatory local camera track is inactive, disconnect the live room during the block, and shall not upload or retain camera video. & Students & UR-STU-02 & Yes & Yes & Medium \\ \hline
 
 \end{longtable}
 

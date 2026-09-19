@@ -372,34 +372,52 @@ TC-4.18.1 & FR-4.18 & System & A timed attempt reaches its deadline without the 
 TC-5.1.1 & FR-5.1 & System & Teacher defines desired interview outcomes without model answers & Interview section is saved with outcome-based assessment criteria & Publication is blocked if no desired outcomes are defined \\ \hline
 
 % --- FR-5.2: Interview Question Drafting and Review ---
-TC-5.2.1 & FR-5.2 & Integ-ration & Teacher drafts interview questions from ingested course content & Questions are associated with desired outcomes and enter teacher review & Questions not mapped to any desired outcome are flagged \\ \hline
+TC-5.2.1 & FR-5.2 & Integ-ration & Teacher drafts interview questions from ingested course content and optionally links one to an outcome & Generated questions enter teacher review; an unlinked question is reported as a readiness warning & A question cannot hold more than one linked outcome \\ \hline
 TC-5.2.2 & FR-5.2 & System & Teacher edits, approves, or rejects drafted interview questions & Reviewed question set is saved for publication & Students cannot access rejected or unpublished questions \\ \hline
 
 % --- FR-5.3: Interview Session Rules ---
-TC-5.3.1 & FR-5.3 & System & Teacher configures maximum attempts, cooldown, and quiz-progression lock & Interview rules are saved and enforced for student sessions & Invalid attempt limits or cooldown values are rejected \\ \hline
+TC-5.3.1 & FR-5.3 & System & Teacher configures maximum attempts and cooldown & Interview rules are saved and enforced for student sessions & Invalid attempt limits or cooldown values are rejected \\ \hline
 
-% --- FR-5.4: Text or Voice Mock Interview ---
-TC-5.4.1 & FR-5.4 & System & Eligible student starts a text-mode interview & AI interviewer begins adaptive turn-taking dialogue & Student is denied entry if interview prerequisites are not satisfied \\ \hline
-TC-5.4.2 & FR-5.4 & System & Eligible student starts a voice-mode interview & Voice-mode interview starts and supports turn-taking interaction & System falls back or shows guidance if microphone permission is denied \\ \hline
+% --- FR-5.4: Hybrid Mock Interview ---
+TC-5.4.1 & FR-5.4 & System & Eligible student starts a hybrid interview and submits a typed turn & The hybrid session starts and the typed turn is associated with its session question & Student is denied entry if interview prerequisites are not satisfied \\ \hline
+TC-5.4.2 & FR-5.4 & System & Eligible student enables microphone interaction where the voice runtime is deployed & The same hybrid room supports spoken turns when rollout controls permit & The client shows guidance while typed interaction remains available if microphone permission is denied \\ \hline
 
-% --- FR-5.5: Voice Mode Audio Processing ---
-TC-5.5.1 & FR-5.5 & Integ-ration & Student speaks during a voice-mode interview & Audio is streamed, transcribed, and used to generate spoken AI responses & Raw audio is not persistently archived after processing \\ \hline
+% --- FR-5.5: Spoken Turns and Optional Recording ---
+TC-5.5.1 & FR-5.5 & Integ-ration & Student speaks during an enabled hybrid interview and accepts or declines recording consent & Audio is streamed, transcribed, and used to generate spoken AI responses; recording begins only after affirmative consent & Declining consent or a recording-provider failure leaves the interview unrecorded and active \\ \hline
 
 % --- FR-5.6: Transcript and Binary Evaluation ---
-TC-5.6.1 & FR-5.6 & Integ-ration & Student completes an interview session & Transcript and metadata are persisted, and system produces a binary pass-or-fail verdict based on desired outcomes & Evaluation is not triggered for incomplete sessions \\ \hline
+TC-5.6.1 & FR-5.6 & Integ-ration & Student completes a gradeable interview session & Transcript and metadata are persisted and asynchronous evaluation produces a binary verdict from desired outcomes & Evaluation is not triggered for an abandoned pre-assessment session \\ \hline
 
 % --- FR-5.7: Student and Teacher Result Visibility ---
-TC-5.7.1 & FR-5.7 & System & Student opens completed interview result & Student sees only the binary pass-or-fail verdict & Per-outcome rubric scores are not exposed to the student \\ \hline
+TC-5.7.1 & FR-5.7 & System & Student opens a successfully evaluated interview result & Student sees pass/fail with qualitative remediation and study plan & Numeric rubric scores, per-outcome verdicts, and internal reasoning are not exposed \\ \hline
 TC-5.7.2 & FR-5.7 & System & Teacher opens a completed interview session & Teacher can review transcript and outcome-level assessment for remediation & Teacher access is denied for courses they do not manage \\ \hline
 
 % --- FR-5.8: Session Integrity Signals ---
-TC-5.8.1 & FR-5.8 & System & Student switches tabs, exits fullscreen, or changes browser focus during interview & System records session activity signals for post-session integrity review & Integrity signals do not directly expose private non-session content \\ \hline
+TC-5.8.1 & FR-5.8 & System & Student switches tabs, exits fullscreen, or changes browser focus during interview & System records session activity signals for post-session integrity review & Integrity signals do not directly expose private non-session content or automatically terminate the interview \\ \hline
 
 % --- FR-5.9: Interview Question Bank and Variants ---
-TC-5.9.1 & FR-5.9 & System & Teacher adds a question to the course interview bank that closely resembles an existing one, then generates sibling variants & Near-duplicates are detected before the question is added, sibling variants are grouped under one logical question covering complementary angles, and variants require Teacher approval before use & An unapproved variant is never served in a published interview \\ \hline
+TC-5.9.1 & FR-5.9 & System & Teacher checks a configuration question for semantic similarity and imports a bank group containing an exact duplicate prompt & Similarity is advisory for the configuration question, while an exact normalised duplicate in the relevant bank scope is rejected; generated variants require Teacher approval before use & An unapproved variant is never served in a published interview \\ \hline
 
 % --- FR-5.10: Interview Gap Report ---
-TC-5.10.1 & FR-5.10 & System & Student completes an interview session and both Student and Teacher open the resulting gap report & Report summarises observed discrepancies with an actionable study plan of topics linked to the relevant lessons and suggested resources, and the Teacher may attach remediation notes & Criterion-level scores and internal assessment rationale are withheld from the Student \\ \hline
+TC-5.10.1 & FR-5.10 & System & Student completes an interview session and both Student and Teacher open a successfully generated gap report & Report summarises observed discrepancies with an actionable study plan of topics linked to relevant lessons and suggested resources, and the Teacher may attach remediation notes & Criterion-level scores and internal assessment rationale are withheld from the Student \\ \hline
+
+% --- FR-5.11: Interview Onboarding ---
+TC-5.11.1 & FR-5.11 & Integ-ration & Student completes identity, audio, language, preparation, and readiness onboarding steps & Steps are persisted and resumable; the assessment timer begins only after readiness & An answer submitted before onboarding completes is rejected \\ \hline
+
+% --- FR-5.12: Active Session and Turn Idempotency ---
+TC-5.12.1 & FR-5.12 & Integ-ration & Student retries a lost session-start response, reloads, then submits a response for an earlier question after the session advanced & The same active session is resumed and the stale response is rejected without duplicating a turn & A second active session is not created for the same student and configuration \\ \hline
+
+% --- FR-5.13: Server-Authoritative Deadline ---
+TC-5.13.1 & FR-5.13 & Integ-ration & Teacher configures a time limit and student submits a response after expiry & Server terminalises the expired session and rejects the late response & An untimed session does not receive a deadline-based rejection \\ \hline
+
+% --- FR-5.14: Published Conduct and Pass Controls ---
+TC-5.14.1 & FR-5.14 & System & Teacher configures minimum outcomes, hints, follow-ups, persona, and TTS settings then publishes the interview & The configured values govern the session and protected conduct/grading fields are frozen after publication & A later edit to a frozen field is refused \\ \hline
+
+% --- FR-5.15: Recording Lifecycle ---
+TC-5.15.1 & FR-5.15 & Integ-ration & Student consents to recording, then an authorised Teacher requests playback after the recording completes and retention later expires & Playback uses a short-lived URL; expiration deletes media and preserves a tombstone & Declining consent permits the same interview without a recording \\ \hline
+
+% --- FR-5.16: Fullscreen and Local Camera Gate ---
+TC-5.16.1 & FR-5.16 & System & Student exits fullscreen or loses the mandatory local camera track during an interview & Workspace is blocked and the live room disconnects until the gate is restored & No camera video is uploaded or retained by the interview service \\ \hline
 
 \end{longtable}
 
@@ -664,11 +682,11 @@ Quiz generation completes within 5 minutes on average &
 Generation failure is logged and the teacher can retry \\ \hline
 
 TC-NFR-1.3 & NFR-1.3 & Perform-ance &
-Teacher generates an interview question bank for a lesson
-with defined target outcomes &
-Question bank generation completes within 15 minutes and
-produces at least 20 candidate questions covering all
-defined outcomes &
+Teacher requests interview generation for a selected source scope,
+outcomes, and a count between 1 and 50 &
+The request validates the supported count range and records the
+generation run; measured performance and coverage evidence are
+reported separately &
 Missing or invalid target outcomes prevent generation \\ \hline
 
 TC-NFR-1.4 & NFR-1.4 & Perform-ance &
