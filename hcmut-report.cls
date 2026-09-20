@@ -73,7 +73,7 @@
   right=2.5cm,
   vmargin=2cm,
   includeheadfoot=true,
-  headheight=35pt
+  headheight=44pt
 }
 
 \onehalfspacing
