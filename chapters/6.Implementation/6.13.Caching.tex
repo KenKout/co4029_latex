@@ -1,0 +1,33 @@
+\subsection{Caching}
+\label{sec:impl_caching}
+
+Redis carries three unrelated responsibilities in this system, and keeping them distinct matters: an application read cache, a small amount of ephemeral runtime state, and the \texttt{arq} job queue. Only the first is a cache in the sense of this section. Cache keys are declared centrally in \path{core/cache/keys.py} --- pattern, TTL and purpose in one place --- so no call site hard-codes a key string, and the declaration is what the invalidation listener reads when a write lands.
+
+Table~\ref{tab:cache_keys} lists the active namespaces.
+
+\begin{table}[H]
+\centering
+\caption{Redis cache namespaces: key pattern, time-to-live, and what each entry saves.}
+\label{tab:cache_keys}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{|>{\raggedright\arraybackslash}m{0.30\textwidth}|c|>{\raggedright\arraybackslash}m{0.44\textwidth}|}
+\hline
+\textbf{Key pattern} & \textbf{TTL} & \textbf{Purpose} \\ \hline
+\path|course_content:published:{course_id}| & 300\,s & The published curriculum tree a learner opens a course to. Shared by every learner on the course; a miss rebuilds it from six batch queries. \\ \hline
+\path|lesson_unlock:{student_id}:{lesson_id}| & 60\,s & Verdict of the unlock gate, whose prerequisite traversal is recursive and re-evaluated on every read that needs it. \\ \hline
+\path|cards_due:{user_id}:...| & 60\,s & One page of the due-card queue. The suffix carries the lesson, course, cursor and limit, so invalidation clears the whole prefix. \\ \hline
+\path|kr:{user_id}:{lesson_id}| & 300\,s & Knowledge-retention estimate $\hat{R}_{s,\ell}$; drifts slowly but is read on every dashboard load. \\ \hline
+\path|compliance:{user_id}:{lesson_id}| & 3600\,s & Review compliance rate. The heaviest of the metric queries and the slowest-changing. \\ \hline
+\path|material:ingest:progress:{material_version_id}| & 3600\,s & Live ingest progress. Written outside the ingest transaction so the teacher sees movement before it commits; PostgreSQL stays authoritative. \\ \hline
+\path|quiz_attempt_session:{attempt_id}| & 90\,s, renewed & Which browser session owns a live quiz attempt. Security-sensitive, so it fails closed rather than open. \\ \hline
+\end{tabular}
+\end{table}
+
+\paragraph{Invalidation}
+TTL is the safety net, not the mechanism. A SQLAlchemy listener maps each written table to the keys it invalidates and issues the deletions itself, so a review that crosses an unlock threshold is visible on the learner's next read rather than up to a minute later. Two details make that work in practice. Keys whose live entries carry suffixes beyond the declared pattern --- the due-card pages --- are cleared by prefix rather than by exact match, or every real key would survive the delete. And the shared course-content key is deleted twice: once at flush, and again after the transaction commits, because between those two moments a concurrent reader can refill it from the pre-write snapshot and pin that stale tree for the full TTL, for everyone on the course.
+
+\paragraph{Failure policy}
+Every read through the cache falls back to PostgreSQL, and every failure to write one is logged and dropped. A dead Redis therefore costs latency and nothing else --- no request fails because a cache entry could not be read or stored. The one deliberate exception is quiz-attempt ownership, which is an authorisation decision rather than a cache: when Redis cannot evaluate the atomic claim, the answer is no.
+
+\paragraph{What is not cached}
+Permissions, authentication principals, presigned URLs and knowledge-graph projections all have declared key namespaces that are not wired into the read path. Declaring a key is not the same as having a cache: each of these needs an invalidation story that is provably complete before it can be turned on, and for permissions and sessions the cost of being wrong is stale access rather than a stale page. They are left inactive deliberately, since an additional database query is cheaper than a revoked permission that keeps working.

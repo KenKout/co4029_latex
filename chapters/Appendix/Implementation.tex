@@ -1,7 +1,7 @@
 ﻿\section{Implementation Details}
 \label{appendix:implementation}
 
-This appendix carries the material that Chapter~\ref{sec:implementation} states only in summary: the full lifecycle vocabulary the system enforces, the cross-cutting conventions every feature package observes, the end-to-end path a learner takes through those packages, and the per-case detail behind the reported test results.
+This appendix carries the material that Chapter~\ref{sec:implementation} states only in summary: the full lifecycle vocabulary the system enforces, the cross-cutting conventions every feature package observes, the end-to-end path a learner takes through those packages, the two subsystems built entirely to established patterns, and the per-case detail behind the reported test results.
 
 \subsection{Entity lifecycle reference}
 
@@ -83,6 +83,23 @@ They differ in how failure is handled, and the differences are deliberate rather
 The deployed system is a single-page application served to the browser, a FastAPI service handling requests, and a worker pool consuming the job queue, over four stores: PostgreSQL with \texttt{pgvector} for relational and vector data, Redis for caching, rate limiting and the queue itself, an S3-compatible object store for uploaded media, and Neo4j for the course knowledge graph. External model providers sit outside all of it, reached only through the LLM gateway.
 
 Two boundaries in that picture carry more weight than the rest. The first is the trust boundary crossed by learner-supplied content: uploaded material and interview utterances originate outside the system and are treated as untrusted wherever they meet a model prompt, which is what the interview input and output guards exist to enforce. The second is the object store path: clients upload and download through presigned URLs issued by the API rather than streaming bytes through it, so the API handles the authorisation decision while the store handles the transfer. That split is why material size is bounded by storage policy rather than by request timeouts.
+
+\subsection*{Subsystems built to established patterns}
+
+The two subsystems below are documented here rather than in
+Chapter~\ref{sec:implementation} because neither is novel. OAuth~2.0 sign-in
+with rotating refresh tokens, TOTP second factors, category-scoped
+notification preferences and threaded comments are well-established patterns,
+implemented here as the literature and the relevant standards prescribe. They
+are recorded in full because the system depends on them and because a few of
+the decisions taken within them --- the invite-only pre-registration gate on
+OAuth, the keyed MAC over refresh tokens, and the rule that a notification
+failure never rolls back the academic record that triggered it --- are specific
+to this platform rather than inherited from the pattern.
+
+\input{chapters/Appendix/Implementation-Identity}
+
+\input{chapters/Appendix/Implementation-Notifications}
 
 \subsection{Test execution detail}
 

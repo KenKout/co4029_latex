@@ -1,9 +1,11 @@
 \subsection{Database Design}
+\label{sec:database-design}
 
-This section presents the database design of aBridgeAI through three views: the Entity-Relationship Diagram, the logical design, and the physical design. Together, these views describe how system data is structured, related, and implemented.
+This section presents the Entity-Relationship Diagram of the main database --- the structure every feature reads and writes. The logical and physical designs derived from it, which restate the same structure at the level of relations and of storage, are given in Appendix~\ref{appendix:database-design}.
+
 \subsubsection{Entity-Relationship Diagram}
 
-The database schema is presented first as an overall map, then through focused diagrams for the quiz, interview, and remaining cross-domain entities. Splitting the ERD makes the primary keys, foreign keys, and domain-specific relationships readable without losing the overall context.
+The schema is presented first as an overall map, then through focused diagrams for the quiz, interview, and remaining cross-domain entities. Splitting the ERD makes the primary keys, foreign keys, and domain-specific relationships readable without losing the overall context.
 
 \begin{figure}[H]
     \centering
@@ -31,25 +33,4 @@ The database schema is presented first as an overall map, then through focused d
     \includegraphics[width=\textwidth]{graphics/db-diagrams/ERD-Others.png}
     \caption{Entity-Relationship Diagram: Remaining Cross-Domain Entities}
     \label{fig:erd-others}
-\end{figure}
-
-\subsubsection{Logical Database Design}
-
-
-\begin{figure}[H]
-    \centering
-    % Replace with logical database design image
-    \includegraphics[width=\textwidth]{graphics/db-diagrams/LOGICAL_DESIGN.png}
-    \caption{Logical Database Design}
-    \label{fig:logical-db-design}
-\end{figure}
-
-\subsubsection{Physical Database Design}
-
-\begin{figure}[H]
-    \centering
-    % Replace with physical database design image
-    \includegraphics[width=\textwidth]{graphics/db-diagrams/PHYSICAL_DESIGN.pdf}
-    \caption{Physical Database Design}
-    \label{fig:physical-db-design}
 \end{figure}
