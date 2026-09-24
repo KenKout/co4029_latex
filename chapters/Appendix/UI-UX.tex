@@ -293,6 +293,18 @@ The quiz editor (\path|/teacher/courses/$courseId/quizzes/$quizId|) is structure
 
 The \textbf{Open generator} button on the quiz editor opens a modal that drives the AI quiz pipeline. The instructor selects one or more source lessons (only lessons whose materials have been processed are eligible), the desired number of questions, the difficulty band, and the question types (Multiple choice, True/False, Short answer, Fill in the blank). A generation-mode selector trades off two strategies: \textit{Topic} produces a balanced spread across all selected lessons, while \textit{Coverage} guarantees at least one question per section. An existing-questions selector decides between \textit{Replace} (wipe and regenerate) and \textit{Append} (add to the current bank). An advanced personalisation block, collapsed by default, exposes per-attempt prompt controls. Generated questions land in the editor in a \textit{Pending Review} state and only become visible to students after explicit instructor approval.
 
+% ── Manager ─────────────────────────────────────────────────
+\paragraph{Manager Dashboard}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{graphics/screenshots/manager_dashboard.png}
+  \caption{Manager Dashboard --- Management overview with curriculum health stats, unpublishable courses, and programs needing attention.}
+  \label{fig:manager_dashboard}
+\end{figure}
+
+The manager dashboard (\path|/manager|) is the operational hub for curriculum coordinators. Four stat cards summarise the health of the course catalogue --- Cannot Publish (courses lacking gradeable content), Draft Courses, Learning Programs, and Path Changes to Review. Below the cards, the left column lists courses that cannot be published with their blocking reasons (e.g.\ ``No gradeable content (no published lesson, quiz or interview)'', ``No learning outcomes''), unit count, outcome count, and assigned teachers. The right column surfaces learning programs and career paths that need attention, flagging unpublished draft versions and pending stage configurations. The layout prioritises actionable items so that managers can triage curriculum quality without navigating into individual course or path editors.
+
 % ── Administrator ───────────────────────────────────────────
 \paragraph{Processing Queue}
 
