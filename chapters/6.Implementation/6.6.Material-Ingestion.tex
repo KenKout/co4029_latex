@@ -1,7 +1,7 @@
 \subsection{Material Ingestion Pipeline}
 \label{sec:impl_ingestion}
 
-When an instructor uploads a learning material, the file is stored in Garage S3-compatible object storage and a background worker triggers the ingestion pipeline implemented in \path{abridgeai/features/materials/ingestion/pipeline.py}. The pipeline transforms raw files into searchable, embeddable document chunks in five sequential stages.
+When an instructor uploads a learning material, the file is stored in Garage S3-compatible object storage and a background worker triggers the ingestion pipeline implemented in \path{abridgeai/features/materials/ingestion/pipeline.py}. The pipeline transforms raw files into searchable, embeddable document chunks in five sequential stages. The stages below describe what each one does; Figure~\ref{fig:material_ingestion_flow} in Appendix~\ref{appendix:algorithm} shows how they are strung together with the upload that precedes them and the teacher curation that follows, including the failure paths that no single stage owns.
 
 \paragraph{Stage 1 — Extraction}
 The \path{dispatch_extractor(mime)} factory selects the appropriate extractor based on the file's MIME type. The extraction registry supports PDF, DOCX, PPTX, HTML, plain text, source code, images, audio, and video. Each extractor implements the \texttt{BaseExtractor} interface and returns an \texttt{ExtractedContent} object carrying the raw text and a \texttt{source\_type} tag. Audio and video files are transcribed using a speech-to-text model before text extraction proceeds.

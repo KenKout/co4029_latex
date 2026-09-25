@@ -32,7 +32,7 @@ When \texttt{mmr\_enabled} is true, Maximal Marginal Relevance~\cite{carbonell19
 \subsubsection{Quiz Generation Pipeline}
 \label{sec:impl_quiz_pipeline}
 
-The full quiz generation pipeline (\path{features/quizzes/ai/pipelines/full.py}) executes six stages in sequence:
+The full quiz generation pipeline (\path{features/quizzes/ai/pipelines/full.py}) executes six stages in sequence. Figure~\ref{fig:quiz_generation_flow} in Appendix~\ref{appendix:algorithm} places these stages in the wider request they serve --- the synchronous dispatch that returns before any of them run, the durable run row they report against, and the poll by which the teacher's browser learns the outcome.
 
 \begin{enumerate}
     \item \textbf{Retrieval} — hybrid retrieval as described above, returning the top-$N$ fused chunks plus optional knowledge graph context.

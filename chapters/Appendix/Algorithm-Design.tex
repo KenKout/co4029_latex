@@ -1,13 +1,19 @@
-\section{Algorithm Specification}
+\section{Algorithm and Process Flow Specifications}
 \label{appendix:algorithm}
 % Retains the original section label so every \ref{sec:system_sm2} elsewhere in
 % the report now resolves to this appendix rather than breaking.
 \label{sec:system_sm2}
 
-This appendix carries the two algorithm specifications the body of the report
-states only in summary. The first is the spaced-repetition scheduling model,
-given here in full; the second is the flow of the career-pathway stage
-evaluation whose rules are specified in Section~\ref{sec:pathway_completion}.
+This appendix carries the specification of the spaced-repetition scheduling
+model, which the body of the report states only in summary, together with the
+flow diagrams for those processes whose control flow is difficult to follow
+from prose alone. A flow earns a diagram here on one criterion: that its shape
+is unusual enough that a linear description of it misleads. Each of the four
+--- card review scheduling, career-pathway stage evaluation, material
+ingestion, and quiz generation --- crosses several processes, branches on
+conditions that are not obvious from the endpoint that starts it, and has at
+least one path that exists only to handle a failure. The diagrams show the
+branches and the failure paths together, which prose in sequence cannot.
 
 \subsection*{Spaced repetition: why this is an appendix}
 
@@ -297,4 +303,62 @@ why the pass runs forward and only once.
     \includegraphics[width=\textwidth]{graphics/act-diagrams/stage_evaluation_flow.png}
     \caption{Career pathway stage evaluation: from pinned version to per-stage completion, unlock, and overall progress.}
     \label{fig:stage_evaluation_flow}
+\end{figure}
+
+
+\subsection{Material Ingestion}
+\label{appendix:ingestion-flow}
+
+The implementation is described in Section~\ref{sec:impl_ingestion}.
+Figure~\ref{fig:material_ingestion_flow} traces one uploaded document from the
+teacher's file picker to the knowledge graph a learner eventually reads,
+across the three processes that carry it.
+
+Three properties of this flow are the reason it is drawn rather than only
+described. The bytes never pass through the API: the browser uploads directly
+to object storage against a presigned session, and the API's job afterwards is
+to verify that what was promised actually arrived --- which is why a
+\texttt{HEAD} check for a phantom or truncated object appears as a rejection
+path with no counterpart anywhere else in the system. The work then leaves the
+request entirely, so every stage after the enqueue runs in a worker whose
+failure is recorded against the material version rather than returned to
+anyone. And the last lane is not automatic at all: the AI-extracted graph is a
+\emph{seed} for a teacher to curate, publishing is blocked until they do, and
+an unavailable graph yields an in-memory placeholder rather than an empty one
+--- a distinction with no visible difference until the teacher tries to
+publish.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/act-diagrams/material_ingestion_flow.png}
+    \caption{Material ingestion: upload and scheduling, worker extraction and indexing, and teacher curation of the knowledge graph.}
+    \label{fig:material_ingestion_flow}
+\end{figure}
+
+\subsection{Quiz Generation}
+\label{appendix:quiz-generation-flow}
+
+The implementation is described in Section~\ref{sec:impl_quiz_pipeline}.
+Figure~\ref{fig:quiz_generation_flow} traces a generation request from the
+teacher's click to the questions that land in their review queue.
+
+What the diagram makes visible is that the HTTP request and the work it asks
+for are two different things with two different lifetimes. The endpoint
+validates, guards, creates a durable run row, enqueues, and returns
+\texttt{202} --- at which point the request is over and nothing has been
+generated. Everything of substance happens afterwards in a worker, and the
+client learns of it only by polling the run it was handed. The consequences of
+that split are what the remaining branches encode: a run orphaned by a worker
+crash is recovered by a separate sweep rather than by the caller; progress is
+checkpointed on its own short-lived database session so a report of progress
+survives a pipeline transaction that later rolls back; and the two generation
+modes diverge into genuinely different pipelines, topic mode over-generating
+to absorb the losses that validation and de-duplication will inflict, coverage
+mode budgeting per outline section before it generates anything at all.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/act-diagrams/quiz_generation_flow.png}
+    \caption{Quiz generation: synchronous validation and dispatch, the durable generation run, the topic and coverage pipelines, and the terminal poll.}
+    \label{fig:quiz_generation_flow}
 \end{figure}
