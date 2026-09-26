@@ -8,16 +8,16 @@ and database infrastructure.
 
 The sequence diagrams focus on the core workflows
 of the aBridgeAI platform, including authentication,
-smart content ingestion, Human-in-the-Loop quiz
-generation, and context-aware mock interview sessions.
-These diagrams emphasize asynchronous processing,
+smart content ingestion, and Human-in-the-Loop quiz
+generation. These diagrams emphasize asynchronous processing,
 AI integration, and communication across the hybrid
 system architecture.
 
 Reproducing a representative subset here would duplicate the appendix without
 adding to the argument, since each diagram is only legible at full width and
-each carries the same weight as the others. The complete set --- authentication,
-smart content ingestion, Human-in-the-Loop quiz generation, and the three
-phases of a mock interview session --- is therefore presented together in
-Appendix~\ref{appendix:sequence-diagrams}, where the interactions can be read
-in sequence rather than sampled.
+each carries the same weight as the others. The retained rendered diagrams ---
+authentication, smart content ingestion, and Human-in-the-Loop quiz generation ---
+are presented in Appendix~\ref{appendix:sequence-diagrams}. The mock-interview
+raster sequence was replaced with a code-backed native textual trace in that
+appendix because its former routed/Qdrant narrative no longer represents the
+deployed runtime; Section~\ref{sec:impl_interviews} provides the full implementation detail.

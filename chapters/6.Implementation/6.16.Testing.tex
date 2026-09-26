@@ -1,40 +1,27 @@
-﻿\subsection{Testing}
+\subsection{Testing}
 \label{sec:impl_testing}
 
-This section presents the test execution results for the implemented modules of the first iteration. The backend test suite uses \path{pytest} with \texttt{asyncio\_mode = "auto"} for native async test support, running against a real PostgreSQL database in integration mode. Tests are organised into unit tests (pure function isolation) and integration tests (full request--response cycles).
+The backend uses \path{pytest}. Asynchronous tests are supported through \texttt{asyncio\_mode = "auto"}; the test root is \path{tests/}. The default suite measures branch coverage for the \path{abridgeai} package, requires at least 75\% coverage, and excludes tests marked \texttt{destructive} or \texttt{voice\_live}. This section documents the implemented test strategy and coverage boundaries rather than reporting an unsupported historical pass-count total.
 
-Table~\ref{tab:test_result_summary} summarises the test execution results for the modules delivered in this iteration. The individual cases behind these totals --- each with its scenario, expected result, and outcome --- are listed in Appendix~\ref{appendix:implementation}.
+\subsubsection{Native Interview Test Coverage}
 
-\begin{table}[htbp]
-\centering
-\caption{Test Execution Summary by Module (Iteration 1)}
-\label{tab:test_result_summary}
-\renewcommand{\arraystretch}{1.3}
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{Module} & \textbf{Test Cases} & \textbf{Passed} & \textbf{Result} \\
-\hline
-Authentication \& Access Control & 8 & 8 & \textbf{Pass} \\
-Course \& Material Management    & 5 & 5 & \textbf{Pass} \\
-Quiz Generation \& Taking        & 4 & 4 & \textbf{Pass} \\
-\hline
-\textbf{Total}                   & \textbf{17} & \textbf{17} & \textbf{100\%} \\
-\hline
-\end{tabular}
-\end{table}
+The native interview runtime is tested at both deterministic and database-backed boundaries. Unit tests verify feature-flag routing, native-agent tool exposure, persistent conversational-state preparation, server-controlled state notes, answer grading, transcript persistence, typed-input processing, resume behavior, and hard-stop termination. Representative modules are \path{tests/unit/test\_interview\_native\_agent.py}, \path{tests/unit/test\_interview\_native\_scenarios.py}, \path{tests/unit/test\_interview\_native\_grading.py}, \path{tests/unit/test\_interview\_native\_transcript.py}, \path{tests/unit/test\_interview\_native\_text\_input.py}, and \path{tests/unit/test\_interview\_native\_resume\_and\_hard\_stop.py}.
 
-% ------------------------------------------------------------------
-% ------------------------------------------------------------------
-\subsubsection{CI Pipeline}
+These tests focus on the native authority boundary: the conversational LLM may generate phrasing, but server code retains question selection, runtime-state persistence, hint and follow-up limits, progression, and terminal submission. They also verify that typed turns use receipt-based idempotency while spoken recognition remains a best-effort media path rather than an exactly-once transport.
+
+Database-backed integration tests exercise native seams that cannot be established by isolated unit tests. \path{tests/integration/test\_interview\_typed\_turn\_receipt.py} verifies receipt durability, idempotency, question linkage, and compare-and-set behavior; \path{tests/integration/test\_interview\_late\_fold\_reeval.py} verifies reevaluation when a receipt lands after an earlier verdict; and \path{tests/integration/test\_interview\_finish\_race.py} verifies concurrent learner finish and native hard-stop terminalization. Together, these tests validate the persistence and race-safety properties described in Section~\ref{sec:impl_interviews}.
+
+\subsubsection{Continuous Integration and Live Voice Boundary}
 \label{sec:impl_ci}
 
-The GitHub Actions workflow (\texttt{.github/workflows/backend-new-ci.yml}) runs the following jobs on every pull request:
+The normal test command is \texttt{uv run pytest}. In continuous integration, migrations are applied before one complete coverage run:
 
-\begin{enumerate}
-    \item \textbf{Lint} — \texttt{ruff check}, \texttt{ruff format --check}, \texttt{mypy abridgeai}, \texttt{bandit -r abridgeai/}.
-    \item \textbf{Secret scan} — \texttt{gitleaks detect} with the project's custom ruleset covering OpenAI, Anthropic, and Garage S3 key patterns.
-    \item \textbf{Unit tests} — \path{pytest tests/unit/} with coverage reporting.
-    \item \textbf{Integration tests} — \path{pytest tests/integration/} against a PostgreSQL service container spun up by the workflow.
-\end{enumerate}
+\begin{verbatim}
+uv run alembic upgrade head
+uv run pytest --cov=abridgeai --cov-report=xml \
+  --cov-report=term-missing --cov-fail-under=75
+\end{verbatim}
 
-All pull requests must pass all four stages before merge is permitted. Live infrastructure tests (S3, Neo4j, audio, video) are gated behind pytest markers and excluded from the default CI run to keep pipeline duration manageable.
+The CI environment provides PostgreSQL and Redis service containers. Its quality gates are linting, security scanning, and the test job; the test job does not claim to execute paid or credentialed voice infrastructure. The configured default marker expression excludes \texttt{destructive} and \texttt{voice\_live} tests.
+
+A separate opt-in harness, \path{tests/integration/test\_voice\_live\_harness.py}, drives English and Vietnamese LiveKit voice scenarios. It requires \texttt{RUN\_LIVEKIT\_VOICE\_TESTS=1}, LiveKit credentials, and an LLM endpoint credential; it checks audible agent output, persisted turns, and cleanup. Because this harness consumes external real-time services, it is intentionally excluded from the ordinary CI suite. This distinction ensures that deterministic state and persistence behavior is continuously verified while live STT/TTS/WebRTC validation remains an explicit operational test.

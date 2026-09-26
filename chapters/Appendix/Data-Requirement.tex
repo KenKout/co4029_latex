@@ -365,11 +365,11 @@ additionally maintained in a course-scoped bank in which one logical
 question may carry sibling variants that probe the same outcome from
 different angles, with semantic duplicate detection over the bank.
 
-The system must capture teacher-defined interview configuration 
+The system must capture teacher-defined interview configuration
 parameters including the maximum number of attempts permitted per
 student, the minimum number of outcomes that must be satisfied for a
 pass verdict, cooldown and time-limit rules, and any supplementary
-instructions provided to the AI assessment model.
+instructions provided to the AI assessment model. An interview configuration is course-scoped; it may be surfaced within a module's ordered learning journey but is not owned by a lesson or module record.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \subsection{Student Interview Sessions}
@@ -397,13 +397,18 @@ remediation and a study plan, while withholding numeric rubric scores,
 per-outcome verdicts, and internal reasoning.
 
 The system must additionally maintain the \textit{runtime state} of an
-in-progress adaptive interview as a durable record rather than in
-memory alone: the current phase, per-outcome coverage, the ledgers of
-questions asked, skipped, and completed, follow-up counters, and the
-most recent answer analysis. This record must carry a monotonic
-version counter so that a retried or duplicated client message
-carrying stale state is rejected and the interview cannot be advanced
-twice.
+in-progress native interview as a durable record rather than in
+memory alone: the current question and phase, provisional per-outcome
+coverage, the ledgers of questions asked and skipped, follow-up and
+hint counters, and the most recent runtime analysis. This record
+carries a monotonic version counter. Typed turns additionally have a
+durable receipt and idempotency key, so a retransmission can be
+acknowledged without applying a second fold. Transcript rows retain
+the question linkage needed by later reconciliation and terminal
+evaluation. The native conversational context itself is ephemeral;
+PostgreSQL runtime state and messages remain the authority. Provisional
+coverage is later reconciled and is distinct from the final outcome
+verdict and pass decision.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \subsection{Assessment Integrity and AI Safety}

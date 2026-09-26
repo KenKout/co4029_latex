@@ -960,7 +960,7 @@ $\bullet$ A timed attempt is finalised even when the Student never submits it. \
 \textbf{Use Case ID} & \textbf{UC-INTERVIEW-01} \\ \hline
 \textbf{Use Case Name} & \textbf{Configure Mock Interview} \\ \hline
 \textbf{Actors} & Teacher, Educational Manager \\ \hline
-\textbf{Related Requirements} & FR-5.1, FR-5.2, FR-5.3 \\ \hline
+\textbf{Related Requirements} & FR-5.1, FR-5.2, FR-5.3, FR-5.14 \\ \hline
 \textbf{Description} & Allows Teachers to define desired interview outcomes, generate and review interview questions, and configure interview session rules. \\ \hline
 \textbf{Pre-conditions} & The actor has authoring permission for the course or module. \\ \hline
 \textbf{Post-conditions} & The interview configuration, desired outcomes, reviewed questions, and session rules are saved. \\ \hline
@@ -971,8 +971,8 @@ $\bullet$ A timed attempt is finalised even when the Student never submits it. \
 4. The Teacher drafts interview questions from ingested course content or creates them manually. \newline
 5. The system may associate each question with one desired outcome and reports unlinked questions as readiness warnings. \newline
 6. The Teacher reviews, edits, approves, or rejects drafted questions. \newline
-7. The Teacher configures session rules, including maximum attempts, cooldown periods, and whether related quiz progression remains locked until the interview is passed. \newline
-8. The system saves the interview configuration for publication. \\ \hline
+7. The Teacher configures session rules, including maximum attempts, cooldown periods, outcome threshold, follow-up and hint limits, interviewer persona, and supported TTS settings. \newline
+8. The system freezes conduct and grading controls when the configuration is published. \\ \hline
 \textbf{Alternative Flows} &
 \textbf{2a. No desired outcomes defined:} \newline
 \hspace*{1em}1. The system blocks interview publication. \newline
@@ -1004,27 +1004,35 @@ $\bullet$ A timed attempt is finalised even when the Student never submits it. \
 \textbf{Use Case ID} & \textbf{UC-INTERVIEW-02} \\ \hline
 \textbf{Use Case Name} & \textbf{Take Mock Interview} \\ \hline
 \textbf{Actors} & Student \\ \hline
-\textbf{Related Requirements} & FR-5.4, FR-5.5, FR-5.6, FR-5.8 \\ \hline
-\textbf{Description} & Allows Students to participate in unified hybrid mock interview sessions supporting typed and spoken turns, while the system records transcript, metadata, and session activity signals. Adaptive sequencing and follow-ups apply only when the relevant rollout flags are enabled; otherwise the session uses the established legacy progression path. \\ \hline
+\textbf{Related Requirements} & FR-5.4, FR-5.5, FR-5.6, FR-5.8, FR-5.11, FR-5.12, FR-5.13, FR-5.15, FR-5.16 \\ \hline
+\textbf{Description} & Allows Students to participate in unified hybrid mock interview sessions supporting typed and spoken turns. The deployed native LiveKit worker maintains conversational context while server-side state, selectors, and tool gates control progression; the routed runtime remains a rollback path. The system records transcript, metadata, and session activity signals. \\ \hline
 \textbf{Pre-conditions} & The Student is authenticated, enrolled, and eligible to access the interview. \\ \hline
 \textbf{Post-conditions} & The interview transcript, session metadata, and activity signals are persisted for evaluation and review. \\ \hline
 \textbf{Main Flow} &
-1. The Student selects an available mock interview. \newline
-2. The system starts a hybrid room that supports typed turns and optional microphone interaction. \newline
-3. The system applies adaptive sequencing and follow-ups only when the relevant rollout flags are enabled; otherwise it uses the legacy progression path. \newline
-4. The AI interviewer presents a question. \newline
+1. The Student selects an available mock interview and completes resumable onboarding. \newline
+2. The system may open a warm LiveKit room during onboarding, but dispatches the interviewer only after readiness. \newline
+3. The system starts one hybrid room supporting typed turns and optional microphone interaction. \newline
+4. The native worker loads persisted runtime state and the approved question bank, then the AI interviewer presents the server-selected question. \newline
 5. The Student responds by typing or speaking. \newline
-6. When spoken interaction is available, the runtime streams audio, transcribes speech, and generates text-to-speech responses. \newline
-7. Voice-answer media may be linked to stored audio; optional whole-session recording requires current-policy consent and deployment enablement, and a recording failure does not interrupt the interview. \newline
-8. The interview continues until the session is completed. \newline
-9. The system persists the interview transcript and session metadata. \newline
-10. The system records browser activity signals such as focus changes, tab switching, full-screen status, and session events for review. \\ \hline
+6. Spoken audio is transcribed after turn detection; typed input is stored as an idempotent receipt before acknowledgement. \newline
+7. The server folds the answer into provisional state, advances or bounds follow-up according to policy, then the conversational model generates the response and text-to-speech audio. \newline
+8. Voice-answer media may be linked to stored audio; optional whole-session recording requires current-policy consent and deployment enablement, and a recording failure does not interrupt the interview. \newline
+9. The interview continues until one finalization path completes the session. \newline
+10. The system persists transcript and session metadata, queues deferred reconciliation where applicable, and records browser activity signals for review. \\ \hline
 \textbf{Alternative Flows} &
 \textbf{1a. Student is not eligible:} \newline
 \hspace*{1em}1. The system denies access to the interview. \newline
 \hspace*{1em}2. The Student is shown the unmet requirement. \newline
-\textbf{2a. Microphone permission denied:} \newline
+\textbf{1a. Onboarding is incomplete:} \newline
+\hspace*{1em}1. The system preserves onboarding progress but withholds assessed questioning, native dispatch, and timer start until readiness. \newline
+\textbf{2a. Dispatch or reconnect fails:} \newline
+\hspace*{1em}1. The client surfaces recovery guidance; on rejoin the native worker republishes a snapshot and re-reads the current question. \newline
+\textbf{3a. Microphone permission denied:} \newline
 \hspace*{1em}1. The system shows guidance; typed interaction remains available in the hybrid session. \newline
+\textbf{6a. Typed turn is retransmitted or targets a stale question:} \newline
+\hspace*{1em}1. The receipt idempotency key prevents a duplicate state fold; a stale question binding is rejected and the current snapshot is returned. \newline
+\textbf{9a. Server deadline is reached:} \newline
+\hspace*{1em}1. The finalization path terminalizes the session and rejects late turns. \newline
 \textbf{10a. Integrity signal detected:} \newline
 \hspace*{1em}1. The system records the event for post-session human review; it does not by itself prove misconduct or terminate the interview. \\
 \end{longtable}
@@ -1163,8 +1171,8 @@ $\bullet$ Teacher notes are recorded against the report. \\ \hline
 \textbf{Alternative Flows} &
 \textbf{3a. The course does not support a topic that would otherwise be suggested:} \newline
 \hspace*{1em}1. The system omits the suggestion rather than inventing coverage the course does not have. \newline
-\textbf{2a. No gap report has been generated:} \newline
-\hspace*{1em}1. The system presents the verdict alone. \newline
+\textbf{2a. Evaluation is pending, recovering, or terminally failed:} \newline
+\hspace*{1em}1. The system presents a processing or unavailable state and exposes neither an invented verdict nor a gap report. \newline
 \textbf{4a. Student attempts to view criterion-level detail:} \newline
 \hspace*{1em}1. The system withholds it, exposing only the verdict and the qualitative remediation. \\
 \end{longtable}

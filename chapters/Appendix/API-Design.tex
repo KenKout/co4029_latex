@@ -471,10 +471,17 @@ Quiz authoring follows a draft / generate / review / publish pipeline. \path|POS
     POST   & \path|/teacher/interview-configs/{config_id}/outcomes|                                 & Bearer + teacher & Add a desired outcome. \\ \hline
     PATCH  & \path|/teacher/interview-configs/{config_id}/outcomes/{outcome_id}|                    & Bearer + teacher & Update an outcome. \\ \hline
     GET    & \path|/teacher/interview-sessions/{session_id}/gap-report|                             & Bearer + teacher & Per-student gap report (instructor view). \\ \hline
+    GET    & \path|/teacher/interview-sessions/{session_id}/recording|                              & Bearer + teacher & Short-lived playback URL or recording availability state; consent alone does not guarantee media exists. \\ \hline
     GET    & \path|/interview-configs/{config_id}|                                                  & Bearer & Learner-facing config view. \\ \hline
-    POST   & \path|/interview-configs/{config_id}/sessions|                                         & Bearer & Start an interview session. \\ \hline
-    GET    & \path|/interview-sessions/{session_id}|                                                & Bearer & Get session state. \\ \hline
-    POST   & \path|/interview-sessions/{session_id}/respond|                                        & Bearer & Submit a response to the current question. \\ \hline
+    POST   & \path|/interview-configs/{config_id}/sessions|                                         & Bearer & Start or resume an interview session. \\ \hline
+    GET    & \path|/interview-sessions/{session_id}|                                                & Bearer & Get session state and persisted history. \\ \hline
+    POST   & \path|/interview-sessions/{session_id}/onboarding/respond|                             & Bearer & Persist one onboarding step before assessed questioning. \\ \hline
+    POST   & \path|/interview-sessions/{session_id}/realtime-token|                                 & Bearer & Mint a room participant token; \texttt{warm=true} joins without agent dispatch. \\ \hline
+    POST   & \path|/interview-sessions/{session_id}/realtime-agent|                                 & Bearer & Dispatch the native LiveKit agent after readiness. \\ \hline
+    POST   & \path|/interview-sessions/{session_id}/recording-consent|                              & Bearer & Record or revoke versioned audio-recording consent. \\ \hline
+    POST   & \path|/interview-sessions/{session_id}/integrity-events|                               & Bearer & Batch browser integrity signals for server-side review. \\ \hline
+    POST   & \path|/interview-sessions/{session_id}/narration|                                      & Bearer & Request controlled server-side narration where applicable. \\ \hline
+    POST   & \path|/interview-sessions/{session_id}/respond|                                        & Bearer & REST/routed compatibility turn endpoint using \texttt{take\_session\_step}; native room turns use LiveKit. \\ \hline
     POST   & \path|/interview-sessions/{session_id}/finish|                                         & Bearer & Finalise the session; trigger AI scoring. \\ \hline
     GET    & \path|/interview-sessions/{session_id}/gap-report|                                     & Bearer & Per-student gap report (learner view). \\ \hline
     GET    & \path|/me/interview-sessions|                                                          & Bearer & Caller's interview-session history. \\ \hline
@@ -577,7 +584,7 @@ Quiz authoring follows a draft / generate / review / publish pipeline. \path|POS
 \subsubsection{Spaced Repetition}
 
 \begin{longtable}{|p{0.1\textwidth}|p{0.461\textwidth}|p{0.15\textwidth}|p{0.169\textwidth}|}
-    \caption{Spaced-repetition endpoints (FSRS scheduler).} \label{tab:api_sr} \\
+    \caption{Spaced-repetition endpoints (hybrid SM-2 scheduler).} \label{tab:api_sr} \\
     \hline
     \textbf{Method} & \textbf{Path} & \textbf{Auth} & \textbf{Description} \\
     \hline

@@ -43,19 +43,16 @@ The full quiz generation pipeline (\path{features/quizzes/ai/pipelines/full.py})
     \item \textbf{Persistence} — accepted, deduplicated questions are written to the \texttt{quiz\_questions} and \texttt{quiz\_question\_options} tables as a draft batch, associated with the quiz and the \texttt{pipeline\_run\_id}.
 \end{enumerate}
 
-\subsubsection{Interview Generation Pipeline}
-\label{sec:impl_interview_pipeline}
+\subsubsection{Interview Question Generation}
 
-The interview generation pipeline (\path{features/interviews/ai/pipelines/generation.py}) follows a four-stage pattern:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{graphics/act-diagrams/act_interview_generation.png}
+    \caption{Interview Question Generation Pipeline.}
+    \label{fig:interview_question_generation}
+\end{figure}
 
-\begin{enumerate}
-    \item \textbf{Retrieval} — hybrid retrieval scoped to the interview configuration's associated course and learning outcomes.
-    \item \textbf{Generation} — an LLM call produces open-ended interview questions grounded in the retrieved chunks and the configured learning outcomes. Each question includes a model answer and an evaluation rubric.
-    \item \textbf{Validation} — a second LLM call checks that each question is answerable from the course materials, is unambiguous, and aligns with the specified outcomes. Invalid questions are rejected.
-    \item \textbf{Persistence} — accepted questions are written to \texttt{interview\_questions} and linked to the \texttt{InterviewConfig}.
-\end{enumerate}
-
-At session runtime, a \textbf{follow-up} stage generates contextual follow-up questions based on the student's previous answer, implemented in \path{ai/stages/followup/}. After the student submits the session, an \textbf{evaluation} stage scores each answer against the rubric and produces a \textbf{gap report} identifying knowledge gaps relative to the learning outcomes.
+As shown in Figure~\ref{fig:interview_question_generation}, the pipeline retrieves authorised course material and learning outcomes, then creates draft open-ended questions with suggested assessment guidance. Basic validation checks grounding and outcome alignment before accepted drafts are stored for teacher review. Only teacher-approved questions enter a published interview configuration.
 
 \subsubsection{LLM Gateway and Audit}
 \label{sec:impl_llm_gateway}

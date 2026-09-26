@@ -35,16 +35,21 @@ This diagram maps the assessment creation lifecycle. It demonstrates the "Human-
 \end{figure}
 
 
-\subsection{Context-Aware Mock Interview Flow}
+\subsection{Native Mock Interview Flow}
 
-This diagram maps the core application loop where a student undergoes an AI-driven mock interview. It details the real-time interaction cycle: the system selecting context-appropriate questions from an approved, teacher-reviewed question bank, the student providing typed or spoken answers in a unified hybrid session, and the adaptive runtime evaluating responses to determine sequencing or follow-up questions. It also includes alternative paths for handling AI latency and connection timeouts.
+The previous raster activity diagram described an older generic interview flow and has no editable source. It is replaced by the current native activity trace.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{graphics/act-diagrams/act_interview.png}
-    \caption{Activity Diagram: Context-Aware Mock Interview}
-    \label{fig:act_interview}
-\end{figure}
+\begin{enumerate}
+    \item Start or resume the persisted interview session; complete identity, audio, language, preparation, and readiness onboarding.
+    \item Optionally connect a warm LiveKit room during onboarding; dispatch the native interviewer only after readiness and start the assessment clock.
+    \item Receive either a final speech transcript or a typed \texttt{lk.chat} turn. For typed input, validate the action/key and persist a receipt before acknowledgement.
+    \item Fold the answer into durable runtime state. Apply a fast provisional sufficiency probe, persist the state version, then server-select the next question or retain the current question within configured follow-up and hint bounds.
+    \item Refresh the conversational state note. The LLM may phrase the next response and invoke guarded tools, while server policy remains authoritative for progression and completion.
+    \item Publish TTS audio, transcription, and control snapshot; queue deferred reconciliation for richer analysis. On reconnect, republish a snapshot and re-read the current question.
+    \item On model end or hard stop, close intake, drain bounded active work, flush transcript writes, submit once, enqueue terminal evaluation, and publish the final result when evaluation completes.
+\end{enumerate}
+
+This textual activity trace is aligned with Section~\ref{sec:impl_interviews}; it avoids presenting obsolete raster artwork as the deployed native architecture.
 
 % \subsection{Bulk User Import and Validation Flow}
 

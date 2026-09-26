@@ -9,10 +9,10 @@ Each subsection below states the constraint the component must satisfy and the d
 \subsubsection{Backend Framework}
 % ─────────────────────────────────────────────
 
-The backend must orchestrate complex AI logic — adaptive SR scheduling, knowledge retention estimation, and real-time interview evaluation — while handling asynchronous LLM API calls and audio streams simultaneously. The orchestration layer requires native access to Python AI libraries (LangChain, scikit-learn, NumPy) without inter-language bridging overhead.
+The backend must orchestrate adaptive SR scheduling, knowledge retention estimation, asynchronous LLM calls, and interview lifecycle operations. The implementation uses first-party Python modules for retrieval, state policy, and model integration, together with standard scientific libraries where appropriate; it does not depend on a chain-composition framework.
 
 
-\textbf{Decision: FastAPI.} FastAPI is the only framework that combines Python-native AI library access with a fully asynchronous request model. Django REST's synchronous ORM creates bottlenecks when streaming LLM responses; Express.js requires a separate Python sidecar to run LangChain or scikit-learn, introducing network latency and operational complexity. FastAPI's built-in OpenAPI generation also accelerates API contract development across the team.
+\textbf{Decision: FastAPI.} FastAPI combines Python-native AI library access with a fully asynchronous request model. It provides the lifecycle, authorization, token, dispatch, and persistence APIs for the native LiveKit interview worker, while independent worker processes hold long-running real-time sessions and asynchronous \texttt{arq} jobs. Its built-in OpenAPI generation also accelerates API contract development across the team.
 
 % ─────────────────────────────────────────────
 \subsubsection{Frontend Framework}
@@ -27,10 +27,10 @@ The frontend must support both a standard LMS interface (course catalog, quiz ed
 \subsubsection{Real-Time Communication}
 % ─────────────────────────────────────────────
 
-The AI interview feature requires sub-200ms voice latency, built-in Speech-to-Text (STT) integration, and AI agent turn-taking orchestration. The communication layer must handle continuous audio streams without TCP head-of-line blocking.
+The AI interview feature requires low-latency voice transport, streaming STT/TTS integration, and conversational agent turn-taking. The communication layer must handle continuous audio streams without TCP head-of-line blocking.
 
 
-\textbf{Decision: LiveKit.} LiveKit is the only self-hostable, open-source WebRTC platform with a dedicated AI Agents SDK that handles turn-taking, Voice Activity Detection (VAD), and Whisper STT out of the box. Twilio introduces vendor lock-in and cloud routing latency. Socket.io's TCP transport causes head-of-line blocking that makes continuous voice streams unacceptable for real-time AI interviews \cite{versatik2025webrtc}.
+\textbf{Decision: LiveKit.} The deployed architecture uses LiveKit Cloud for the WebRTC room and a separate native LiveKit Agents worker for the interview runtime. The worker combines configured STT, LLM, and TTS plugins with Silero VAD and persistent conversational context; application code retains question selection and assessment state authority. Socket.io's TCP transport causes head-of-line blocking that makes continuous voice streams unsuitable for real-time AI interviews \cite{versatik2025webrtc}.
 
 % ─────────────────────────────────────────────
 \subsubsection{Primary Database \& Vector Search}
