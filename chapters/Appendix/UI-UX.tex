@@ -262,14 +262,47 @@ The course-management page (\path|/teacher/courses/$courseId|) is the authoring 
 
 \paragraph{Lesson Editor}
 
+The lesson editor (\path|/teacher/courses/$courseId/lessons/$lessonId|) is a
+long scrolling page, so it is shown in two parts: the authoring area and its
+settings sidebar in Figure~\ref{fig:instructor_lesson_manage}, and the material
+and collaboration sections that follow it in
+Figure~\ref{fig:instructor_lesson_manage_lower}. The two overlap by one section
+heading so the join is readable.
+
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{graphics/screenshots/instructor_lesson_manage.png}
-  \caption{Lesson Editor --- Markdown content editor with attached resources and right-hand settings panel.}
+  \includegraphics[width=\textwidth,height=0.42\textheight,keepaspectratio]{graphics/screenshots/instructor_lesson_manage_a.png}
+  \caption{Lesson Editor (upper) --- Markdown content editor with the right-hand lesson settings and prerequisites panel.}
   \label{fig:instructor_lesson_manage}
 \end{figure}
 
-The lesson editor (\path|/teacher/courses/$courseId/lessons/$lessonId|) is split into a content area and a settings sidebar. The left side shows a Markdown editor for reading lessons (with bold, italic, list, heading, link, image, and code controls) and a \textit{Downloadable Resources} block for attached PDFs and other files. The right sidebar exposes Visibility (Published / Draft), Lesson Type (Video / Reading), Estimated Duration, Difficulty Level, and a Prerequisites picker. An \textit{AI Material Hub} card promotes uploading source material so the platform can auto-generate quizzes from it. Destructive actions (Archive, Delete) are pushed to the bottom of the sidebar to reduce mis-clicks. A persistent \textbf{Save changes} button anchors the top-right corner.
+The upper half is split into a content area and a settings sidebar. The left
+side shows a Markdown editor for reading lessons, with bold, italic, list,
+heading, link, image and code controls and a Write / Preview toggle. The right
+sidebar exposes Estimated Duration, the completion rules that duration implies,
+Difficulty Level, and a Prerequisites picker. A persistent \textbf{Save
+changes} button anchors the top-right corner alongside the Archive, Delete and
+Unpublish actions, and a banner above the title offers to generate a draft quiz
+from the material already attached to the lesson.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{graphics/screenshots/instructor_lesson_manage_b.png}
+  \caption{Lesson Editor (lower) --- downloadable resources, material processing history, the curated knowledge graph, and lesson discussion.}
+  \label{fig:instructor_lesson_manage_lower}
+\end{figure}
+
+The lower half carries everything downstream of the lesson text. A
+\textit{Downloadable Resources} block holds attached PDFs and other files, each
+with a \textit{Use for AI} switch deciding whether the document also enters the
+ingestion pipeline for quizzes, search and the knowledge graph. \textit{Material
+history} reports the processing state of each version --- the \texttt{Ready}
+badge here is what Section~\ref{sec:impl_ingestion} describes the worker
+writing. The \textit{Knowledge Graph} panel renders the curated concept graph
+for the lesson with its own publish toggle, showing the top concepts of the
+extracted set, and \textit{Discussion} carries the lesson's threads. Destructive
+actions are kept at the top bar rather than beside the content to reduce
+mis-clicks.
 
 \paragraph{Quiz Editor}
 
