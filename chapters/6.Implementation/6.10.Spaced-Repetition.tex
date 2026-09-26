@@ -36,7 +36,7 @@ Card creation is driven by the quiz answer flow, which calls the review service 
 The asymmetry is deliberate. Suppressing the creation of new cards prevents an examination from populating a student's review queue with every question it asked; suppressing the grading of existing cards as well would allow an assessment to shield an item from the evidence of having been failed, which inverts the purpose of assessing it. Like the other SM-2 parameters on a quiz, the flag is excluded from the set of fields editable after publication, so it cannot change beneath a live or completed attempt.
 
 \paragraph{Lesson unlock}
-Unlock is implemented in \path{sm2/lesson_unlock.py} as the combined gate specified in Section~\ref{sec:individualised_modeling}, evaluated over three independent conditions:
+Unlock is implemented in \path{sm2/lesson_unlock.py} as the combined gate specified in Section~\ref{sec:individualised_modeling}, evaluated over three independent conditions --- shown together with the enrolment checks that precede them and the content boundary they protect in Figure~\ref{fig:lesson_unlock_gate} of Appendix~\ref{appendix:algorithm}:
 
 \begin{itemize}
     \item \textbf{Prerequisite gate} — every lesson listed in \texttt{lesson\_prerequisites} must itself be eligible. The check recurses through the prerequisite graph and is cycle-safe: an $A \rightarrow B \rightarrow A$ edge short-circuits with a warning log and is treated as satisfied, so a malformed graph never bricks a learner out of their own course.

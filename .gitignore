@@ -86,3 +86,6 @@ Desktop.ini
 *.log
 _logs/
 compile.ps1
+
+*.drawio
+*.html

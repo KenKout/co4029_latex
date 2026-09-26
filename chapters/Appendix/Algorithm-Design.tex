@@ -8,12 +8,14 @@ This appendix carries the specification of the spaced-repetition scheduling
 model, which the body of the report states only in summary, together with the
 flow diagrams for those processes whose control flow is difficult to follow
 from prose alone. A flow earns a diagram here on one criterion: that its shape
-is unusual enough that a linear description of it misleads. Each of the four
---- card review scheduling, career-pathway stage evaluation, material
-ingestion, and quiz generation --- crosses several processes, branches on
-conditions that are not obvious from the endpoint that starts it, and has at
-least one path that exists only to handle a failure. The diagrams show the
-branches and the failure paths together, which prose in sequence cannot.
+is unusual enough that a linear description of it misleads. Each of the seven
+crosses several processes, branches on conditions that are not obvious from the
+endpoint that starts it, and has at least one path that exists only to handle a
+failure or an attempt at abuse. The diagrams show the branches and the failure
+paths together, which prose in sequence cannot. They are ordered as the system
+is exercised rather than as the packages are named: the learner's own loop
+first, then the authoring pipelines that fill it, then the assessment those
+pipelines produce, and finally the pathway structure above all of them.
 
 \subsection*{Spaced repetition: why this is an appendix}
 
@@ -286,25 +288,41 @@ the result and releases its side effects.
 \end{figure}
 
 
-\subsection{Career Pathway Stage Evaluation}
-\label{appendix:stage-evaluation}
+\subsection{Lesson Unlock Gate}
+\label{appendix:lesson-unlock-flow}
 
-The rules this evaluator applies are specified in
-Section~\ref{sec:pathway_completion}. Figure~\ref{fig:stage_evaluation_flow}
-shows the order in which it applies them for one student against one pinned
-pathway version: stages are walked in position order, each one's required and
-quota-limited elective counts are resolved into a live completion, a latched
-completion already recorded is honoured over a live one that has since lapsed,
-and the unlock verdict for each stage reads the stage before it --- which is
-why the pass runs forward and only once.
+The gate's three conditions are specified in
+Section~\ref{sec:individualised_modeling} and its implementation in
+Section~\ref{sec:impl_sr}. Figure~\ref{fig:lesson_unlock_gate} shows what
+happens between a learner clicking a lesson and the server deciding whether to
+hand over its body.
+
+The diagram exists mainly to make two things unmistakable. The first is that
+the verdict is computed on \emph{read} and nowhere else: there is no unlock
+event, no service that fires when a threshold is crossed, and no stored
+eligibility column --- only a memoised computation and a cache key that writes
+invalidate. The second is what the gate does with a malformed prerequisite
+graph. The traversal is recursive, so a cycle would not terminate; the
+implementation detects one, logs it, and treats the cyclic edge as
+\emph{satisfied}. That is a deliberate choice to fail open on a data error the
+learner did not cause, and it is the kind of decision a reader will assume is
+an oversight unless the diagram shows it as a labelled branch.
+
+Two further details are visible only here. Navigation metadata and lesson
+content sit on opposite sides of the boundary --- the curriculum tree tells the
+learner a lesson exists and is locked, while every read that would return its
+body, its resources, a signed download URL, or its knowledge graph passes
+through the gate --- so a locked lesson is discoverable but not readable. And
+the whole gate sits behind a single deployment switch, which returns eligible
+immediately when set: an escape hatch for the case where a misconfigured
+threshold locks a cohort out of its own course mid-term.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{graphics/act-diagrams/stage_evaluation_flow.png}
-    \caption{Career pathway stage evaluation: from pinned version to per-stage completion, unlock, and overall progress.}
-    \label{fig:stage_evaluation_flow}
+    \includegraphics[width=\textwidth]{graphics/act-diagrams/lesson_unlock_gate.png}
+    \caption{Lesson unlock gate: enrolment and visibility checks, the three unlock conditions, and the protected-content boundary.}
+    \label{fig:lesson_unlock_gate}
 \end{figure}
-
 
 \subsection{Material Ingestion}
 \label{appendix:ingestion-flow}
@@ -361,4 +379,96 @@ mode budgeting per outline section before it generates anything at all.
     \includegraphics[width=\textwidth]{graphics/act-diagrams/quiz_generation_flow.png}
     \caption{Quiz generation: synchronous validation and dispatch, the durable generation run, the topic and coverage pipelines, and the terminal poll.}
     \label{fig:quiz_generation_flow}
+\end{figure}
+
+\subsection{Quiz Attempt Lifecycle}
+\label{appendix:quiz-attempt-flow}
+
+The implementation is described in Section~\ref{sec:impl_quizzing}.
+Figure~\ref{fig:quiz_attempt_lifecycle} follows one attempt from the intro
+screen to the result, and it is the longest flow in the system because an
+attempt is the one place where assessment integrity, spaced repetition and
+crash recovery all bear on the same rows at the same time.
+
+Three of its properties are worth naming before reading it. Everything that
+could change beneath a live attempt is \emph{frozen at creation}: the question
+order and option shuffle, the timing, and the integrity policy are all
+snapshotted onto the attempt row, so editing the quiz mid-attempt cannot alter
+what the student is being measured against. Ownership is a lease rather than a
+check --- a Redis entry claimed before the database commit and renewed by
+heartbeat --- which is what makes an explicit takeover on a second device
+possible without two tabs writing to one attempt. And the SM-2 review fires on
+the \emph{first} saved answer to each question only: a later edit still changes
+the score, because the answer row is upserted, but it does not reschedule the
+card, or a student could tune their own review queue by toggling answers.
+
+The diagram also carries the paths that exist only for things going wrong. An
+attempt left open past its deadline is closed by a cron sweep rather than by
+the student, and the sweep chooses between submitting it and expiring it
+according to the quiz's own policy. A submit flushes every unsaved answer
+first and aborts if any of those writes fails, rather than finalising a partial
+record. What the result exposes is itself gated: a quiz needing manual grading
+returns no score at all, and the visibility policy decides separately whether
+the student may see their score, their correctness, or the answers.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/act-diagrams/quiz_attempt_life_cycle.png}
+    \caption{Quiz attempt lifecycle: entry and resumption, attempt creation and freezing, the live answer loop with integrity monitoring, and submission.}
+    \label{fig:quiz_attempt_lifecycle}
+\end{figure}
+
+\subsection{Career Pathway Stage Evaluation}
+\label{appendix:stage-evaluation}
+
+The rules this evaluator applies are specified in
+Section~\ref{sec:pathway_completion}. Figure~\ref{fig:stage_evaluation_flow}
+shows the order in which it applies them for one student against one pinned
+pathway version: stages are walked in position order, each one's required and
+quota-limited elective counts are resolved into a live completion, a latched
+completion already recorded is honoured over a live one that has since lapsed,
+and the unlock verdict for each stage reads the stage before it --- which is
+why the pass runs forward and only once.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/act-diagrams/stage_evaluation_flow.png}
+    \caption{Career pathway stage evaluation: from pinned version to per-stage completion, unlock, and overall progress.}
+    \label{fig:stage_evaluation_flow}
+\end{figure}
+
+\subsection{Path Change and Attempt Closure}
+\label{appendix:path-change-flow}
+
+The governance model is described in Section~\ref{sec:impl_path_governance}.
+Figure~\ref{fig:path_change_attempt_closure} traces a student's request to
+switch or drop a career path from creation through a dean's decision to the
+downstream access that decision revokes.
+
+This flow is drawn because approving a request is not a status update. The
+approval runs inside one transaction that closes the source attempt, writes an
+immutable \texttt{exit\_snapshot} of the progress it had earned, creates the
+replacement attempt pinned to the target version, and then reconciles every
+entitlement the old path had granted. That reconciliation is where the
+subtlety lies: grants are transferred only for courses the two paths share and
+revoked otherwise, a course enrolment is dropped only when no other live
+entitlement still covers it, and completed enrolments and their awards are
+preserved regardless. A student who switches paths therefore keeps what they
+finished, keeps access to what both paths need, and loses only what the old
+path alone justified.
+
+The guards are also checked twice, at different times and for different
+reasons. Creation checks that the request is coherent; approval re-checks the
+same invariants against the state as it stands at the moment of decision,
+because a target path can be archived, or a budget exhausted, between the
+request and the review. A change request whose target has since disappeared is
+invalidated rather than approved, and no attempt is closed --- the one outcome
+that must never be reached by default, since closure is irreversible and the
+snapshot it writes is the only record of what the student had earned.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/act-diagrams/path_change_attempt_closure.png}
+    \caption{Path change and attempt closure: request creation, the dean's review state machine, the approval transaction, and downstream entitlement reconciliation.}
+    \label{fig:path_change_attempt_closure}
 \end{figure}
