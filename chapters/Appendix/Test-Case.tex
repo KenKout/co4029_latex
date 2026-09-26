@@ -379,14 +379,20 @@ TC-5.2.2 & FR-5.2 & System & Teacher edits, approves, or rejects drafted intervi
 TC-5.3.1 & FR-5.3 & System & Teacher configures maximum attempts and cooldown & Interview rules are saved and enforced for student sessions & Invalid attempt limits or cooldown values are rejected \\ \hline
 
 % --- FR-5.4: Hybrid Mock Interview ---
-TC-5.4.1 & FR-5.4 & System & Eligible student starts a hybrid interview and submits a typed turn & The hybrid session starts and the typed turn is associated with its session question & Student is denied entry if interview prerequisites are not satisfied \\ \hline
-TC-5.4.2 & FR-5.4 & System & Eligible student enables microphone interaction where the voice runtime is deployed & The same hybrid room supports spoken turns when rollout controls permit & The client shows guidance while typed interaction remains available if microphone permission is denied \\ \hline
+TC-5.4.1 & FR-5.4 & System & Eligible student starts a hybrid interview, completes readiness, and submits a typed turn & The native LiveKit worker is dispatched after readiness; the typed turn is associated with its session question through a durable receipt & Student is denied entry if interview prerequisites are not satisfied \\ \hline
+TC-5.4.2 & FR-5.4 & System & Eligible student enables microphone interaction in the deployed native room & The same hybrid room supports spoken turns through STT, native state folding, and TTS response & The client shows guidance while typed interaction remains available if microphone permission is denied \\ \hline
+TC-5.4.3 & FR-5.4 & Integration & Client requests a warm realtime token before readiness, then requests agent dispatch after readiness & The warm room does not receive an interviewer before readiness; the native worker receives dispatch metadata only after readiness & Dispatch failure surfaces recovery and does not silently create a second session \\ \hline
+TC-5.4.4 & FR-5.4 & Integration & A deployment disables the native-agent flag & The routed compatibility worker handles a smoke turn without changing the public hybrid-room contract & The rollback path is not selected while native mode is enabled \\ \hline
 
 % --- FR-5.5: Spoken Turns and Optional Recording ---
 TC-5.5.1 & FR-5.5 & Integ-ration & Student speaks during an enabled hybrid interview and accepts or declines recording consent & Audio is streamed, transcribed, and used to generate spoken AI responses; recording begins only after affirmative consent & Declining consent or a recording-provider failure leaves the interview unrecorded and active \\ \hline
 
 % --- FR-5.6: Transcript and Binary Evaluation ---
 TC-5.6.1 & FR-5.6 & Integ-ration & Student completes a gradeable interview session & Transcript and metadata are persisted and asynchronous evaluation produces a binary verdict from desired outcomes & Evaluation is not triggered for an abandoned pre-assessment session \\ \hline
+TC-5.6.2 & FR-5.6 & Integration & A typed turn is retransmitted after a lost acknowledgement & The stored receipt is reused; no duplicate grading fold or transcript answer is created & A failed receipt remains retryable rather than being reported as applied \\ \hline
+TC-5.6.3 & FR-5.6 & Integration & Student reconnects while the native session is in progress & Worker republishes an absolute snapshot and re-reads the current question without resetting durable state & Finalized sessions do not re-open on reconnect \\ \hline
+TC-5.6.4 & FR-5.6 & Integration & Fast sufficiency probe succeeds, then deferred reconciliation fails or is delayed & Provisional runtime state supports the live turn; final outcome evaluation still uses the persisted transcript & Reconciliation failure does not invent coverage or a final verdict \\ \hline
+TC-5.6.5 & FR-5.6 & Integration & Model end request and hard-stop race at session end & Intake closes, active folds are boundedly drained, and one terminal submission is persisted & A losing finalizer observes the already terminal session \\ \hline
 
 % --- FR-5.7: Student and Teacher Result Visibility ---
 TC-5.7.1 & FR-5.7 & System & Student opens a successfully evaluated interview result & Student sees pass/fail with qualitative remediation and study plan & Numeric rubric scores, per-outcome verdicts, and internal reasoning are not exposed \\ \hline

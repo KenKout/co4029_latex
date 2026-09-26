@@ -1,6 +1,9 @@
 \section{Functional Requirements Specification}
 \label{appendix:fr}
 
+\subsection{Specialized Project FRS}
+This section contains the 57 functional requirements covered by Modules 1--4.
+
 % ============================ Module 1: Authentication & Access Control ====================
 \paragraph{Authentication and Access Control}
 
@@ -218,6 +221,9 @@ FR-4.20 & The system shall allow Teachers to require a camera for a quiz, in whi
 
 \end{longtable}
 
+\subsection{Bonus}
+This section contains the 49 additional functional requirements covered by Modules 5--8.
+
 % ============================ Module 5: Application Loop & Mock Interview ====================
 \paragraph{Application Loop and Mock Interview}
 
@@ -247,7 +253,7 @@ FR-5.2 & The system shall draft interview questions from ingested course content
 
 FR-5.3 & The system shall allow Teachers to configure interview session rules, including maximum attempts, cooldown periods. & Teachers, Educational Managers & UR-TCH-03 & Yes & Yes & High \\ \hline
 
-FR-5.4 & The system shall allow Students to start mock interview sessions in a hybrid real-time room supporting typed and spoken turns; adaptive orchestration shall be enabled only by the applicable deployment and rollout controls. & Students & UR-STU-02 & Yes & Yes & High \\ \hline
+FR-5.4 & The system shall allow Students to start mock interview sessions in a hybrid real-time room supporting typed and spoken turns. The deployed native conversational worker may be enabled by server configuration, while server policy remains authoritative for durable progression. & Students & UR-STU-02 & Yes & Yes & High \\ \hline
 
 FR-5.5 & The system shall support spoken interview turns through real-time audio streaming, speech-to-text transcription, and text-to-speech responses. Audio recording shall be optional, require deployment enablement and affirmative consent, and follow configured retention and tombstone rules without being required to conduct the interview. & Students & UR-STU-02 & Yes & Yes & High \\ \hline
 
