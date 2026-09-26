@@ -10,10 +10,10 @@
 aBridgeAI adopts a \textbf{light-first, academic} design language inspired by enterprise dashboards (Metronic) — dense rows, crisp 1\,px borders, restrained 4--10\,px corner radii. The interface visually positions the platform as a serious learning tool rather than a consumer product. Four guiding principles drive every screen:
 
 \begin{enumerate}
-  \item \textbf{Role-based clarity} — students, instructors and administrators see entirely distinct navigation structures and accent colours, preventing cognitive overload from features that are not relevant to the active role.
+  \item \textbf{Role-based clarity} — students, instructors and administrators see distinct navigation structures and role-appropriate destinations, preventing cognitive overload from features that are not relevant to the active role.
   \item \textbf{Progressive disclosure} — advanced AI capabilities (quiz generation, processing queue, cost telemetry) are surfaced contextually inside their host screens rather than buried in a separate ``AI'' section, but appear only when the user has the required role and prerequisites.
   \item \textbf{Accessibility-first typography} — body copy uses \textit{Be Vietnam Pro}, a humanist sans-serif designed with full Vietnamese diacritic support, paired with a 14\,px base size and 1.5 line-height for sustained reading.
-  \item \textbf{Responsive shell architecture} — a persistent \path|AppShell| component renders a left sidebar that collapses from 256\,px (\path|w-64|) to 64\,px (\path|w-16|, icons only) below the \path|md| breakpoint. The same shell is reused across all authenticated routes; role differentiation is driven entirely by a \path|navItems| prop and accent colour.
+  \item \textbf{Responsive shell architecture} — a persistent \path|AppShell| component renders a desktop sidebar that collapses from 256\,px (\path|w-64|) to 64\,px (\path|w-16|, icons only) by user toggle. On narrow screens the sidebar is replaced by an off-canvas navigation menu opened from the mobile top bar.
 \end{enumerate}
 
 The implementation uses \textbf{shadcn/ui} components on top of \textbf{Tailwind CSS v4}, with the colour system defined as CSS custom properties (\path|var(--primary)|, \path|var(--surface)|, \dots) so that the light and dark themes share a single component layer with full parity.
@@ -22,7 +22,7 @@ The implementation uses \textbf{shadcn/ui} components on top of \textbf{Tailwind
 \subsubsection{Internationalisation (i18n)}
 % ────────────────────────────────────────────────────────────
 
-The interface ships with multilingual support out of the box. Every page exposes a globe icon in the top-right corner of the \path|ContentTopBar| that opens a language selector; the active language is shown next to the icon (\textit{e.g.}\ ``EN''). Locale strings live in \path|src/locales/<lang>.json| and are loaded lazily, with English as the fallback. Every navigation label, page heading, and form field references an \path|i18nKey| (for example \path|nav.dashboard|, \path|nav.career_paths|) defined in \path|src/lib/navigation.ts|, so adding a new locale only requires translating the JSON dictionary --- no component changes are needed. The platform was developed with English and Vietnamese as the first-class locales, matching the choice of Be Vietnam Pro as the primary typeface.
+The interface ships with multilingual support out of the box. Every page exposes a globe icon in the top-right corner of the \path|ContentTopBar| that opens a language selector; the active language is shown next to the icon (\textit{e.g.}\ ``EN''). Locale strings live in \path|src/i18n/locales/<lang>.json| and are loaded lazily, with English as the fallback. Every navigation label, page heading, and form field references an \path|i18nKey| (for example \path|nav.dashboard|, \path|nav.career_paths|) defined in \path|src/lib/navigation.ts|, so adding a new locale only requires translating the JSON dictionary --- no component changes are needed. The platform was developed with English and Vietnamese as the first-class locales, matching the choice of Be Vietnam Pro as the primary typeface.
 
 % ────────────────────────────────────────────────────────────
 \subsubsection{Design Rules \& Constraints}
@@ -96,7 +96,7 @@ The dark theme keeps the same primary blue and amber accents but swaps surfaces 
   \hline
   Label / Caption & xs, slate-500, uppercase tracking & Reserved for metadata such as status badges and stat-card legends. \\
   \hline
-  Minimum size & 12\,px & No text below 12\,px is permitted anywhere in the interface. \\
+  Minimum size & 12\,px for body and control text; 10\,px permitted for compact metadata and status badges & No primary content or interactive control label falls below 12\,px; compact, non-primary metadata may use a smaller label size when its meaning is also conveyed by surrounding text or structure. \\
   \hline
 \end{longtable}
 
@@ -380,7 +380,7 @@ The AI Costs page (\path|/admin/ai-costs|) exposes platform-wide spend on langua
   \endfoot
   \path|TopNavBar| & Landing page only & Horizontal marketing nav: Explore, Login, Sign Up. Distinct from the authenticated shell. \\
   \hline
-  \path|SideNavBar| & Authenticated (all) & Always rendered. Collapses to \path|w-16| (icons only) below the \path|md| breakpoint or by user toggle; expands to \path|w-64| with full labels. Receives a role-specific \path|navItems| array as a prop. \\
+  \path|SideNavBar| & Authenticated (all) & Always rendered on desktop. It collapses to \path|w-16| (icons only) or expands to \path|w-64| by user toggle; narrow screens use an off-canvas navigation menu opened from the mobile top bar. Receives a role-specific \path|navItems| array as a prop. \\
   \hline
   \path|ContentTopBar| & Authenticated (all) & Sticky page header carrying the current page title, language selector (i18n), notification bell, and user avatar with menu. \\
   \hline
@@ -390,7 +390,7 @@ The AI Costs page (\path|/admin/ai-costs|) exposes platform-wide spend on langua
   \hline
 \end{longtable}
 
-The \path|AppShell| component is the structural keystone of the authenticated experience. The shell itself is role-agnostic; role differentiation is communicated through the \path|navItems| prop (defined in \path|src/lib/navigation.ts|) and through the active accent colour on the sidebar. Below the \path|md| breakpoint the sidebar overlays the page content via a backdrop rather than pushing it, keeping the main column readable on narrow screens.
+The \path|AppShell| component is the structural keystone of the authenticated experience. The shell itself is role-agnostic; role differentiation is communicated through the \path|navItems| prop (defined in \path|src/lib/navigation.ts|) and through shared design tokens. On desktop the sidebar can collapse to an icon rail; on narrow screens it is replaced by a mobile top-bar menu, keeping the main column readable without permanently consuming horizontal space.
 
 % ────────────────────────────────────────────────────────────
 \subsubsection{Design System Summary}
@@ -435,7 +435,7 @@ The \path|AppShell| component is the structural keystone of the authenticated ex
   \hline
   Charts & Recharts & Bar, line, area; reuses palette for chart series 1--5. \\
   \hline
-  i18n keys & \path|src/lib/navigation.ts| + \path|src/locales/<lang>.json| & Translatable nav labels and copy. \\
+  i18n keys & \path|src/lib/navigation.ts| + \path|src/i18n/locales/<lang>.json| & Translatable nav labels and copy. \\
   \hline
   Max modal depth & 1 stacked modal & Prevents nested-modal anti-patterns. \\
   \hline
@@ -443,6 +443,6 @@ The \path|AppShell| component is the structural keystone of the authenticated ex
   \hline
   Border radius (card) & 8\,px (\path|rounded-lg|) & Consistent card rounding; 10\,px hard cap project-wide. \\
   \hline
-  Sidebar widths & 64\,px collapsed / 256\,px expanded & \path|w-16| / \path|w-64|; collapse driven by viewport width and user toggle. \\
+  Sidebar widths & 64\,px collapsed / 256\,px expanded & \path|w-16| / \path|w-64| on desktop; narrow screens use the off-canvas mobile navigation menu. \\
   \hline
 \end{longtable}

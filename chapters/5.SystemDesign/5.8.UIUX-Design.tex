@@ -13,10 +13,10 @@
 aBridgeAI adopts a \textbf{light-first, academic} design language inspired by enterprise dashboards (Metronic Demo 6) --- dense rows, crisp 1\,px borders, restrained 4--10\,px corner radii. The interface deliberately reads as a serious learning tool rather than a consumer product. Four guiding principles shape every screen:
 
 \begin{enumerate}
-  \item \textbf{Role-based clarity} --- students, instructors, and administrators see entirely distinct navigation and accent colours; the same shell component renders all three contexts driven by a per-role \path|navItems| prop.
+  \item \textbf{Role-based clarity} --- students, instructors, and administrators see distinct navigation structures and role-appropriate destinations; the same shell component renders all three contexts from a per-role \path|navItems| prop.
   \item \textbf{Progressive disclosure} --- AI features (quiz generation, processing queue, cost telemetry) are surfaced contextually inside their host screens, only when the user has the required role and prerequisites.
   \item \textbf{Accessibility-first typography} --- body copy uses \textit{Be Vietnam Pro}, a humanist sans-serif with full Vietnamese diacritic support, paired with a 14\,px base size and 1.5 line-height for sustained reading.
-  \item \textbf{Responsive shell architecture} --- a persistent \path|AppShell| renders a left sidebar that collapses from 256\,px (\path|w-64|) to 64\,px (\path|w-16|, icons only) below the \path|md| breakpoint or by user toggle.
+  \item \textbf{Responsive shell architecture} --- a persistent \path|AppShell| renders a desktop left rail that can collapse from 256\,px (\path|w-64|) to 64\,px (\path|w-16|) by user toggle. On narrow screens the rail is replaced by an off-canvas navigation menu opened from the mobile top bar.
 \end{enumerate}
 
 The implementation uses \textbf{shadcn/ui} components on top of \textbf{Tailwind CSS v4}; the colour system is defined as CSS custom properties (\path|var(--primary)|, \path|var(--surface)|, \dots) so that the light and dark themes share a single component layer with full parity.
@@ -66,9 +66,9 @@ Table~\ref{tab:design_tokens_main} consolidates the design tokens that govern th
   \hline
   Charts & Recharts & Bar, line, area; reuses palette for chart series 1--5. \\
   \hline
-  i18n keys & \path|src/lib/navigation.ts| + \path|src/locales/<lang>.json| & Translatable nav labels and copy. \\
+  i18n keys & \path|src/lib/navigation.ts| + \path|src/i18n/locales/<lang>.json| & Translatable nav labels and copy. \\
   \hline
-  Sidebar widths & 64\,px collapsed / 256\,px expanded & \path|w-16| / \path|w-64| with auto-collapse below \path|md|. \\
+  Sidebar widths & 64\,px collapsed / 256\,px expanded & \path|w-16| / \path|w-64| on desktop; narrow screens use the off-canvas mobile navigation menu. \\
   \hline
   Border radius (card) & 8\,px (\path|rounded-lg|) & 10\,px hard cap project-wide. \\
   \hline
@@ -104,6 +104,6 @@ The \textbf{Quiz Editor} (\path|/teacher/courses/$courseId/quizzes/$quizId|) is 
 \subsubsection{Navigation Architecture}
 % ────────────────────────────────────────────────────────────
 
-The authenticated experience is built around a single role-agnostic \path|AppShell| component that orchestrates a fixed-position \path|SideNavBar| and a sticky \path|ContentTopBar| around the main content. The shell receives a \path|navItems| array as a prop (defined in \path|src/lib/navigation.ts|), so the same layout code serves the student, teacher, and admin route groups; role differentiation is communicated entirely through the \path|navItems| configuration and the active accent colour. Below the \path|md| breakpoint the sidebar collapses to icons-only and overlays the page content via a backdrop on toggle, keeping the main column readable on narrow screens.
+The authenticated experience is built around a single role-agnostic \path|AppShell| component that orchestrates a fixed-position \path|SideNavBar| and a sticky \path|ContentTopBar| around the main content. The shell receives a \path|navItems| array as a prop (defined in \path|src/lib/navigation.ts|), so the same layout code serves the student, teacher, and admin route groups; role differentiation is communicated through the \path|navItems| configuration and shared design tokens. On desktop the sidebar can collapse to an icon rail; on narrow screens it is replaced by a mobile top-bar menu, keeping the main column readable without permanently consuming horizontal space.
 
 The \path|TopNavBar| and \path|Footer| components are reserved exclusively for the landing page, ensuring a clean visual handoff between the marketing surface and the authenticated product.
