@@ -55,7 +55,7 @@ The limitations below are separated into two kinds, because they carry different
 \begin{itemize}
     \item \textbf{No learning-outcome study.} The pedagogical premise of this work --- that algorithmically derived quality scoring and spaced scheduling improve durable retention --- has not been tested against learners. The scheduler is shown to behave as specified; it is not shown to teach better than the alternative it replaces. Establishing that requires a controlled study over a cohort and a term, which this project's timeframe did not permit.
 
-    \item \textbf{Load testing exercised read paths only.} The three scenarios are authenticated \texttt{GET} requests sustained for thirty seconds on a development machine over a LAN without TLS. Write paths, concurrent attempts on one quiz, the AI generation pipelines, and the background worker pool are not represented, and these are precisely the paths where contention and cost would be expected to appear. The reported headroom against NFR-2.1 should be read as evidence about read-heavy traffic on that configuration, not as a capacity result for the system as deployed.
+    \item \textbf{Media and AI-pipeline load coverage.} The final load evaluation exercises the HTTP control plane --- per-user reads, the quiz write journey, concurrent attempts, session guards --- under a 200-student synthetic cohort, and it drove two deployment remediations (four Uvicorn workers; PostgreSQL \texttt{max\_connections} 300) that were each verified by re-running the identical load. It does not load-test media delivery or the AI pipelines: LiveKit WebRTC streams, video playback, and AI interview sessions are absent because no media material is published on the deployment and each interview session consumes LLM gateway tokens. NFR-2.1's video-stream and interview-session clauses therefore remain asserted rather than measured, and the remediation chain was validated only to the point of worker-CPU saturation on a single development machine rather than through a connection-pooling layer.
 
     \item \textbf{Generation quality is model-assessed.} Quiz quality was scored by an independent judge model under a reference-guided protocol with anti-bias guardrails and bootstrap confidence intervals. That protocol is well founded and materially reduces judge error, but it remains an automated proxy: no subject-matter expert has rated the generated questions, and no learner has sat them. Groundedness and distractor plausibility as measured are properties the judge recognised, not outcomes observed in teaching.
 
@@ -64,6 +64,7 @@ The limitations below are separated into two kinds, because they carry different
 
 % ===========================================================
 \subsection{Future Work}
+\label{sec:conclusion_future_work}
 
 The work below is recorded as scope rather than as a schedule: each item states what remains to be built and why the system needs it, without committing to an ordering or an allocation. Several follow directly from boundaries stated earlier in this report; the rest are capabilities the present design accommodates but does not yet provide.
 
@@ -107,6 +108,12 @@ The work below is recorded as scope rather than as a schedule: each item states 
 \paragraph{Platform configuration}
 \begin{itemize}
     \item \textbf{Richer setting types.} The runtime settings registry admits boolean, integer and floating-point values only. Operational knobs that are naturally textual or enumerated --- a default locale, a provider selection, a retention policy name --- cannot be expressed and must therefore remain deployment constants, which is the very coupling the registry exists to remove.
+\end{itemize}
+
+\paragraph{Performance at media scale}
+\begin{itemize}
+    \item \textbf{Load-testing the media and AI clauses of NFR-2.1.} The load evaluation covers the HTTP control plane up to four times the NFR's concurrent-user target, but the NFR's other two clauses --- ten simultaneous video streams and five concurrent AI interview sessions --- remain unmeasured. Verifying them needs a deployment with published video material, a LiveKit media path driven by real WebRTC clients or a media-capable load generator, and an LLM budget for interview sessions, none of which the current development deployment provides. The interview control plane (session start, token minting, onboarding, state polling) is already scripted and cost-gated in the load suite, so extending coverage is a matter of environment rather than new tooling.
+    \item \textbf{A connection-pooling layer before further worker scaling.} The measured bottleneck progression --- single worker CPU, then PostgreSQL \texttt{max\_connections}, then worker CPU again --- was cleared by configuration each time. Scaling the worker count materially beyond four should first introduce a pooling layer such as PgBouncer between the application and PostgreSQL, so that capacity growth spends database connections linearly rather than per-worker, and should re-run the archived peak profile to locate the next wall.
 \end{itemize}
 
 % ===========================================================
