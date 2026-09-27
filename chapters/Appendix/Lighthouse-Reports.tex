@@ -1,7 +1,7 @@
 \section{Lighthouse Audit Reports}
 \label{appendix:lighthouse}
 
-This appendix reproduces the full Google Lighthouse audit evidence for the five pages summarised in Table~\ref{tab:lighthouse_results}. Each audit ran against the production deployment (\path|https://abridgeai.tech|) with desktop emulation, Lighthouse~v13 on Chrome~153. Authenticated pages were audited through a real signed-in session, so the rendered views below show the authenticated application rather than a login redirect.
+This appendix reproduces the Google Lighthouse audit evidence for the five pages summarised in Table~\ref{tab:lighthouse_results}, under the desktop emulation profile. Each audit ran against the production deployment (\path|https://abridgeai.tech|) with Lighthouse~v13 on Chrome~153 (1350$\times$940 viewport, desktop throttling). Authenticated pages were audited through a real signed-in session, so the rendered views below show the authenticated application rather than a login redirect.
 
 For each page, two figures are given: the Lighthouse category scores with the core web-vital metrics, and the final rendered screenshot captured by the audit itself.
 
@@ -12,14 +12,14 @@ For each page, two figures are given: the Lighthouse category scores with the co
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/lighthouse/login_scores.png}
-    \caption{Lighthouse audit scores and metrics for the Login page (Performance 85, Accessibility 100, Best Practices 100, SEO 100).}
+    \caption{Lighthouse audit scores and metrics for the Login page (Performance 100, Accessibility 100, Best Practices 100, SEO 100).}
     \label{fig:lh_login_scores}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/lighthouse/login_final.jpg}
-    \caption{Final rendered view of the Login page at audit time.}
+    \caption{Final desktop rendering of the Login page at audit time.}
     \label{fig:lh_login_final}
 \end{figure}
 
@@ -30,14 +30,14 @@ For each page, two figures are given: the Lighthouse category scores with the co
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/lighthouse/dashboard_scores.png}
-    \caption{Lighthouse audit scores and metrics for the Student Dashboard (Performance 96, Accessibility 96, Best Practices 100, SEO 100; CLS 0).}
+    \caption{Lighthouse audit scores and metrics for the Student Dashboard (Performance 100, Accessibility 96, Best Practices 100, SEO 100; CLS 0.006).}
     \label{fig:lh_dashboard_scores}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/lighthouse/dashboard_final.jpg}
-    \caption{Final rendered view of the authenticated Student Dashboard at audit time.}
+    \caption{Final desktop rendering of the authenticated Student Dashboard at audit time.}
     \label{fig:lh_dashboard_final}
 \end{figure}
 
@@ -48,14 +48,14 @@ For each page, two figures are given: the Lighthouse category scores with the co
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/lighthouse/courses_scores.png}
-    \caption{Lighthouse audit scores and metrics for the My Courses page (Performance 98, Accessibility 100, Best Practices 100, SEO 100).}
+    \caption{Lighthouse audit scores and metrics for the My Courses page (Performance 100, Accessibility 100, Best Practices 100, SEO 100).}
     \label{fig:lh_courses_scores}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/lighthouse/courses_final.jpg}
-    \caption{Final rendered view of the My Courses page at audit time.}
+    \caption{Final desktop rendering of the My Courses page at audit time.}
     \label{fig:lh_courses_final}
 \end{figure}
 
@@ -66,14 +66,14 @@ For each page, two figures are given: the Lighthouse category scores with the co
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/lighthouse/course-detail_scores.png}
-    \caption{Lighthouse audit scores and metrics for the Course Detail page (Performance 94, Accessibility 96, Best Practices 100, SEO 100).}
+    \caption{Lighthouse audit scores and metrics for the Course Detail page (Performance 100, Accessibility 96, Best Practices 100, SEO 100).}
     \label{fig:lh_course_detail_scores}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/lighthouse/course-detail_final.jpg}
-    \caption{Final rendered view of the Course Detail page at audit time.}
+    \caption{Final desktop rendering of the Course Detail page at audit time.}
     \label{fig:lh_course_detail_final}
 \end{figure}
 
@@ -84,13 +84,13 @@ For each page, two figures are given: the Lighthouse category scores with the co
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/lighthouse/quiz-attempt_scores.png}
-    \caption{Lighthouse audit scores and metrics for the Quiz Attempt Review page (Performance 96, Accessibility 95, Best Practices 100, SEO 100).}
+    \caption{Lighthouse audit scores and metrics for the Quiz Attempt Review page (Performance 100, Accessibility 95, Best Practices 100, SEO 100).}
     \label{fig:lh_quiz_scores}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{graphics/lighthouse/quiz-attempt_final.jpg}
-    \caption{Final rendered view of the Quiz Attempt Review page at audit time.}
+    \caption{Final desktop rendering of the Quiz Attempt Review page at audit time.}
     \label{fig:lh_quiz_final}
 \end{figure}
