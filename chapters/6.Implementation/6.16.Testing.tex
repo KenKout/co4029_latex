@@ -96,7 +96,7 @@ percentages do not; the 85.8\% headline above is coverage.py's own
 branch-inclusive total for the whole package.
 
 \begin{longtable}{|>{\raggedright\arraybackslash}m{0.42\textwidth}|r|r|r|r|}
-\caption{Backend statement coverage by package.}
+\caption{Backend tesing coverage by package.}
 \label{tab:coverage_by_area} \\
 \hline
 \textbf{Package} & \textbf{Files} & \textbf{Stmts} & \textbf{Missed} & \textbf{Cover} \\ \hline
@@ -143,36 +143,6 @@ reached without live media. The application factory in \path{api} is the lowest
 at 73\%: it is composition rather than logic --- router mounting and middleware
 registration --- and its uncovered lines are the production-only branches that
 a test client never takes.
-
-\subsubsection{Where testing shaped the implementation}
-
-Two areas are worth naming, because in each the test is the reason the code has
-the shape it does.
-
-The native interview runtime is tested at the \textit{authority boundary}
-rather than at the conversation. The model may generate phrasing; server code
-retains question selection, runtime-state persistence, hint and follow-up
-limits, progression, and terminal submission --- and the unit suite
-(\path{tests/unit/test_interview_native_agent.py} and its siblings) asserts
-exactly that division, so a change that let the model decide any of those
-fails. The seams that cannot be established without a database are covered
-separately: \path{test_interview_typed_turn_receipt.py} verifies receipt
-durability, idempotency and compare-and-set behaviour;
-\path{test_interview_late_fold_reeval.py} verifies re-evaluation when a receipt
-lands after an earlier verdict; and \path{test_interview_finish_race.py}
-verifies that a learner finishing and a native hard stop cannot both terminalise
-a session. Those three are race properties, and no amount of unit testing
-substitutes for them.
-
-The architectural suite inverts the usual relationship between tests and
-design. \path{tests/lint/} contains no behavioural assertions: it walks the
-application's own route table and model registry to assert that every route
-carrying organisation-scoped data applies the scope, that no write path
-bypasses the audit trail, and that prompt-injection hardening is present where
-learner-supplied text meets a model prompt. Alongside it, the import-linter
-contracts described in Appendix~\ref{appendix:implementation} machine-check
-that no feature reaches into another's internals. Both convert a convention
-that would otherwise rely on a reviewer noticing into a build failure.
 
 \subsubsection{Continuous integration and excluded suites}
 \label{sec:impl_ci}
