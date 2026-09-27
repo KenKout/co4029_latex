@@ -7,31 +7,33 @@ This chapter evaluates the aBridgeAI system across four dimensions: frontend use
 \subsection{Frontend Evaluation}
 \label{sec:eval_frontend}
 
-Frontend quality is assessed with Google Lighthouse (v13, Chrome 153, desktop emulation) against the deployed production site. Five representative pages are audited: the public Login page and four authenticated learner pages (Student Dashboard, My Courses, Course Detail, and a submitted Quiz Attempt Review). Authenticated pages are audited with a dedicated test account whose long-lived session is minted with the application's own signing key, so every audit exercises the real authenticated rendering path rather than a login redirect.
+Frontend quality is assessed with Google Lighthouse (v13, Chrome 153) against the deployed production site, auditing every page under both the mobile and the desktop emulation profiles. Five representative pages are audited: the public Login page and four authenticated learner pages (Student Dashboard, My Courses, Course Detail, and a submitted Quiz Attempt Review). Authenticated pages are audited with a dedicated test account whose long-lived session is minted with the application's own signing key, so every audit exercises the real authenticated rendering path rather than a login redirect.
 
 Table~\ref{tab:lighthouse_results} summarises the per-page scores and the average across pages; the full audit reports, including per-page metric details and final-view screenshots, are reproduced in Appendix~\ref{appendix:lighthouse}.
 
 \begin{table}[htbp]
 \centering
-\caption{Lighthouse Audit Results (Desktop Emulation, Lighthouse v13, Production Deployment)}
+\caption{Lighthouse Audit Results (Lighthouse v13, Chrome 153, Production Deployment)}
 \label{tab:lighthouse_results}
 \renewcommand{\arraystretch}{1.3}
-\begin{tabular}{|l|c|c|c|c|}
+\small
+\begin{tabular}{|l|c|c|c|c||c|c|c|c|}
 \hline
-\textbf{Page} & \textbf{Performance} & \textbf{Accessibility} & \textbf{Best Practices} & \textbf{SEO} \\
+& \multicolumn{4}{c||}{\textbf{Mobile emulation}} & \multicolumn{4}{c|}{\textbf{Desktop emulation}} \\
+\textbf{Page} & \textbf{P} & \textbf{A} & \textbf{BP} & \textbf{SEO} & \textbf{P} & \textbf{A} & \textbf{BP} & \textbf{SEO} \\
 \hline
-Login                  & 85  & 100 & 100 & 100 \\
-Student Dashboard      & 96  & 96  & 100 & 100 \\
-My Courses             & 98  & 100 & 100 & 100 \\
-Course Detail          & 94  & 96  & 100 & 100 \\
-Quiz Attempt Review    & 96  & 95  & 100 & 100 \\
+Login                  & 85  & 100 & 100 & 100 & 100 & 100 & 100 & 100 \\
+Student Dashboard      & 96  & 96  & 100 & 100 & 100 & 96  & 100 & 100 \\
+My Courses             & 98  & 100 & 100 & 100 & 100 & 100 & 100 & 100 \\
+Course Detail          & 94  & 96  & 100 & 100 & 100 & 96  & 100 & 100 \\
+Quiz Attempt Review    & 96  & 95  & 100 & 100 & 100 & 95  & 100 & 100 \\
 \hline
-\textbf{Average}       & \textbf{93.8} & \textbf{97.4} & \textbf{100} & \textbf{100} \\
+\textbf{Average}       & \textbf{93.8} & \textbf{97.4} & \textbf{100} & \textbf{100} & \textbf{100} & \textbf{97.4} & \textbf{100} & \textbf{100} \\
 \hline
 \end{tabular}
 \end{table}
 
-The Login page records the lowest Performance score (85) of the set: its first paint waits on the render-blocking stylesheet and the preloaded font set, and Lighthouse's cold-profile audit offers no warm-cache credit. All other pages score at least 94, and every page achieves a perfect Best Practices and SEO score --- the latter reflecting the crawlability, canonical, and indexing fixes applied during the evaluation iteration. Two audit findings surfaced by the dashboard run (a 0.43 cumulative layout shift caused by a collapsing loading skeleton, and the invalid canonical URL on deep links) were fixed during this evaluation and re-measured at zero shift and full SEO score respectively. These automated results support the audited frontend configuration and web-platform practices, but do not independently establish WCAG~2.1 AA conformance without complementary keyboard, contrast, and assistive-technology checks.
+Mobile emulation applies Lighthouse's default constrained profile (slow 4G throttling, 4$\times$ CPU slowdown, 412\,px viewport); desktop emulation applies the lighter desktop profile (40\,ms RTT, 10\,Mbps, unthrottled CPU). Under the desktop profile every page scores a perfect 100 in Performance, Best Practices, and SEO, and every page achieves a perfect SEO and Best Practices score under both profiles --- the latter reflecting the crawlability, canonical, and indexing fixes applied during the evaluation iteration. Two audit findings surfaced by the initial dashboard run (a 0.43 cumulative layout shift caused by a collapsing loading skeleton, and the invalid canonical URL on deep links) were fixed during this evaluation and re-measured at zero shift and full SEO score respectively. These automated results support the audited frontend configuration and web-platform practices, but do not independently establish WCAG~2.1 AA conformance without complementary keyboard, contrast, and assistive-technology checks.
 
 % ===========================================================
 \subsection{Backend Performance}
