@@ -1,20 +1,184 @@
 \subsection{Testing}
 \label{sec:impl_testing}
 
-The backend uses \path{pytest}. Asynchronous tests are supported through \texttt{asyncio\_mode = "auto"}; the test root is \path{tests/}. The default suite measures branch coverage for the \path{abridgeai} package, requires at least 75\% coverage, and excludes tests marked \texttt{destructive} or \texttt{voice\_live}. This section documents the implemented test strategy and coverage boundaries rather than reporting an unsupported historical pass-count total.
+Verification of this system is documented in four places, and it is worth
+stating once which owns what. Section~\ref{sec:impl_testing} --- this one ---
+describes how the implementation is verified: the layers the suite is built
+from, what each layer can establish that the others cannot, what the suite
+measures, and what is deliberately left outside it. The test cases themselves,
+traced to the requirements they discharge, are designed in
+Section~\ref{sec:testcase_design} and listed in full in
+Appendix~\ref{appendix:testcases}; the per-case execution detail behind the
+totals reported here is in Appendix~\ref{appendix:implementation}. Quality
+attributes --- latency under load against the non-functional targets, frontend
+audit scores, and generated-question quality --- are not verified by this suite
+at all: they are measured, and those measurements are Chapter~\ref{sec:evaluation}'s.
 
-\subsubsection{Native Interview Test Coverage}
+\subsubsection{Test architecture}
 
-The native interview runtime is tested at both deterministic and database-backed boundaries. Unit tests verify feature-flag routing, native-agent tool exposure, persistent conversational-state preparation, server-controlled state notes, answer grading, transcript persistence, typed-input processing, resume behavior, and hard-stop termination. Representative modules are \path{tests/unit/test\_interview\_native\_agent.py}, \path{tests/unit/test\_interview\_native\_scenarios.py}, \path{tests/unit/test\_interview\_native\_grading.py}, \path{tests/unit/test\_interview\_native\_transcript.py}, \path{tests/unit/test\_interview\_native\_text\_input.py}, and \path{tests/unit/test\_interview\_native\_resume\_and\_hard\_stop.py}.
+The suite is layered by what each layer is able to prove, not by the packages
+it happens to cover. The distinction that matters most is between the tests
+that may touch a database and the tests that may not.
 
-These tests focus on the native authority boundary: the conversational LLM may generate phrasing, but server code retains question selection, runtime-state persistence, hint and follow-up limits, progression, and terminal submission. They also verify that typed turns use receipt-based idempotency while spoken recognition remains a best-effort media path rather than an exactly-once transport.
+\begin{table}[H]
+\centering
+\caption{Test layers, what each establishes, and what it requires to run.}
+\label{tab:test_layers}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{|>{\raggedright\arraybackslash}m{0.17\textwidth}|>{\raggedright\arraybackslash}m{0.40\textwidth}|>{\raggedright\arraybackslash}m{0.22\textwidth}|c|}
+\hline
+\textbf{Layer} & \textbf{What it establishes} & \textbf{Requires} & \textbf{Files} \\ \hline
+Backend unit & Pure logic and single-module behaviour: scheduling arithmetic, grading, derivation rules, router branches driven by stubbed sessions. & Nothing external & 299 \\ \hline
+Backend integration & Properties that exist only in the database: transaction boundaries, cascade and constraint behaviour, raw SQL, concurrency and race handling. & PostgreSQL + Redis & 166 \\ \hline
+Architectural & Invariants that are otherwise matters of review: audit bypass, org-scoped routing, prompt-injection hardening. & Nothing external & 3 \\ \hline
+Characterisation & Behaviour of the legacy surface preserved across the ORM consolidation and cutover. & PostgreSQL & 2 \\ \hline
+Frontend unit / component & Component rendering, hook state machines, guard and invalidation wiring, formatting and i18n integrity. & jsdom, requests intercepted at the network boundary & 229 \\ \hline
+Frontend end-to-end & Whole journeys through a real browser against a running stack, including a smoke wave and an accessibility wave. & Browser + full stack & 9 \\ \hline
+\end{tabular}
+\end{table}
 
-Database-backed integration tests exercise native seams that cannot be established by isolated unit tests. \path{tests/integration/test\_interview\_typed\_turn\_receipt.py} verifies receipt durability, idempotency, question linkage, and compare-and-set behavior; \path{tests/integration/test\_interview\_late\_fold\_reeval.py} verifies reevaluation when a receipt lands after an earlier verdict; and \path{tests/integration/test\_interview\_finish\_race.py} verifies concurrent learner finish and native hard-stop terminalization. Together, these tests validate the persistence and race-safety properties described in Section~\ref{sec:impl_interviews}.
+The split between the first two rows is the load-bearing one. A unit test that
+stubs the session can assert that a service calls what it should and in what
+order --- the commit-then-dispatch ordering the notification path depends on is
+verified exactly this way --- but it cannot establish that a constraint fires,
+that a cascade reaches the rows it should, or that two concurrent writers reach
+a consistent state. Those properties do not exist in Python; they exist in
+PostgreSQL, and the tests that assert them run against a real instance with the
+migrations applied. The architectural layer is the unusual one: rather than
+testing behaviour, it walks the route table and the model registry to assert
+that no route escapes organisation scoping and no write escapes the audit
+trail, so an invariant that would otherwise depend on a reviewer noticing fails
+the build instead.
 
-\subsubsection{Continuous Integration and Live Voice Boundary}
+\subsubsection{Results}
+
+Both suites were executed in full on the deployment server. The backend run
+applies the migrations first and measures branch coverage over the
+\path{abridgeai} package in the same pass.
+
+\begin{table}[H]
+\centering
+\caption{Executed test results.}
+\label{tab:test_results}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{|l|r|r|r|}
+\hline
+ & \textbf{Backend} & \textbf{Front-end} & \textbf{End-to-end} \\ \hline
+Passed & 6{,}871 & 1{,}668 & 52 \\ \hline
+Skipped & 16 & 0 & 26 \\ \hline
+Deselected by marker & 3 & --- & --- \\ \hline
+Expected failures (\texttt{xfail} / \texttt{xpass}) & 5 / 7 & --- & --- \\ \hline
+Failed & 0 & 0 & 0 \\ \hline
+Test files & 472 & 229 & 9 \\ \hline
+Wall-clock duration & 13\,min 26\,s & 75.9\,s & 2\,min 6\,s \\ \hline
+\end{tabular}
+\end{table}
+
+That is 8{,}591 executed cases with no failures. Coverage over the backend is
+\textbf{85.8\%} measured with branch coverage across 45{,}945 statements,
+against a configured gate of 75\% that fails the build when it is not met. The
+front-end runs report no coverage figure because the gate is not applied there;
+their file counts are given above instead.
+
+The end-to-end column is the smallest and the most expensive per case, which is
+the expected shape: each of those 52 drives a real browser against a running
+stack. Its 26 skips are conditional rather than disabled --- a spec that needs a
+processed material or a live interview session skips itself when the fixture
+data is absent, which keeps an environment-dependent scenario from being
+reported as a failure of the code. Ten of the 52 are accessibility scans, one
+per learner, teacher and administrator route, each asserting that the page
+carries no axe violation of serious or critical impact.
+
+Table~\ref{tab:coverage_by_area} breaks the backend figure down by package.
+Statement coverage is reported per area rather than the branch-inclusive
+figure, because statements aggregate exactly across files while branch
+percentages do not; the 85.8\% headline above is coverage.py's own
+branch-inclusive total for the whole package.
+
+\begin{longtable}{|>{\raggedright\arraybackslash}m{0.42\textwidth}|r|r|r|r|}
+\caption{Backend statement coverage by package.}
+\label{tab:coverage_by_area} \\
+\hline
+\textbf{Package} & \textbf{Files} & \textbf{Stmts} & \textbf{Missed} & \textbf{Cover} \\ \hline
+\endfirsthead
+\multicolumn{5}{c}%
+{{\bfseries Table \thetable\ -- Continued from previous page}} \\
+\hline
+\textbf{Package} & \textbf{Files} & \textbf{Stmts} & \textbf{Missed} & \textbf{Cover} \\ \hline
+\endhead
+\hline \multicolumn{5}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+\path|features/interviews|        & 154 & 13{,}156 & 1{,}880 & 85.7\% \\ \hline
+\path|features/quizzes|           &  91 &  7{,}552 &    819 & 89.2\% \\ \hline
+\path|features/courses|           &  30 &  4{,}551 &    597 & 86.9\% \\ \hline
+\path|ai|                         &  58 &  3{,}663 &    325 & 91.1\% \\ \hline
+\path|features/materials|         &  33 &  2{,}606 &    273 & 89.5\% \\ \hline
+\path|features/career_paths|      &  15 &  1{,}936 &    273 & 85.9\% \\ \hline
+\path|features/admin|             &  30 &  1{,}926 &    133 & 93.1\% \\ \hline
+\path|features/access_control|    &  13 &  1{,}682 &    180 & 89.3\% \\ \hline
+\path|features/learning_programs| &   7 &  1{,}497 &    142 & 90.5\% \\ \hline
+\path|core|                       &  30 &  1{,}470 &    105 & 92.9\% \\ \hline
+\path|features/identity|          &  18 &  1{,}281 &     84 & 93.4\% \\ \hline
+\path|features/spaced_repetition| &  18 &  1{,}229 &    120 & 90.2\% \\ \hline
+\path|features/enrollments|       &  15 &    687 &     83 & 87.9\% \\ \hline
+\path|features/notifications|     &  11 &    593 &     77 & 87.0\% \\ \hline
+\path|features/progress|          &  13 &    575 &     64 & 88.9\% \\ \hline
+\path|features/discussions|       &   7 &    428 &     67 & 84.3\% \\ \hline
+\path|features/policies|          &   6 &    399 &     26 & 93.5\% \\ \hline
+\path|infrastructure|             &   5 &    317 &     31 & 90.2\% \\ \hline
+\path|api|                        &   1 &    185 &     50 & 73.0\% \\ \hline
+\path|access_control|             &   3 &    153 &     13 & 91.5\% \\ \hline
+\path|workers|                    &   3 &     59 &      0 & 100.0\% \\ \hline
+\textbf{Total}                    & \textbf{561} & \textbf{45{,}945} & \textbf{5{,}342} & \textbf{88.4\%} \\ \hline
+\end{longtable}
+
+The distribution follows the risk rather than the line count. Identity,
+configuration policy, the administrative surface and the shared \texttt{core}
+layer sit above 92\%, being small, widely depended upon, and cheap to exercise.
+The interview feature carries the largest absolute gap because it is both the
+largest package and the one with the most real-time behaviour that cannot be
+reached without live media. The application factory in \path{api} is the lowest
+at 73\%: it is composition rather than logic --- router mounting and middleware
+registration --- and its uncovered lines are the production-only branches that
+a test client never takes.
+
+\subsubsection{Where testing shaped the implementation}
+
+Two areas are worth naming, because in each the test is the reason the code has
+the shape it does.
+
+The native interview runtime is tested at the \textit{authority boundary}
+rather than at the conversation. The model may generate phrasing; server code
+retains question selection, runtime-state persistence, hint and follow-up
+limits, progression, and terminal submission --- and the unit suite
+(\path{tests/unit/test_interview_native_agent.py} and its siblings) asserts
+exactly that division, so a change that let the model decide any of those
+fails. The seams that cannot be established without a database are covered
+separately: \path{test_interview_typed_turn_receipt.py} verifies receipt
+durability, idempotency and compare-and-set behaviour;
+\path{test_interview_late_fold_reeval.py} verifies re-evaluation when a receipt
+lands after an earlier verdict; and \path{test_interview_finish_race.py}
+verifies that a learner finishing and a native hard stop cannot both terminalise
+a session. Those three are race properties, and no amount of unit testing
+substitutes for them.
+
+The architectural suite inverts the usual relationship between tests and
+design. \path{tests/lint/} contains no behavioural assertions: it walks the
+application's own route table and model registry to assert that every route
+carrying organisation-scoped data applies the scope, that no write path
+bypasses the audit trail, and that prompt-injection hardening is present where
+learner-supplied text meets a model prompt. Alongside it, the import-linter
+contracts described in Appendix~\ref{appendix:implementation} machine-check
+that no feature reaches into another's internals. Both convert a convention
+that would otherwise rely on a reviewer noticing into a build failure.
+
+\subsubsection{Continuous integration and excluded suites}
 \label{sec:impl_ci}
 
-The normal test command is \texttt{uv run pytest}. In continuous integration, migrations are applied before one complete coverage run:
+The ordinary command is \texttt{uv run pytest}. In continuous integration the
+migrations are applied before a single coverage run:
 
 \begin{verbatim}
 uv run alembic upgrade head
@@ -22,6 +186,39 @@ uv run pytest --cov=abridgeai --cov-report=xml \
   --cov-report=term-missing --cov-fail-under=75
 \end{verbatim}
 
-The CI environment provides PostgreSQL and Redis service containers. Its quality gates are linting, security scanning, and the test job; the test job does not claim to execute paid or credentialed voice infrastructure. The configured default marker expression excludes \texttt{destructive} and \texttt{voice\_live} tests.
+The CI environment provides PostgreSQL and Redis service containers, and the
+job sits alongside linting and security scanning as a required gate. The
+frontend equivalents are \texttt{npm run test:run} for the unit and component
+suite and \texttt{npm run test:e2e} for the browser suite.
 
-A separate opt-in harness, \path{tests/integration/test\_voice\_live\_harness.py}, drives English and Vietnamese LiveKit voice scenarios. It requires \texttt{RUN\_LIVEKIT\_VOICE\_TESTS=1}, LiveKit credentials, and an LLM endpoint credential; it checks audible agent output, persisted turns, and cleanup. Because this harness consumes external real-time services, it is intentionally excluded from the ordinary CI suite. This distinction ensures that deterministic state and persistence behavior is continuously verified while live STT/TTS/WebRTC validation remains an explicit operational test.
+Three things are deliberately outside the gated run. The \texttt{voice\_live}
+marker guards an opt-in harness
+(\path{tests/integration/test_voice_live_harness.py}) that drives English and
+Vietnamese LiveKit scenarios end to end, checking audible agent output,
+persisted turns and cleanup; it requires \texttt{RUN\_LIVEKIT\_VOICE\_TESTS=1},
+LiveKit credentials and a live model endpoint, so it consumes paid external
+services and cannot be a per-commit gate. The \texttt{destructive} marker
+guards tests that reset shared state. The Playwright suite needs a browser and a
+running stack, so it is executed against the deployed environment rather than in
+the per-commit unit job; the end-to-end column of
+Table~\ref{tab:test_results} reports that run. The resulting boundary is
+deliberate: deterministic state, persistence and race-safety behaviour is
+verified continuously, while live STT, TTS and WebRTC validation remains an
+explicit operational test.
+
+That boundary carries a cost worth recording, because it is the one this suite
+paid most visibly. An end-to-end assertion is reached only through a chain of
+environment --- browser binaries, the backend's signing key and database,
+fixture state, and the rendered language --- and a break anywhere along it
+surfaces as dozens of failing assertions rather than as one configuration
+error. Reading such a run therefore begins by asking whether the failures share
+a cause, not by treating them as a list of defects: in practice they rarely
+are one.
+
+One limit should be stated plainly, because no quantity of passing tests
+addresses it. This suite establishes that the system behaves as specified; it
+does not establish that the specification improves learning. In particular the
+scheduling model of Appendix~\ref{appendix:algorithm} is verified against its
+own definition --- the derivation of $Q$, the ease-factor update, the interval
+rules and their boundary conditions --- and not against retention outcomes,
+which would require a longitudinal cohort study outside this project's scope.
