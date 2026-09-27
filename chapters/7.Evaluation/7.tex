@@ -39,7 +39,7 @@ Mobile emulation applies Lighthouse's default constrained profile (slow 4G throt
 \subsection{Backend Performance}
 \label{sec:eval_backend}
 
-Backend performance is evaluated with k6 against the deployed system. The methodology deliberately replaces the read-only, single-endpoint scenarios of the specialized project with a multi-user mixed read/write profile tied directly to NFR-2.1, and the evaluation doubles as a remediation loop: three deployment configurations are measured in sequence, each bottleneck found is fixed, and the fix is verified by re-running the identical load.
+Backend performance is evaluated with k6 against the deployed system. The methodology deliberately replaces the read-only, single-endpoint scenarios of the capstone project with a multi-user mixed read/write profile tied directly to NFR-2.1, and the evaluation doubles as a remediation loop: three deployment configurations are measured in sequence, each bottleneck found is fixed, and the fix is verified by re-running the identical load.
 
 \subsubsection{Test Environment}
 
@@ -132,7 +132,7 @@ C (4wk + PG300) & $4\times$ & 200 & 111.5 & 539\,ms & 5.34\,s & 11.92\,s & 0.00 
 \subsection{Requirements Scope}
 \label{sec:eval_fr_coverage}
 
-This section distinguishes the Functional Requirements Specification (FRS) prepared for the Specialized Project phase from the final Capstone Project FRS. The Specialized Project FRS contains 57 functional requirements (FRs), represented by Modules 1--4 in Appendix~\ref{appendix:fr}. The Capstone Project FRS expands the specification to 106 FRs. Its additional Bonus section contains 49 FRs in Modules 5--8.
+This section distinguishes the Functional Requirements Specification (FRS) prepared for the Capstone Project phase from the final Capstone Project FRS. The Capstone Project FRS contains 57 functional requirements (FRs), represented by Modules 1--4 in Appendix~\ref{appendix:fr}. The Capstone Project FRS expands the specification to 106 FRs. Its additional Bonus section contains 49 FRs in Modules 5--8.
 
 Table~\ref{tab:fr_scope_comparison} compares the two requirements baselines. The increase reflects broader capstone scope.
 
