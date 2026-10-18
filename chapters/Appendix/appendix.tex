@@ -1,14 +1,14 @@
+% Appendix list for Volume I --- the appendices a reader needs while reading
+% the body: technology comparisons, the algorithm and process-flow
+% specifications, the database design, and the structural diagrams.
+%
+% The reference catalogues (requirements, use cases, API surface, site map,
+% UI inventory, test cases, audit reports) are in Volume II; see
+% appendix-volume2.tex. Between the two lists every appendix file is input
+% exactly once.
 \begin{appendices}
 \renewcommand{\thesection}{\Alph{section}}
 \titleformat{\section}{\normalfont\Large\bfseries}{Appendix \thesection}{1em}{}
-\input{chapters/Appendix/Functional-Requirement}
-\clearpage
-\input{chapters/Appendix/N-Functional-Requirement}
-\clearpage
-\input{chapters/Appendix/Data-Requirement}
-\clearpage
-\input{chapters/Appendix/Use-Case}
-\clearpage
 \input{chapters/Appendix/Tech-Stack-Comparison}
 \clearpage
 \input{chapters/Appendix/Algorithm-Design}
@@ -21,15 +21,5 @@
 \clearpage
 \input{chapters/Appendix/Class-Diagram}
 \clearpage
-\input{chapters/Appendix/API-Design}
-\clearpage
-\input{chapters/Appendix/Site-Map}
-\clearpage
-\input{chapters/Appendix/UI-UX}
-\clearpage
-\input{chapters/Appendix/Test-Case}
-\clearpage
 \input{chapters/Appendix/Implementation}
-\clearpage
-\input{chapters/Appendix/Lighthouse-Reports}
 \end{appendices}

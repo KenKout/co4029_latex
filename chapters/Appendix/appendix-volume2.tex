@@ -1,0 +1,25 @@
+% Appendix list for Volume II --- the reference catalogues.
+% The counterpart list for Volume I is appendix.tex. Between them every
+% appendix file is input exactly once, so nothing is duplicated across the two
+% volumes and nothing is orphaned.
+\begin{appendices}
+\renewcommand{\thesection}{\Alph{section}}
+\titleformat{\section}{\normalfont\Large\bfseries}{Appendix \thesection}{1em}{}
+\input{chapters/Appendix/Functional-Requirement}
+\clearpage
+\input{chapters/Appendix/N-Functional-Requirement}
+\clearpage
+\input{chapters/Appendix/Data-Requirement}
+\clearpage
+\input{chapters/Appendix/Use-Case}
+\clearpage
+\input{chapters/Appendix/API-Design}
+\clearpage
+\input{chapters/Appendix/Site-Map}
+\clearpage
+\input{chapters/Appendix/UI-UX}
+\clearpage
+\input{chapters/Appendix/Test-Case}
+\clearpage
+\input{chapters/Appendix/Lighthouse-Reports}
+\end{appendices}

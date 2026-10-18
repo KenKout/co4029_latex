@@ -43,7 +43,7 @@ User Requirements articulate the functional needs of the system from the perspec
 \end{itemize}
 \subsubsection{Functional Requirements}
 
-The functional requirements of aBridgeAI specify the concrete system behaviours, processes, and user interactions that the platform must support. They are organised into eight functional modules: (1)~Authentication and Access Control, (2)~Organisation and User Management, (3)~Course and Material Management, (4)~Learning Loop and Adaptive Quiz, (5)~Application Loop and Mock Interview, (6)~Analytics, Reporting, and Notifications, (7)~Learning Programs and Path Governance, and (8)~Platform Configuration and Policy Documents. Each requirement is traced to one or more User Requirements to ensure comprehensive coverage and end-to-end traceability. The complete specification --- one hundred requirements, each with its actors, traced user requirement, feasibility and testability assessment, and priority --- is given in Appendix~\ref{appendix:fr}, and is not reproduced here.
+The functional requirements of aBridgeAI specify the concrete system behaviours, processes, and user interactions that the platform must support. They are organised into eight functional modules: (1)~Authentication and Access Control, (2)~Organisation and User Management, (3)~Course and Material Management, (4)~Learning Loop and Adaptive Quiz, (5)~Application Loop and Mock Interview, (6)~Analytics, Reporting, and Notifications, (7)~Learning Programs and Path Governance, and (8)~Platform Configuration and Policy Documents. Each requirement is traced to one or more User Requirements to ensure comprehensive coverage and end-to-end traceability. The complete specification --- one hundred requirements, each with its actors, traced user requirement, feasibility and testability assessment, and priority --- is given in \voltwo{appendix:fr}, and is not reproduced here.
 
 The modules divide along the lines the system itself is built on. Modules~1 and~2 establish who a user is and what they may do: federated sign-in, second-factor verification, and the dynamic role and permission model, then the tenant structure of organisations, faculties and memberships within which every later permission is resolved. Modules~3 to~5 carry the teaching loop in the order a learner meets it --- a course and its ingested materials, the quiz cycle and the spaced-repetition scheduling that governs progression, and the mock interview that tests explanation rather than recognition. Module~6 turns what those produce into reporting, notification and audit.
 
@@ -58,7 +58,7 @@ Two properties hold across the assessment requirements and are worth stating onc
 % =================================================
 \subsubsection{Non-Functional Requirements}
 
-Non-functional requirements define the quality attributes and operational constraints of aBridgeAI, specifying how the system behaves rather than what it does. They govern performance, scalability, security, and usability properties that collectively determine the reliability and institutional suitability of the platform. The complete Non-Functional Requirements specification is provided in Appendix~\ref{appendix:nfr}. Representative points are summarised below:
+Non-functional requirements define the quality attributes and operational constraints of aBridgeAI, specifying how the system behaves rather than what it does. They govern performance, scalability, security, and usability properties that collectively determine the reliability and institutional suitability of the platform. The complete Non-Functional Requirements specification is provided in \voltwo{appendix:nfr}. Representative points are summarised below:
 
 \begin{itemize}
     \item Performance and latency targets ensure AI interview responses and core learning workflows remain responsive for users.
@@ -67,7 +67,7 @@ Non-functional requirements define the quality attributes and operational constr
     \item Usability and accessibility requirements emphasise responsive UI and WCAG 2.1 AA alignment.
 \end{itemize}
 
-\noindent Two of these carry more weight than their priority suggests. The concurrency target is modest by design --- the deployment is institutional rather than public, and the measured headroom against it is reported in Section~\ref{sec:evaluation} --- but the accessibility requirement is the one most likely to be treated as optional and least likely to be recoverable late, since retrofitting keyboard navigation and contrast onto a finished component library costs far more than building to them. The nineteen requirements, with their actors and priorities, are enumerated in Appendix~\ref{appendix:nfr}.
+\noindent Two of these carry more weight than their priority suggests. The concurrency target is modest by design --- the deployment is institutional rather than public, and the measured headroom against it is reported in Section~\ref{sec:evaluation} --- but the accessibility requirement is the one most likely to be treated as optional and least likely to be recoverable late, since retrofitting keyboard navigation and contrast onto a finished component library costs far more than building to them. The nineteen requirements, with their actors and priorities, are enumerated in \voltwo{appendix:nfr}.
 
 
 
@@ -80,7 +80,7 @@ requirements identify what information must be captured, maintained,
 and related to support each system capability. The complete
 specification --- fifteen domains, covering the full lifecycle of
 content creation, assessment, learner modeling, and progress reporting
---- is provided in Appendix~\ref{appendix:data}. The governing
+--- is provided in \voltwo{appendix:data}. The governing
 demands are as follows.
 
 \begin{itemize}

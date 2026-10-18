@@ -10,6 +10,16 @@
 \section{API Designs Specification}
 \label{appendix:api-design}
 
+% Specification tables are reference material, not prose: a step down in
+% size and a tighter row stretch cost nothing in legibility and a great
+% deal in printed bulk. The stretch is set here as well as on the
+% individual tables, because not every table in this appendix declares one.
+% Grouped so neither change leaks into the appendix that follows.
+\begingroup
+\small
+\renewcommand{\arraystretch}{1.12}
+
+
 % ────────────────────────────────────────────────────────────
 \subsection{Architecture \& Design Philosophy}
 % ────────────────────────────────────────────────────────────
@@ -889,7 +899,7 @@ This catalogue captures the live Swagger UI rendered by FastAPI from \texttt{/op
 
 A learning programme bundles career paths into a single enrolment. Authoring is version-based: edits land on an open draft and publishing freezes it, so a student who enrolled under version~2 continues to see version~2. Enrolment places a student on the programme version's default path at once; further paths may be added directly, up to the limit the version declares. The request endpoints implement the dean-review workflow by which a student leaves a path --- moving to another without losing progress on courses the two share, or dropping one outright --- and both kinds share one queue, one open-request slot and one switch allowance.
 
-\renewcommand{\arraystretch}{1.25}
+\renewcommand{\arraystretch}{1.12}
 \small
 \begin{longtable}{|>{\raggedright\arraybackslash}m{0.07\textwidth}|>{\raggedright\arraybackslash}m{0.45\textwidth}|>{\raggedright\arraybackslash}m{0.38\textwidth}|}
 \caption{Learning Programs endpoints.}
@@ -935,7 +945,7 @@ A learning programme bundles career paths into a single enrolment. Authoring is 
 
 Platform policies (terms, privacy, academic regulations) are authored under \path|/admin| and read under \path|/policies|. Versioning is copy-on-write --- a published version is immutable, and correcting it means opening a new draft --- so the text a reader agreed to can always be retrieved. Audience is a set of roles; an empty set means public, including signed-out visitors.
 
-\renewcommand{\arraystretch}{1.25}
+\renewcommand{\arraystretch}{1.12}
 \small
 \begin{longtable}{|>{\raggedright\arraybackslash}m{0.07\textwidth}|>{\raggedright\arraybackslash}m{0.45\textwidth}|>{\raggedright\arraybackslash}m{0.38\textwidth}|}
 \caption{Policies endpoints.}
@@ -969,7 +979,7 @@ Platform policies (terms, privacy, academic regulations) are authored under \pat
 
 Discussion topics are opened by course managers and answered by enrolled students. A topic is scoped either to one lesson or to the course as a whole; both use the same comment, moderation and notification paths, which is why the two create endpoints differ only in their parent resource. Replies carry a parent comment, which is also what determines who is notified.
 
-\renewcommand{\arraystretch}{1.25}
+\renewcommand{\arraystretch}{1.12}
 \small
 \begin{longtable}{|>{\raggedright\arraybackslash}m{0.07\textwidth}|>{\raggedright\arraybackslash}m{0.45\textwidth}|>{\raggedright\arraybackslash}m{0.38\textwidth}|}
 \caption{Discussions endpoints.}
@@ -1003,7 +1013,7 @@ Discussion topics are opened by course managers and answered by enrolled student
 
 An invitation code lets a student self-enrol onto a course without a manager adding them individually. Codes carry an optional expiry and usage limit; revoking a code stops further redemptions but does not withdraw anyone already enrolled through it.
 
-\renewcommand{\arraystretch}{1.25}
+\renewcommand{\arraystretch}{1.12}
 \small
 \begin{longtable}{|>{\raggedright\arraybackslash}m{0.07\textwidth}|>{\raggedright\arraybackslash}m{0.45\textwidth}|>{\raggedright\arraybackslash}m{0.38\textwidth}|}
 \caption{Course Invitation Codes endpoints.}
@@ -1024,3 +1034,5 @@ An invitation code lets a student self-enrol onto a course without a manager add
 
 \end{longtable}
 \normalsize
+
+\endgroup

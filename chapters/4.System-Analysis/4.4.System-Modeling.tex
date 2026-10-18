@@ -22,7 +22,7 @@ The Overall Use Case Diagram provides a macroscopic view of the aBridgeAI system
 % ==========================================
 \subsubsection{Detailed Use Case Diagrams and Use Case Specifications}
 
-The detailed use case diagrams decompose the overall system into module-level views. Each module-level diagram is followed by use case specifications that illustrate the most important workflows of that module. To keep the main report concise, only the most critical use cases are described in this section. The complete set of use case specifications is provided in Appendix~\ref{appendix:usecase-specifications}.
+The detailed use case diagrams decompose the overall system into module-level views. Each module-level diagram is followed by use case specifications that illustrate the most important workflows of that module. To keep the main report concise, only the most critical use cases are described in this section. The complete set of use case specifications is provided in \voltwo{appendix:usecase-specifications}.
 
 
 % ================1 Authentication and Access Control Module==========================
@@ -39,7 +39,7 @@ The diagram highlights that all users must authenticate before accessing protect
     \label{fig:auth_access_usecase}
 \end{figure}
 
-The full set of use case specifications for this module is provided in Appendix~\ref{appendix:usecase-specifications}.
+The full set of use case specifications for this module is provided in \voltwo{appendix:usecase-specifications}.
 
 
 
@@ -58,7 +58,7 @@ IT Administrators are responsible for provisioning and managing tenant organisat
     \label{fig:org_user_usecase}
 \end{figure}
 
-\noindent The use case specifications for this module --- including tenant organisation management, which exercises the provisioning, lifecycle and domain-attachment flows in full --- are given in Appendix~\ref{appendix:usecase-specifications}.
+\noindent The use case specifications for this module --- including tenant organisation management, which exercises the provisioning, lifecycle and domain-attachment flows in full --- are given in \voltwo{appendix:usecase-specifications}.
 
 
 % ==========================================
@@ -76,7 +76,7 @@ The diagram also shows the student-facing side of the module, where enrolled Stu
     \label{fig:course_material_usecase}
 \end{figure}
 
-\noindent The use case specifications for this module --- including the upload and ingestion workflow for learning materials --- are given in Appendix~\ref{appendix:usecase-specifications}.
+\noindent The use case specifications for this module --- including the upload and ingestion workflow for learning materials --- are given in \voltwo{appendix:usecase-specifications}.
 
 
 % =====================4 Learning Loop and Adaptive Quiz Module =====================
@@ -93,7 +93,7 @@ Teachers create or review quiz questions, configure expected response time $T_{\
     \label{fig:learning_loop_usecase}
 \end{figure}
 
-\noindent The use case specifications for this module --- including the adaptive quiz workflow, with $Q$ derivation and hybrid SM-2 scheduling --- are given in Appendix~\ref{appendix:usecase-specifications}.
+\noindent The use case specifications for this module --- including the adaptive quiz workflow, with $Q$ derivation and hybrid SM-2 scheduling --- are given in \voltwo{appendix:usecase-specifications}.
 
 
 
@@ -113,7 +113,7 @@ Because the assessment is conducted through a conversational model, the module a
     \label{fig:mock_interview_usecase}
 \end{figure}
 
-The full set of use case specifications for this module is provided in Appendix~\ref{appendix:usecase-specifications}.
+The full set of use case specifications for this module is provided in \voltwo{appendix:usecase-specifications}.
 
 
 
@@ -131,7 +131,7 @@ Students can view completion progress and receive notifications, while Teachers 
     \caption{Detailed Use Case Diagram: Analytics, Reporting and Notifications Module}
     \label{fig:analytics_reporting_usecase}
 \end{figure}
-The full set of use case specifications for this module is provided in Appendix~\ref{appendix:usecase-specifications}.
+The full set of use case specifications for this module is provided in \voltwo{appendix:usecase-specifications}.
 
 % ====================7 Learning Programs and Path Governance Module======================
 \paragraph{Learning Programs and Path Governance Module}
@@ -142,7 +142,7 @@ Faculty Deans and Educational Managers author programmes within their own facult
 
 On the student-facing side a programme version nominates one of its pathways as the default, and enrolment attempts to activate a system-originated attempt on it when the path is eligible and the concurrent-path constraints permit. Otherwise the enrolment remains awaiting selection. A student may then take on further pathways without approval, up to a limit the programme sets, which may exceed neither the pathways it bundles nor an organisation-configurable ceiling. Relinquishing a pathway is governed rather than free: a student may request either a change of pathway or, holding more than one, that a pathway be dropped, in each case with a mandatory written justification. Both kinds share a single open request per enrolment and a single finite switch allowance, which an approval spends and nothing restores. A request is adjudicated by a Faculty Dean who owns the programme and who may not be the subject of it. Approval closes the outgoing attempt with a progress snapshot, opening a replacement attempt for a change and none for a drop; no approval may leave a student with no pathway in progress, that being a withdrawal rather than a pathway decision. Course completions already earned are preserved as immutable awards, so work shared between pathways is never repeated, and the enrolment completes only once every pathway the student holds is itself complete.
 
-\noindent A dedicated rendered use case diagram for this module is not yet included; the programme authoring, conditional default-path activation, pathway selection, and dean-adjudicated change-request workflows are specified textually in Appendix~\ref{appendix:usecase-specifications}.
+\noindent A dedicated rendered use case diagram for this module is not yet included; the programme authoring, conditional default-path activation, pathway selection, and dean-adjudicated change-request workflows are specified textually in \voltwo{appendix:usecase-specifications}.
 
 
 % ====================8 Platform Configuration and Policy Documents Module======================
@@ -154,7 +154,7 @@ Every setting declares its key, grouping, data type, default value, and descript
 
 Policy documents — each classified as legal or academic — hold their content in independently numbered versions, so that the text in force on a given date remains recoverable. The index of published policies and the current text of any published policy are served without requiring authentication, since a prospective user must be able to read the terms before holding an account.
 
-\noindent A dedicated rendered use case diagram for this module is not yet included; runtime-setting precedence, preview, rollback, and policy-document workflows are specified textually in Appendix~\ref{appendix:usecase-specifications}.
+\noindent A dedicated rendered use case diagram for this module is not yet included; runtime-setting precedence, preview, rollback, and policy-document workflows are specified textually in \voltwo{appendix:usecase-specifications}.
 
 
 

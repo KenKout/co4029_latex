@@ -1,6 +1,13 @@
 \section{Use Case Specification}
 \label{appendix:usecase-specifications}
 
+% Specification tables are reference material, not prose: a step down in
+% size and a tighter row stretch cost nothing in legibility and a great
+% deal in printed bulk. Grouped so the size change cannot leak into the
+% appendix that follows.
+\begingroup
+\small
+
 % =========================================================
 % Module 1: Authentication and Access Control
 % =========================================================
@@ -9,7 +16,7 @@
 % =========================================================
 % UC-AUTH-01: Authenticate and Log Out
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Authenticate and Log Out}
 \label{tab:uc_auth_login_logout} \\
@@ -70,7 +77,7 @@ $\bullet$ If the user logs out, the active session is revoked and can no longer 
 % =========================================================
 % UC-AUTH-02: Manage MFA
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Manage Multi-Factor Authentication}
 \label{tab:uc_auth_mfa} \\
@@ -116,7 +123,7 @@ $\bullet$ If the user logs out, the active session is revoked and can no longer 
 % =========================================================
 % UC-AUTH-03: Access Protected Features
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Access Protected Features}
 \label{tab:uc_auth_access_control} \\
@@ -159,7 +166,7 @@ $\bullet$ If the user logs out, the active session is revoked and can no longer 
 % =========================================================
 % UC-AUTH-04: Manage User Account Access
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Manage User Account Access}
 \label{tab:uc_auth_account_access} \\
@@ -210,7 +217,7 @@ $\bullet$ If the user logs out, the active session is revoked and can no longer 
 % =========================================================
 % UC-ORG-01: Manage Tenant Organisations
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Manage Tenant Organisations}
 \label{tab:uc_org_manage_tenants} \\
@@ -253,7 +260,7 @@ $\bullet$ If the user logs out, the active session is revoked and can no longer 
 % =========================================================
 % UC-ORG-02: Manage Users and Memberships
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Manage Users and Memberships}
 \label{tab:uc_org_manage_users} \\
@@ -303,7 +310,7 @@ $\bullet$ If the user logs out, the active session is revoked and can no longer 
 % =========================================================
 % UC-ORG-03: Manage Career Pathways and Teacher Assignments
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Manage Career Pathways and Teacher Assignments}
 \label{tab:uc_org_career_pathway} \\
@@ -348,7 +355,7 @@ $\bullet$ If the user logs out, the active session is revoked and can no longer 
 % =========================================================
 % UC-ORG-04: Organise Faculties and Staff Courses
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Organise Faculties and Staff Courses}
 \label{tab:uc_org_faculty_staffing} \\
@@ -402,7 +409,7 @@ $\bullet$ A revoked assignment is expired rather than deleted, preserving the au
 % =========================================================
 % UC-ORG-05: Manage Course Enrolment and Invitation Codes
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Manage Course Enrolment and Invitation Codes}
 \label{tab:uc_org_enrolment} \\
@@ -459,7 +466,7 @@ $\bullet$ An unenrolment is recorded as a dropped enrolment retaining its histor
 % =========================================================
 % UC-COURSE-01: Manage Course Structure and Lifecycle
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Manage Course Structure and Lifecycle}
 \label{tab:uc_course_structure_lifecycle} \\
@@ -502,7 +509,7 @@ $\bullet$ An unenrolment is recorded as a dropped enrolment retaining its histor
 % =========================================================
 % UC-COURSE-02: Upload and Process Learning Materials
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Upload and Process Learning Materials}
 \label{tab:uc_course_material_upload} \\
@@ -548,7 +555,7 @@ $\bullet$ An unenrolment is recorded as a dropped enrolment retaining its histor
 % =========================================================
 % UC-COURSE-03: Browse Courses and Access Materials
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Browse Courses and Access Materials}
 \label{tab:uc_course_browse_materials} \\
@@ -592,7 +599,7 @@ $\bullet$ An unenrolment is recorded as a dropped enrolment retaining its histor
 % =========================================================
 % UC-COURSE-04: Curate Ingested Content and Reuse a Course
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Curate Ingested Content and Reuse a Course}
 \label{tab:uc_course_curate_clone} \\
@@ -642,7 +649,7 @@ $\bullet$ A cloned course exists as a draft with a unique identifier and carries
 % =========================================================
 % UC-COURSE-05: Participate in a Lesson Discussion
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Participate in a Lesson Discussion}
 \label{tab:uc_course_discussion} \\
@@ -700,7 +707,7 @@ $\bullet$ Prior participants and, for a Student comment, the course managers are
 % =========================================================
 % UC-LEARN-01: Author and Review Quiz Questions
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Author and Review Quiz Questions}
 \label{tab:uc_learn_quiz_authoring} \\
@@ -740,7 +747,7 @@ $\bullet$ Prior participants and, for a Student comment, the course managers are
 % =========================================================
 % UC-LEARN-02: Configure and Take Adaptive Quiz
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Configure and Take Adaptive Quiz}
 \label{tab:uc_learn_take_adaptive_quiz} \\
@@ -787,7 +794,7 @@ $\bullet$ Prior participants and, for a Student comment, the course managers are
 % =========================================================
 % UC-LEARN-03: View Learning Loop Dashboards and Notifications
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: View Learning Loop Dashboards and Notifications}
 \label{tab:uc_learn_dashboard_notifications} \\
@@ -830,7 +837,7 @@ $\bullet$ Prior participants and, for a Student comment, the course managers are
 % =========================================================
 % UC-LEARN-04: Grade Open Responses and Maintain the Gradebook
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Grade Open Responses and Maintain the Gradebook}
 \label{tab:uc_learn_grading} \\
@@ -883,7 +890,7 @@ $\bullet$ A committed regrade updates the affected scores and is recorded for au
 % =========================================================
 % UC-LEARN-05: Administer Assessment Delivery and Integrity
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Administer Assessment Delivery and Integrity}
 \label{tab:uc_learn_delivery} \\
@@ -942,7 +949,7 @@ $\bullet$ A timed attempt is finalised even when the Student never submits it. \
 % =========================================================
 % UC-INTERVIEW-01: Configure Mock Interview
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Configure Mock Interview}
 \label{tab:uc_interview_configure} \\
@@ -986,7 +993,7 @@ $\bullet$ A timed attempt is finalised even when the Student never submits it. \
 % =========================================================
 % UC-INTERVIEW-02: Take Mock Interview
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Take Mock Interview}
 \label{tab:uc_interview_take} \\
@@ -1040,7 +1047,7 @@ $\bullet$ A timed attempt is finalised even when the Student never submits it. \
 % =========================================================
 % UC-INTERVIEW-03: Review Interview Result
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Review Interview Result}
 \label{tab:uc_interview_review_result} \\
@@ -1086,7 +1093,7 @@ $\bullet$ A timed attempt is finalised even when the Student never submits it. \
 % =========================================================
 % UC-INTERVIEW-04: Curate the Interview Question Bank
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Curate the Interview Question Bank}
 \label{tab:uc_interview_bank} \\
@@ -1134,7 +1141,7 @@ $\bullet$ Near-duplicate questions are reported before they enter the bank. \\ \
 % =========================================================
 % UC-INTERVIEW-05: Review the Interview Gap Report
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Review the Interview Gap Report}
 \label{tab:uc_interview_gap} \\
@@ -1185,7 +1192,7 @@ $\bullet$ Teacher notes are recorded against the report. \\ \hline
 % =========================================================
 % UC-ANALYTICS-01: Manage Notifications
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Manage Notifications}
 \label{tab:uc_analytics_notifications} \\
@@ -1223,7 +1230,7 @@ $\bullet$ Teacher notes are recorded against the report. \\ \hline
 % =========================================================
 % UC-ANALYTICS-02: View Progress and Career Readiness Reports
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: View Progress and Career Readiness Reports}
 \label{tab:uc_analytics_reports} \\
@@ -1266,7 +1273,7 @@ $\bullet$ Teacher notes are recorded against the report. \\ \hline
 % =========================================================
 % UC-ANALYTICS-03: Monitor Platform Operations
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Monitor Platform Operations}
 \label{tab:uc_analytics_operations} \\
@@ -1316,7 +1323,7 @@ $\bullet$ Teacher notes are recorded against the report. \\ \hline
 % =========================================================
 % UC-PROGRAM-01: Define and Publish a Learning Programme
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Define and Publish a Learning Programme}
 \label{tab:uc_program_define} \\
@@ -1374,7 +1381,7 @@ $\bullet$ Students already enrolled remain attached to the programme version the
 % =========================================================
 % UC-PROGRAM-02: Enrol Students onto a Learning Programme
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Enrol Students onto a Learning Programme}
 \label{tab:uc_program_enrol} \\
@@ -1428,7 +1435,7 @@ $\bullet$ A withdrawn Student's enrolment records the withdrawal reason and any 
 % =========================================================
 % UC-PROGRAM-03: Hold, Change, and Drop Career Pathways
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Hold, Change, and Drop Career Pathways}
 \label{tab:uc_program_path_change} \\
@@ -1510,7 +1517,7 @@ $\bullet$ Upon rejection the enrolment and the current pathway are unchanged and
 % =========================================================
 % UC-CONFIG-01: Tune Runtime Configuration with Preview and Rollback
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Tune Runtime Configuration with Preview and Rollback}
 \label{tab:uc_config_settings} \\
@@ -1564,7 +1571,7 @@ $\bullet$ The new value takes effect on the next operation that reads the settin
 % =========================================================
 % UC-CONFIG-02: Publish and Read Policy Documents
 % =========================================================
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.7\textwidth}|}
 \caption{Use Case Specification: Publish and Read Policy Documents}
 \label{tab:uc_config_policies} \\
@@ -1609,3 +1616,5 @@ $\bullet$ No record of reader acceptance is created, since reading a policy is a
 \textbf{9b. Policy does not exist or has never been published:} \newline
 \hspace*{1em}1. The system reports that the document is not available. \\
 \end{longtable}
+
+\endgroup

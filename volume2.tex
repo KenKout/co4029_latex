@@ -1,0 +1,126 @@
+% ============================================================================
+%  aBridgeAI --- Volume II: Appendices
+%
+%  A companion volume, not a separate work. It carries the reference
+%  catalogues --- requirements, use cases, API surface, site map, UI
+%  inventory, test cases and audit reports --- that a reader consults rather
+%  than reads, and which together ran to roughly 260 pages inside the main
+%  report.
+%
+%  The preamble deliberately mirrors report.tex so the two volumes set
+%  identically. The one structural difference is `xr`: each volume reads the
+%  other's .aux file, so a cross-reference resolves in both directions and
+%  neither document has to restate the other's content.
+%
+%  BUILD ORDER. The two documents reference each other, so a first build of
+%  either has nothing to resolve against. Build each twice, alternating:
+%      latexmk -pdf volume2 && latexmk -pdf report
+%      latexmk -pdf volume2 && latexmk -pdf report
+%  The second round is what fills in the numbers the first round discovered.
+% ============================================================================
+\documentclass[twoside,final]{hcmut-report}
+\usepackage{codespace}
+\usepackage{xurl}
+
+\usepackage[toc,page]{appendix}
+\renewcommand{\appendixname}{Appendix}
+
+% Encodings
+\usepackage{gensymb,textcomp}
+
+% Better tables
+\usepackage{array,longtable,multicol,multirow,siunitx,tabularx}
+\usepackage{seqsplit}
+
+% Better enum
+\usepackage{enumitem}
+
+% Graphics
+\usepackage{caption,float}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,shapes.geometric,positioning,fit,backgrounds}
+\usepackage[export]{adjustbox}
+
+% References
+\usepackage[nameinlink]{cleveref}
+
+% Resolve \ref{} targets that live in the main report (Volume I).
+\usepackage{xr}
+\externaldocument{report}
+
+% Configurations
+\coursename{CAPSTONE PROJECT}
+\reporttype{REPORT --- VOLUME II: APPENDICES}
+\title{aBridgeAI: An AI-Powered Career Readiness Learning Management System}
+\advisor{& Assoc. Prof. Vo Thi Ngoc Chau, PhD &}
+\stuname{%
+  & Le Thanh Duy & 2352178 \\
+  & Vo Hoang Ngan & 2353373 \\
+  & Nguyen Hoang Nam & 2252502 \\
+}
+
+\AtBeginDocument{\counterwithin{lstlisting}{section}}
+
+\usepackage{titlesec}
+
+% Match Volume I: \paragraph behaves as a heading, not a run-in.
+\titleformat{\paragraph}
+  {\normalfont\normalsize\bfseries}
+  {\theparagraph}
+  {1em}
+  {}
+\titlespacing*{\paragraph}
+  {0pt}
+  {0.5em}
+  {0.5em}
+
+% A reference into the volume the reader is NOT holding. Defined in both
+% masters with the same name and opposite wording, so the appendix files can
+% be shared between volumes without edits.
+\newcommand{\volone}[1]{Section~\ref{#1}~\mbox{(Volume~I)}}
+
+\begin{document}
+\emergencystretch=3em
+\coverpage%
+
+\pagestyle{plain}
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+\section*{About this volume}
+\addcontentsline{toc}{section}{About this volume}
+
+This is the second of two volumes. Volume~I carries the thesis itself --- the
+motivation, the related work, the analysis, the design, the implementation and
+the evaluation --- together with the appendices a reader needs \emph{while}
+reading it: the technology comparisons, the algorithm and process-flow
+specifications, the database design, and the activity, sequence and class
+diagrams.
+
+This volume carries the reference catalogues. They are consulted rather than
+read: the full requirements specifications, every use case, the complete API
+surface, the site map, the user-interface inventory, the test-case
+specifications, and the Lighthouse audit reports. Splitting them out keeps
+Volume~I at a length that can be read end to end, without removing anything
+from the record --- every table that was in the single-volume edition is here,
+unchanged.
+
+Cross-references work in both directions. A reference in Volume~I to an
+appendix here resolves to its letter in this volume, and a reference here to a
+section of Volume~I resolves to that section's number.
+
+\clearpage
+\tableofcontents
+\clearpage
+\listoftables
+\clearpage
+\listoffigures
+
+\clearpage
+\pagestyle{fancy}
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\input{chapters/Appendix/appendix-volume2}
+
+\end{document}

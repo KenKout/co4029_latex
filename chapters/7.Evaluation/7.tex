@@ -9,7 +9,7 @@ This chapter evaluates the aBridgeAI system across four dimensions: frontend use
 
 Frontend quality is assessed with Google Lighthouse (v13, Chrome 153) against the deployed production site, auditing every page under both the mobile and the desktop emulation profiles. Five representative pages are audited: the public Login page and four authenticated learner pages (Student Dashboard, My Courses, Course Detail, and a submitted Quiz Attempt Review). Authenticated pages are audited with a dedicated test account whose long-lived session is minted with the application's own signing key, so every audit exercises the real authenticated rendering path rather than a login redirect.
 
-Table~\ref{tab:lighthouse_results} summarises the per-page scores and the average across pages; the full audit reports, including per-page metric details and final-view screenshots, are reproduced in Appendix~\ref{appendix:lighthouse}.
+Table~\ref{tab:lighthouse_results} summarises the per-page scores and the average across pages; the full audit reports, including per-page metric details and final-view screenshots, are reproduced in \voltwo{appendix:lighthouse}.
 
 \begin{table}[htbp]
 \centering
@@ -132,7 +132,7 @@ C (4wk + PG300) & $4\times$ & 200 & 111.5 & 539\,ms & 5.34\,s & 11.92\,s & 0.00 
 \subsection{Requirements Scope}
 \label{sec:eval_fr_coverage}
 
-This section distinguishes the Functional Requirements Specification (FRS) prepared for the Capstone Project phase from the final Capstone Project FRS. The Capstone Project FRS contains 57 functional requirements (FRs), represented by Modules 1--4 in Appendix~\ref{appendix:fr}. The Capstone Project FRS expands the specification to 106 FRs. Its additional Bonus section contains 49 FRs in Modules 5--8.
+This section distinguishes the Functional Requirements Specification (FRS) prepared for the Capstone Project phase from the final Capstone Project FRS. The Capstone Project FRS contains 57 functional requirements (FRs), represented by Modules 1--4 in \voltwo{appendix:fr}. The Capstone Project FRS expands the specification to 106 FRs. Its additional Bonus section contains 49 FRs in Modules 5--8.
 
 Table~\ref{tab:fr_scope_comparison} compares the two requirements baselines. The increase reflects broader capstone scope.
 
@@ -145,9 +145,9 @@ Table~\ref{tab:fr_scope_comparison} compares the two requirements baselines. The
 \hline
 \textbf{Requirements baseline} & \textbf{FR count} & \textbf{Interpretation} \\
 \hline
-Specialized Project FRS & 57 & Requirements in Modules 1--4 of Appendix~\ref{appendix:fr}. \\
+Specialized Project FRS & 57 & Requirements in Modules 1--4 of \voltwo{appendix:fr}. \\
 \hline
-Bonus & 49 & Additional requirements in Modules 5--8 of Appendix~\ref{appendix:fr}. \\
+Bonus & 49 & Additional requirements in Modules 5--8 of \voltwo{appendix:fr}. \\
 \hline
 Capstone Project FRS & 106 & Full final specification: Specialized Project FRS plus Bonus requirements. \\
 \hline

@@ -27,7 +27,7 @@ The implementation uses \textbf{shadcn/ui} components on top of \textbf{Tailwind
 \subsubsection{Design Tokens}
 % ────────────────────────────────────────────────────────────
 
-Table~\ref{tab:design_tokens_main} consolidates the design tokens that govern the visual system. Full per-rule rationale and the complete spacing, layering, and interaction rules are documented in Appendix~\ref{appendix:uiux}.
+Table~\ref{tab:design_tokens_main} consolidates the design tokens that govern the visual system. Full per-rule rationale and the complete spacing, layering, and interaction rules are documented in \voltwo{appendix:uiux}.
 
 \begin{longtable}{|p{0.22\textwidth}|p{0.30\textwidth}|p{0.36\textwidth}|}
   \caption{Core design tokens.} \label{tab:design_tokens_main} \\
@@ -82,7 +82,7 @@ Table~\ref{tab:design_tokens_main} consolidates the design tokens that govern th
 \subsubsection{Key Screens}
 % ────────────────────────────────────────────────────────────
 
-This subsection sketches the principal screens by role. Per-screen layouts and interaction details are illustrated in Appendix~\ref{appendix:uiux}.
+This subsection sketches the principal screens by role. Per-screen layouts and interaction details are illustrated in \voltwo{appendix:uiux}.
 
 \paragraph{Public surfaces.} The \textbf{Landing Page} (\path|/|) is the marketing entry point; it carries a hero, stats strip, category grid, and featured-courses carousel under a dedicated \path|TopNavBar| that is unique to this route. The \textbf{Login} screen (\path|/login|) offers Google SSO as the single sign-in path; on success, accounts with MFA enabled are routed to \path|/login/mfa| for a TOTP or recovery-code challenge before a session is issued. A \path|next| query parameter preserves deep links across the auth round-trip.
 

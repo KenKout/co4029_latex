@@ -19,62 +19,83 @@ from them.
 The scheduling model governs movement \textit{within} a course. A career pathway is the structure above it: an ordered sequence of stages, each bundling required courses with a set of electives from which the stage asks for a stated number. Progress along a pathway, and the decision that a student has finished one, are therefore computed over stages rather than over cards.
 
 \paragraph{Stage Satisfaction and the Elective Quota}
-Let $\mathcal{S}$ denote the stages of the career-path version the student is pinned to. For a stage $s$, let $R_s$ be its required courses, $O_s$ its electives, and $m_s \in \mathbb{N}_0$ the number of electives the stage requires — its quota. A course $c$ is \textit{satisfied}, written $\sigma(c) = 1$, when the student holds a completion award for it; partial lesson progress does not satisfy a course.
+A course is \textit{satisfied} when the student holds a completion award for
+it. Partial lesson progress does not satisfy a course: a course is either
+awarded or it is not, and progress short of the award counts for nothing at
+this level.
 
-The work a stage credits and the work it demands are then
+Each stage of the pathway version the student is pinned to therefore
+\textit{demands} two things --- all of its required courses, and a stated
+number of its electives, which is the stage's quota. Against that, the stage is
+\textit{credited} with every required course the student has satisfied, plus
+the electives they have satisfied, counted only as far as the quota.
 
-\begin{equation}
-d_s = \left|\left\{ c \in R_s \mid \sigma(c) = 1 \right\}\right|
-     + \min\left(\left|\left\{ c \in O_s \mid \sigma(c) = 1 \right\}\right|,\; m_s\right),
-\qquad
-t_s = \left|R_s\right| + m_s.
-\end{equation}
-
-The $\min$ is the whole of the quota rule: electives satisfied beyond $m_s$ are credited at $m_s$ and no further, so a stage offering five electives and asking for one is finished by the first of them. This is a deliberate departure from treating every attached course as owed. An elective set exists to offer a choice, and a design under which choosing one obliges the student to the other four would make that choice meaningless. Because $d_s \leq t_s$ holds by construction, a stage can never be credited beyond what it demands.
+Stopping the elective count at the quota is the whole of the rule. A stage
+offering five electives and asking for one is finished by the first of them,
+and the remaining four are never owed. This is a deliberate departure from
+treating every attached course as outstanding work: an elective set exists to
+offer a choice, and a design under which choosing one obliged the student to
+the other four would make that choice meaningless. Because the elective count
+is capped at the quota, a stage can never be credited with more than it
+demands.
 
 \paragraph{Pathway Progress}
-Pathway progress aggregates the stages, excluding those that demand nothing:
+Progress along the pathway is the share of demanded work that has been
+credited, totalled across every stage and expressed as a percentage.
 
-\begin{equation}
-P = \frac{\sum_{s \in \mathcal{S},\; t_s > 0} d_s}{\sum_{s \in \mathcal{S},\; t_s > 0} t_s} \times 100.
-\end{equation}
+Stages that demand nothing --- no required courses and a quota of zero --- are
+left out of both halves of that comparison. Such a stage has nothing
+outstanding and nothing to measure; counting it as unmet work would hold a
+finished pathway permanently below one hundred per cent.
 
-A stage with $t_s = 0$ — no required courses and no quota — has nothing outstanding and nothing to measure. Leaving it in the denominator would hold a finished pathway permanently below $100$, so it is excluded from both sums rather than counted as incomplete.
+\paragraph{Deciding That a Pathway Is Finished}
+Whether a student has finished a pathway is decided from the stages
+themselves: the pathway is complete when it has at least one stage and every
+one of those stages has met its demand in full. It is not read off the
+progress percentage.
 
-\paragraph{Completion Is a Predicate}
-Whether a student has finished a pathway is decided from the stages directly,
+Because a stage can never be credited beyond what it demands, the two
+presentations agree exactly --- the percentage reaches one hundred precisely
+when every stage is complete. Keeping them as one rule under two presentations
+is what prevents a pathway reading as finished on screen while the records
+built on completion remain open.
 
-\begin{equation}
-\text{complete} \iff \mathcal{S} \neq \emptyset \;\wedge\; d_s = t_s \quad \forall s \in \mathcal{S},
-\end{equation}
-
-rather than from a presentation metric. Since $d_s \leq t_s$ for every stage,
-the predicate and the aggregate agree exactly: $P = 100$ if and only if every
-stage is complete. The two are one rule under two presentations, which is what
-prevents a pathway reading as finished on screen while the records built on
-completion remain open.
-
-An empty $\mathcal{S}$ is excluded deliberately. A pathway with no stages has not been shown to be finished; it has merely offered nothing to examine, and what completion writes is a durable academic record. Publication requires at least one stage per pathway and at least one course per stage, so the case does not arise for any pathway a student can be enrolled onto.
+The requirement of at least one stage is deliberate. A pathway with no stages
+has not been shown to be finished; it has merely offered nothing to examine,
+and what completion writes is a durable academic record. Publication requires
+at least one stage per pathway and at least one course per stage, so the case
+does not arise for any pathway a student can be enrolled onto.
 
 \paragraph{Stage Unlocking}
-Completion says what a student has finished; unlocking says what they may open. The two are computed from the same evaluation but answer different questions, and a pathway needs both: a stage may be finished without ever having been reachable, and the design turns on recognising that as a coherent state rather than a contradiction.
+Completion says what a student has finished; unlocking says what they may
+open. The two are computed from the same evaluation but answer different
+questions, and a pathway needs both: a stage may be finished without ever
+having been reachable, and the design turns on recognising that as a coherent
+state rather than a contradiction.
 
-Each stage carries an unlock policy. Writing $U(s)$ for "stage $s$ is unlocked", $C(s)$ for "stage $s$ is complete" and $R(s)$ for "every required course of $s$ is satisfied", the rule for the stage at position $i$ is
+Each stage carries an unlock policy, and there are three:
 
-\begin{equation}
-U(s_i) =
-\begin{cases}
-\text{true} & i = 1 \text{ or policy} = \texttt{always},\\
-C(s_{i-1}) \wedge U(s_{i-1}) & \text{policy} = \texttt{after\_previous},\\
-R(s_{i-1}) \wedge U(s_{i-1}) & \text{policy} = \texttt{after\_previous\_required},\\
-\text{false} & \text{otherwise.}
-\end{cases}
-\end{equation}
+\begin{itemize}
+  \item \texttt{always} --- the stage is open regardless of what precedes it.
+  \item \texttt{after\_previous} --- the stage opens once the stage before it
+        is complete, quota included, and was itself unlocked.
+  \item \texttt{after\_previous\_required} --- the stage opens once the
+        required courses of the stage before it are satisfied and that stage
+        was itself unlocked, letting its electives run on unfinished.
+\end{itemize}
 
-The first stage is unconditionally open whatever its stored policy says: a pathway whose opening stage were locked could not be started by anyone. An unrecognised policy resolves to false rather than true, so a malformed rule withholds content instead of releasing it. The distinction between the two gated policies is the elective quota: \texttt{after\_previous} waits for the previous stage to be complete, quota included, while \texttt{after\_previous\_required} releases the next stage once its required work is done and lets the electives run on.
+Two rules sit above the policies. The first stage of a pathway is
+unconditionally open whatever its stored policy says, because a pathway whose
+opening stage were locked could not be started by anyone. And a policy the
+system does not recognise resolves to locked rather than open, so a malformed
+rule withholds content instead of releasing it.
+
+The difference between the two gated policies is exactly the elective quota:
+one waits for the previous stage to be finished outright, the other releases
+the next stage as soon as the previous stage's required work is done.
 
 \paragraph{Why Unlocking Chains}
-The conjunction with $U(s_{i-1})$ is the part that is easy to omit and costly to omit. Satisfaction is a property of a student and a course, with no pathway in it, so a stage's courses can be satisfied by work done somewhere else entirely. Where a programme permits several pathways at once, a second pathway whose course set mirrors one stage of the first will complete that stage in the first the moment it is joined --- correctly, because the work was genuinely done, and it counts toward that pathway and is recorded as permanently earned.
+Requiring the previous stage to have been \emph{unlocked}, and not merely complete, is the part that is easy to leave out and costly to leave out. Satisfaction is a property of a student and a course, with no pathway in it, so a stage's courses can be satisfied by work done somewhere else entirely. Where a programme permits several pathways at once, a second pathway whose course set mirrors one stage of the first will complete that stage in the first the moment it is joined --- correctly, because the work was genuinely done, and it counts toward that pathway and is recorded as permanently earned.
 
 It must not, however, open what follows it. Without the conjunction, a stage the student had never been permitted to enter would serve as the prerequisite pass for the stage after it: a curriculum whose first stage is a hard requirement could be entered at its third stage without the first ever being touched, by taking a second pathway that mirrors the second stage. Requiring the previous stage to have been reachable as well as finished closes that route, and does so without weakening the credit: the mirrored stage remains complete, remains counted, and remains permanently recorded.
 

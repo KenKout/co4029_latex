@@ -1,13 +1,23 @@
 \section{Functional Requirements Specification}
 \label{appendix:fr}
 
+% Specification tables are reference material, not prose: a step down in
+% size and a tighter row stretch cost nothing in legibility and a great
+% deal in printed bulk. The stretch is set here as well as on the
+% individual tables, because not every table in this appendix declares one.
+% Grouped so neither change leaks into the appendix that follows.
+\begingroup
+\small
+\renewcommand{\arraystretch}{1.12}
+
+
 \subsection{Specialized Project FRS}
 This section contains the 57 functional requirements covered by Modules 1--4.
 
 % ============================ Module 1: Authentication & Access Control ====================
 \paragraph{Authentication and Access Control}
 
-\renewcommand{\arraystretch}{1.5}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\centering\arraybackslash}m{0.05\textwidth}|m{0.29\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
 \caption{Functional Requirements for Authentication \& Access Control}
 \label{tab:fr_auth_access} \\
@@ -46,7 +56,7 @@ FR-1.6 & The system shall record auditable events for authentication actions, in
 % ============================ Module 2: Organization & User Management ====================
 \paragraph{Organization and User Management}
 
-\renewcommand{\arraystretch}{1.5}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\centering\arraybackslash}m{0.05\textwidth}|m{0.29\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
 \caption{Functional Requirements for Organization \& User Management}
 \label{tab:fr_org} \\
@@ -103,7 +113,7 @@ FR-2.16 & The system shall allow an IT Administrator or an Educational Manager t
 
 \paragraph{Course and Material Management}
 
-\renewcommand{\arraystretch}{1.5}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\centering\arraybackslash}m{0.05\textwidth}|m{0.29\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
 \caption{Functional Requirements for Course \& Material Management}
 \label{tab:fr_course} \\
@@ -158,7 +168,7 @@ FR-3.15 & The system shall provide per-lesson discussion topics that course mana
 % ============================ Module 4: Learning Loop & Adaptive Quiz ====================
 \paragraph{Learning Loop and Adaptive Quiz}
 
-\renewcommand{\arraystretch}{1.5}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\centering\arraybackslash}m{0.05\textwidth}|m{0.29\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
 \caption{Functional Requirements for Learning Loop \& Adaptive Quiz}
 \label{tab:fr_learning_loop} \\
@@ -227,7 +237,7 @@ This section contains the 49 additional functional requirements covered by Modul
 % ============================ Module 5: Application Loop & Mock Interview ====================
 \paragraph{Application Loop and Mock Interview}
 
-\renewcommand{\arraystretch}{1.5}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\centering\arraybackslash}m{0.05\textwidth}|m{0.29\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
 \caption{Functional Requirements for the Application Loop \& Mock Interview}
 \label{tab:fr_interview} \\
@@ -284,7 +294,7 @@ FR-5.16 & The client shall block the interview workspace while fullscreen is abs
 % ============================ Module 6: Analytics, Reporting & Notifications ====================
 \paragraph{Analytics, Reporting and Notifications}
 
-\renewcommand{\arraystretch}{1.5}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\centering\arraybackslash}m{0.05\textwidth}|m{0.29\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
 \caption{Functional Requirements for Analytics, Reporting \& Notifications}
 \label{tab:fr_analytics} \\
@@ -328,7 +338,7 @@ FR-6.9 & The system shall let each user maintain notification preferences as a m
 % ============================ Module 7: Learning Programs & Path Governance ====================
 \paragraph{Learning Programs and Path Governance}
 
-\renewcommand{\arraystretch}{1.5}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\centering\arraybackslash}m{0.05\textwidth}|m{0.29\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
 \caption{Functional Requirements for Learning Programs \& Path Governance}
 \label{tab:fr_programs} \\
@@ -385,7 +395,7 @@ FR-7.16 & The system shall, upon approving the dropping of a pathway, re-verify 
 % ============================ Module 8: Platform Configuration & Policy Documents ====================
 \paragraph{Platform Configuration and Policy Documents}
 
-\renewcommand{\arraystretch}{1.5}
+\renewcommand{\arraystretch}{1.12}
 \begin{longtable}{|>{\centering\arraybackslash}m{0.05\textwidth}|m{0.29\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.13\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|>{\centering\arraybackslash}m{0.08\textwidth}|}
 \caption{Functional Requirements for Platform Configuration \& Policy Documents}
 \label{tab:fr_config} \\
@@ -421,3 +431,5 @@ FR-8.7 & The system shall maintain policy documents, each classified as legal or
 
 FR-8.8 & The system shall serve the index of published policies and the current text of any published policy without requiring authentication, shall substitute the English version when the requested language is unavailable, and shall allow administrators to restrict a policy's audience to selected roles or leave it public. & All Users, IT Administrators & UR-ITA-05 & Yes & Yes & Low \\
 \end{longtable}
+
+\endgroup

@@ -31,6 +31,13 @@
 % Use \Cref{} instead of \ref{}
 \usepackage[nameinlink]{cleveref}
 
+% Resolve \ref{} targets that live in Volume II (the appendix volume). The
+% two documents read each other's .aux files, so a reference crosses the
+% volume boundary without either document restating the other's content.
+% Build each volume twice, alternating, so both sets of numbers settle.
+\usepackage{xr}
+\externaldocument{volume2}
+
 % FOR DEMONSTRATION PURPOSES, REMOVE IN PRODUCTION
 \usepackage{mwe}
 
@@ -112,6 +119,12 @@
   \end{figure}%
 }
 % ---------------------------------------------------------------------------
+
+
+% A reference into the volume the reader is NOT holding. Defined in both
+% masters under the same name with opposite wording, so the chapter files
+% can be shared between volumes without edits.
+\newcommand{\voltwo}[1]{Appendix~\ref{#1}~\mbox{(Volume~II)}}
 
 \begin{document}
 \emergencystretch=3em
